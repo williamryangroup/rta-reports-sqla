@@ -1,0 +1,30 @@
+USE [RTA_SQLA]
+GO
+
+/****** Object:  Table [dbo].[SQLA_EmpJobTypes]    Script Date: 02/20/2016 19:42:04 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+SET ANSI_PADDING ON
+GO
+
+-- CREATE INITIAL TABLE IF IT DOES NOT EXIST
+IF NOT EXISTS (select * from dbo.sysobjects where id = object_id(N'[dbo].[SQLA_EmpJobTypes]') and OBJECTPROPERTY(id, N'IsTable') = 1)
+	CREATE TABLE [dbo].[SQLA_EmpJobTypes](
+		[JobType] [nvarchar](20) NOT NULL,
+	 CONSTRAINT [PK_SQLA_EmpJobTypes] PRIMARY KEY CLUSTERED 
+	(
+		[JobType] ASC
+	)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+	) ON [PRIMARY]
+GO
+
+-- TABLE UPDATES
+
+
+SET ANSI_PADDING OFF
+GO
+

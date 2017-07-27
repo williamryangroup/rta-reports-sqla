@@ -1,0 +1,11 @@
+select RspSecs = DATEDIFF(second,tOut,isnull(tInitialResponse,tAuthorize)), *
+  from EVENT1
+ where tOut >= '4/1/2016 03:00:00'
+   and tOut <  '4/4/2016 03:00:00'
+   and CustTierLevel in ('DIA','SEV')
+   and DATEDIFF(second,tOut,isnull(tInitialResponse,tAuthorize)) > 120
+ order by PktNum
+
+EXEC [dbo].[sp_RTSS_FloorActivity_Current]
+     @StartDt = N'3/29/2016 17:15:00',
+     @EndDt = N'3/29/2016 17:22:00'
