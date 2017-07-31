@@ -130,6 +130,23 @@
         </Field>
       </Fields>
     </DataSet>
+    <DataSet Name="ZonesAreNumericQ">
+      <Query>
+        <DataSourceName>RTSS</DataSourceName>
+        <CommandText>select top 1 Setting from (
+select Setting = ltrim(rtrim(Setting)) from SYSTEMSETTINGS where ConfigSection = 'RTSSWS' and ConfigParam = 'ZonesAreNumeric'
+ union
+select Setting = 0) as t
+order by Setting desc</CommandText>
+        <rd:UseGenericDesigner>true</rd:UseGenericDesigner>
+      </Query>
+      <Fields>
+        <Field Name="Setting">
+          <DataField>Setting</DataField>
+          <rd:TypeName>System.Int32</rd:TypeName>
+        </Field>
+      </Fields>
+    </DataSet>
   </DataSets>
   <ReportSections>
     <ReportSection>
@@ -1954,7 +1971,7 @@
                       </Group>
                       <SortExpressions>
                         <SortExpression>
-                          <Value>=iif(isnumeric(Fields!ToArea.Value)=true,CInt(Fields!ToArea.Value),Fields!ToArea.Value)</Value>
+                          <Value>=iif(Parameters!ZonesAreNumeric.Value=1,CInt(iif(Parameters!ZonesAreNumeric.Value=1,Fields!ToArea.Value,0)),Fields!ToArea.Value)</Value>
                         </SortExpression>
                       </SortExpressions>
                       <TablixHeader>
@@ -2003,7 +2020,7 @@
                           </Group>
                           <SortExpressions>
                             <SortExpression>
-                              <Value>=iif(isnumeric(Fields!FromArea.Value)=true,CInt(Fields!FromArea.Value),Fields!FromArea.Value)</Value>
+                              <Value>=iif(Parameters!ZonesAreNumeric.Value=1,CInt(iif(Parameters!ZonesAreNumeric.Value=1,Fields!FromArea.Value,0)),Fields!FromArea.Value)</Value>
                             </SortExpression>
                           </SortExpressions>
                           <TablixHeader>
@@ -2041,7 +2058,6 @@
                                   <PaddingBottom>2pt</PaddingBottom>
                                 </Style>
                               </Textbox>
-                              <rd:Selected>true</rd:Selected>
                             </CellContents>
                           </TablixHeader>
                           <TablixMembers>
@@ -2486,6 +2502,26 @@
           </ParameterValue>
         </ParameterValues>
       </ValidValues>
+    </ReportParameter>
+    <ReportParameter Name="ZonesAreNumeric">
+      <DataType>Integer</DataType>
+      <Nullable>true</Nullable>
+      <DefaultValue>
+        <DataSetReference>
+          <DataSetName>ZonesAreNumericQ</DataSetName>
+          <ValueField>Setting</ValueField>
+        </DataSetReference>
+      </DefaultValue>
+      <Prompt>ZonesAreNumeric</Prompt>
+      <Hidden>true</Hidden>
+      <ValidValues>
+        <DataSetReference>
+          <DataSetName>ZonesAreNumericQ</DataSetName>
+          <ValueField>Setting</ValueField>
+          <LabelField>Setting</LabelField>
+        </DataSetReference>
+      </ValidValues>
+      <UsedInQuery>True</UsedInQuery>
     </ReportParameter>
   </ReportParameters>
   <rd:ReportUnitType>Inch</rd:ReportUnitType>
