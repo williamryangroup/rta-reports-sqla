@@ -7,6 +7,11 @@
       <rd:SecurityType>None</rd:SecurityType>
       <rd:DataSourceID>ed45922d-27e5-487c-8552-1524ec984945</rd:DataSourceID>
     </DataSource>
+    <DataSource Name="RTSS">
+      <DataSourceReference>/ANI/Data Sources/RTSS</DataSourceReference>
+      <rd:SecurityType>None</rd:SecurityType>
+      <rd:DataSourceID>04fdb866-df5d-417b-af57-f8e499bc92d0</rd:DataSourceID>
+    </DataSource>
   </DataSources>
   <DataSets>
     <DataSet Name="RTA_Ameristar_DailyRpt">

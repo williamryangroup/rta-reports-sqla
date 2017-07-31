@@ -3,15 +3,20 @@
   <AutoRefresh>0</AutoRefresh>
   <DataSources>
     <DataSource Name="RTSS">
-      <DataSourceReference>/ANI/Data Sources/RTA_SQLA</DataSourceReference>
+      <DataSourceReference>/ANI/Data Sources/RTSS</DataSourceReference>
       <rd:SecurityType>None</rd:SecurityType>
       <rd:DataSourceID>299cf1b6-e317-42e8-9a6f-0f4be63b2936</rd:DataSourceID>
+    </DataSource>
+    <DataSource Name="RTA_SQLA">
+      <DataSourceReference>/ANI/Data Sources/RTA_SQLA</DataSourceReference>
+      <rd:SecurityType>None</rd:SecurityType>
+      <rd:DataSourceID>acd3a15d-ed7c-4cb4-b4fd-24b2116e0ee1</rd:DataSourceID>
     </DataSource>
   </DataSources>
   <DataSets>
     <DataSet Name="RTA_SupReview">
       <Query>
-        <DataSourceName>RTSS</DataSourceName>
+        <DataSourceName>RTA_SQLA</DataSourceName>
         <QueryParameters>
           <QueryParameter Name="@StartDt">
             <Value>=Parameters!StartDt.Value</Value>
@@ -61,7 +66,7 @@
     </DataSet>
     <DataSet Name="RTA_CustTiers">
       <Query>
-        <DataSourceName>RTSS</DataSourceName>
+        <DataSourceName>RTA_SQLA</DataSourceName>
         <CommandType>StoredProcedure</CommandType>
         <CommandText>sp_SSRS_Rpt_RTA_CustTiers</CommandText>
       </Query>
@@ -74,7 +79,7 @@
     </DataSet>
     <DataSet Name="RTA_CustTiers_Top2Desc">
       <Query>
-        <DataSourceName>RTSS</DataSourceName>
+        <DataSourceName>RTA_SQLA</DataSourceName>
         <CommandText>select Top2Desc = 
        (select top 1 TierLevel from (select top 2 TierLevel, PriorityLevel from SQLA_CustTiers order by PriorityLevel desc ) as t
          order by PriorityLevel)

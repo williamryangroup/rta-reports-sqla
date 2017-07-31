@@ -7,6 +7,11 @@
       <rd:SecurityType>None</rd:SecurityType>
       <rd:DataSourceID>5cdd4340-aee1-4916-80e2-49fa900d9960</rd:DataSourceID>
     </DataSource>
+    <DataSource Name="RTSS">
+      <DataSourceReference>/ANI/Data Sources/RTSS</DataSourceReference>
+      <rd:SecurityType>None</rd:SecurityType>
+      <rd:DataSourceID>11b24368-7b33-40a1-b7bc-b5c1bb6e17cb</rd:DataSourceID>
+    </DataSource>
   </DataSources>
   <DataSets>
     <DataSet Name="RTA_EventDistanceDetail">

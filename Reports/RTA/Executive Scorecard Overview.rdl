@@ -7,11 +7,16 @@
       <rd:SecurityType>None</rd:SecurityType>
       <rd:DataSourceID>d43a667e-dad9-4816-ad3e-3fbdf17eafb0</rd:DataSourceID>
     </DataSource>
+    <DataSource Name="RTA_SQLA">
+      <DataSourceReference>/ANI/Data Sources/RTA_SQLA</DataSourceReference>
+      <rd:SecurityType>None</rd:SecurityType>
+      <rd:DataSourceID>0ea797c8-f453-4e67-b246-4289e0040ffd</rd:DataSourceID>
+    </DataSource>
   </DataSources>
   <DataSets>
     <DataSet Name="RTA_EventDetails_ExecSum_Rsp">
       <Query>
-        <DataSourceName>RTSS</DataSourceName>
+        <DataSourceName>RTA_SQLA</DataSourceName>
         <QueryParameters>
           <QueryParameter Name="@StartDt">
             <Value>=Parameters!StartDt.Value</Value>
@@ -93,7 +98,7 @@
     </DataSet>
     <DataSet Name="RTA_EventTypes">
       <Query>
-        <DataSourceName>RTSS</DataSourceName>
+        <DataSourceName>RTA_SQLA</DataSourceName>
         <CommandType>StoredProcedure</CommandType>
         <CommandText>sp_SSRS_Rpt_RTA_EventTypes</CommandText>
       </Query>
@@ -106,7 +111,7 @@
     </DataSet>
     <DataSet Name="RTA_ZoneArea">
       <Query>
-        <DataSourceName>RTSS</DataSourceName>
+        <DataSourceName>RTA_SQLA</DataSourceName>
         <CommandType>StoredProcedure</CommandType>
         <CommandText>sp_SSRS_Rpt_RTA_ZoneArea</CommandText>
       </Query>
@@ -119,7 +124,7 @@
     </DataSet>
     <DataSet Name="RTA_CustTiers">
       <Query>
-        <DataSourceName>RTSS</DataSourceName>
+        <DataSourceName>RTA_SQLA</DataSourceName>
         <CommandType>StoredProcedure</CommandType>
         <CommandText>sp_SSRS_Rpt_RTA_CustTiers</CommandText>
       </Query>
@@ -132,7 +137,7 @@
     </DataSet>
     <DataSet Name="RTA_EventDetails_ExecSum_Emp">
       <Query>
-        <DataSourceName>RTSS</DataSourceName>
+        <DataSourceName>RTA_SQLA</DataSourceName>
         <QueryParameters>
           <QueryParameter Name="@StartDt">
             <Value>=Parameters!StartDt.Value</Value>
@@ -191,7 +196,7 @@
     </DataSet>
     <DataSet Name="RTA_EventDetails_ExecSum_Cmp">
       <Query>
-        <DataSourceName>RTSS</DataSourceName>
+        <DataSourceName>RTA_SQLA</DataSourceName>
         <QueryParameters>
           <QueryParameter Name="@StartDt">
             <Value>=Parameters!StartDt.Value</Value>
@@ -287,7 +292,7 @@
     </DataSet>
     <DataSet Name="RTA_EmpJobTypes">
       <Query>
-        <DataSourceName>RTSS</DataSourceName>
+        <DataSourceName>RTA_SQLA</DataSourceName>
         <QueryParameters>
           <QueryParameter Name="@IncludeAll">
             <Value>1</Value>

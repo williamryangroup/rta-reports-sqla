@@ -7,6 +7,11 @@
       <rd:SecurityType>Integrated</rd:SecurityType>
       <rd:DataSourceID>c9279d99-387f-4a42-a5a5-e0145fa6f788</rd:DataSourceID>
     </DataSource>
+    <DataSource Name="RTSS">
+      <DataSourceReference>/ANI/Data Sources/RTSS</DataSourceReference>
+      <rd:SecurityType>None</rd:SecurityType>
+      <rd:DataSourceID>2bd91481-1f0b-44fd-88c0-2a2e1501540c</rd:DataSourceID>
+    </DataSource>
   </DataSources>
   <DataSets>
     <DataSet Name="RTA_EventDetails">

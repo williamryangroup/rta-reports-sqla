@@ -3,15 +3,20 @@
   <AutoRefresh>0</AutoRefresh>
   <DataSources>
     <DataSource Name="RTSS">
-      <DataSourceReference>/ANI/Data Sources/RTA_SQLA</DataSourceReference>
+      <DataSourceReference>/ANI/Data Sources/RTSS</DataSourceReference>
       <rd:SecurityType>None</rd:SecurityType>
       <rd:DataSourceID>d143ad89-ee11-4f00-bdf0-fb012fda3051</rd:DataSourceID>
+    </DataSource>
+    <DataSource Name="RTA_SQLA">
+      <DataSourceReference>/ANI/Data Sources/RTA_SQLA</DataSourceReference>
+      <rd:SecurityType>None</rd:SecurityType>
+      <rd:DataSourceID>e2a072f2-26bb-4aab-9181-b98968cb9e78</rd:DataSourceID>
     </DataSource>
   </DataSources>
   <DataSets>
     <DataSet Name="RTA_MEAL">
       <Query>
-        <DataSourceName>RTSS</DataSourceName>
+        <DataSourceName>RTA_SQLA</DataSourceName>
         <QueryParameters>
           <QueryParameter Name="@StartDt">
             <Value>=Parameters!StartDt.Value</Value>
@@ -177,7 +182,7 @@
     </DataSet>
     <DataSet Name="RTA_Locations">
       <Query>
-        <DataSourceName>RTSS</DataSourceName>
+        <DataSourceName>RTA_SQLA</DataSourceName>
         <CommandType>StoredProcedure</CommandType>
         <CommandText>sp_SSRS_Rpt_RTA_Locations</CommandText>
       </Query>

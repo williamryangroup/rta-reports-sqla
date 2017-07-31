@@ -7,6 +7,11 @@
       <rd:SecurityType>None</rd:SecurityType>
       <rd:DataSourceID>155da5dd-2259-4b04-8085-60bb768105f7</rd:DataSourceID>
     </DataSource>
+    <DataSource Name="RTSS">
+      <DataSourceReference>/ANI/Data Sources/RTSS</DataSourceReference>
+      <rd:SecurityType>None</rd:SecurityType>
+      <rd:DataSourceID>5d836c24-3bb8-4af2-b5bb-312d19d7e0be</rd:DataSourceID>
+    </DataSource>
   </DataSources>
   <DataSets>
     <DataSet Name="RTA_PaperOut">
