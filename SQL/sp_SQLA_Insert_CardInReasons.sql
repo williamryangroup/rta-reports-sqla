@@ -46,7 +46,7 @@ BEGIN
 	   and r2.Dept = 'TECH'
 	 where r2.EventDisplay is null
 	 
-	 
+	/*
 	-- COMPLETE REASONS
 	insert into SQLA_CardInReasons (Dept, EventDisplay, EventDescription)	
 	select Dept = 'SLOT', EventDisplay = s1.ConfigParam, EventDescription = s1.Setting
@@ -77,7 +77,7 @@ BEGIN
 	    on s1.ConfigParam = s2.EventDisplay
 	 where s1.ConfigSection = 'CompleteReason_ST' and s2.Dept = 'TECH'
 	   and s1.Setting <> s2.EventDescription
-	   
+	*/
 END
 
 GO

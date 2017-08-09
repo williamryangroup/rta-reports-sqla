@@ -48,8 +48,8 @@ BEGIN
 		   ml.PktNumWitness4, ml.PktNumSourceWitness4, ml.EmpNumWitness4, ml.EmpNameWitness4, ml.EmpLicNumWitness4, ml.tWitness4,
 		   EventComment = isnull(es.EventComment,et.EventComment),
 		   ml.Asset,
-		   CardInEvtDisp = isnull(isnull(isnull(crs.EventDisplay,crt.EventDisplay),es.ResolutionDesc),et.ResolutionDesc),
-		   CardInEvtDesc = isnull(isnull(isnull(crs.EventDescription,crt.EventDescription),es.ResolutionDesc),et.ResolutionDesc),
+		   CardInEvtDisp = isnull(isnull(isnull(isnull(isnull(crs.EventDisplay,crt.EventDisplay),rds.CmpReasonNum),rdt.CmpReasonNum),es.ResolutionDesc),et.ResolutionDesc),
+		   CardInEvtDesc = isnull(isnull(isnull(isnull(isnull(crs.EventDescription,crt.EventDescription),rds.CompleteReason),rdt.CompleteReason),es.ResolutionDesc),et.ResolutionDesc),
 		   Source = case when ml.PktCbMsg = 'RTA Offline' then 'RTA Offline'
 		                 when es.PktNum is not null then 'SLOT'
 						 when et.PktNum is not null then 'TECH'
@@ -65,6 +65,10 @@ BEGIN
 	    on es.ResolutionDesc = crs.EventDisplay
 	  left join RTSS.dbo.CARDIN_REASON_ST as crt
 	    on et.ResolutionDesc = crt.EventDisplay
+	  left join (select CmpReasonNum = row_number() over(order by ConfigSection, ConfigParam)-1, CompleteReason = Setting from RTSS.dbo.SYSTEMSETTINGS where ConfigSection = 'CompleteReason') as rds
+	    on rds.CmpReasonNum = es.ResolutionDesc
+	  left join (select CmpReasonNum = row_number() over(order by ConfigSection, ConfigParam)-1, CompleteReason = Setting from RTSS.dbo.SYSTEMSETTINGS where ConfigSection = 'CompleteReason_ST') as rdt
+	    on rdt.CmpReasonNum = et.ResolutionDesc
 	 where not exists (select null from SQLA_MEAL as sm WITH (NOLOCK) where sm.PktNum = ml.PktNum)
 	   and (ml.tOut is not NULL and isdate(ml.tOut) = 1 and ml.tOut > '1/2/1980')
 	   and (ml.PktCbMsg = 'RTA Offline' or es.PktNum is not null or et.PktNum is not null)
