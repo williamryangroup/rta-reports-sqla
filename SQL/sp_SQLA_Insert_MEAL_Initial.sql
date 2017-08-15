@@ -68,9 +68,9 @@ BEGIN
 	    on es.ResolutionDesc = crs.EventDisplay
 	  left join RTSS.dbo.CARDIN_REASON_ST as crt
 	    on et.ResolutionDesc = crt.EventDisplay
-	  left join (select CmpReasonNum = row_number() over(order by ConfigSection, ConfigParam)-1, CompleteReason = Setting from RTSS.dbo.SYSTEMSETTINGS where ConfigSection = 'CompleteReason') as rds
+	  left join (select CmpReasonNum = cast(row_number() over(order by ConfigSection, ConfigParam)-1 as nvarchar), CompleteReason = Setting from RTSS.dbo.SYSTEMSETTINGS where ConfigSection = 'CompleteReason') as rds
 	    on rds.CmpReasonNum = es.ResolutionDesc
-	  left join (select CmpReasonNum = row_number() over(order by ConfigSection, ConfigParam)-1, CompleteReason = Setting from RTSS.dbo.SYSTEMSETTINGS where ConfigSection = 'CompleteReason_ST') as rdt
+	  left join (select CmpReasonNum = cast(row_number() over(order by ConfigSection, ConfigParam)-1 as nvarchar), CompleteReason = Setting from RTSS.dbo.SYSTEMSETTINGS where ConfigSection = 'CompleteReason_ST') as rdt
 	    on rdt.CmpReasonNum = et.ResolutionDesc
 	 where (@StartDt = null or ml.tOut >= @StartDt) and (ml.tOut is not NULL and isdate(ml.tOut) = 1 and ml.tOut > '1/2/1980')
 	   and (ml.PktCbMsg = 'RTA Offline' or es.PktNum is not null or et.PktNum is not null)
