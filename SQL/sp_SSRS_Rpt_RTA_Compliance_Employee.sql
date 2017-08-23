@@ -35,6 +35,8 @@ BEGIN
 	-- interfering with SELECT statements.
 	SET NOCOUNT ON;	
 	
+	DECLARE @UseAssetField char(1) = isnull((select case when Setting = 'Asset' then '1' else '0' end from RTSS.dbo.SYSTEMSETTINGS WITH (NOLOCK) where ConfigSection = 'RTSSHH' and ConfigParam = 'EventLocationOrAssetFieldName'),'0')
+	
 	DECLARE @StartDt1 datetime = @StartDt
 	DECLARE @EndDt1 datetime = @EndDt
 	DECLARE @EmpJobType1 varchar(2000) = @EmpJobType
@@ -121,7 +123,8 @@ BEGIN
            RspTmSec = RspTmSec, 
            OverallTmSec = OverallTmSec,
            AsnOther = isnull((select distinct 1 from SQLA_EmployeeCompliance as c2 where c2.PktNum = c.PktNum and c2.EmpNum <> c.EmpNum and c2.tAsnMin < c.tRspMin),0),
-		   s.ShiftName, ShiftOrder = s.ShiftColumn, CustTier, d.tOutHour, EvtDay = cast(c.tOut as date)
+		   s.ShiftName, ShiftOrder = s.ShiftColumn, CustTier, d.tOutHour, EvtDay = cast(c.tOut as date),
+	       MEALbkEntries = 0, MEALbkSignatures = 0
       FROM SQLA_EmployeeCompliance as c
 	 INNER JOIN SQLA_EventDetails as d
 	    ON d.PktNum = c.PktNum
@@ -141,7 +144,8 @@ BEGIN
     SELECT EmpNum, EmpNameFirst = e.NameFirst, EmpNameLast = e.NameLast, EmpJobType = e.JobType, j.PktNum, j.EventDisplay, d.Location,
            Asn = 0, Acp = 0, Rsp = 1, Cmp = 1, CmpMobile = 0, RejMan = 0, RejAuto = 0, RspRTA = 0, RspCard = 0, RspRTAandCard = 0, 
            RspTmSec = 0, OverallTmSec = DATEDIFF(second,j.tOut,j.tComplete), AsnOther = 0,
-		   s.ShiftName, ShiftOrder = s.ShiftColumn, CustTier = '', d.tOutHour, EvtDay = cast(d.tOut as date)
+		   s.ShiftName, ShiftOrder = s.ShiftColumn, CustTier = '', d.tOutHour, EvtDay = cast(d.tOut as date),
+	       MEALbkEntries = 0, MEALbkSignatures = 0
 	  FROM SQLA_EventDetails_JPVER as j
 	 INNER JOIN SQLA_EventDetails as d
 	    ON d.PktNum = j.PktNum
@@ -150,11 +154,113 @@ BEGIN
 	  LEFT JOIN SQLA_ShiftHours as s
 	    ON s.StartHour = d.tOutHour
 	 WHERE j.tOut >= @StartDt1 and j.tOut < @EndDt1
-	   and (JobType in (select JobType from #RTA_Compliance_JobTypes) or @EmpJobType1 is null or @EmpJobType1 = '')
+	   and (JobType in (select JobType from #RTA_Compliance_JobTypes) or @EmpJobType1 is null or @EmpJobType1 = '' or @EmpJobType1 = 'All')
 	   and (j.EventDisplay in (select EventType from #RTA_Compliance_EventTypes) or @EventType1 is null or @EventType1 = '')
 	   and @AsnRspOnly1 <> 1
 	   and Source = 'OOS'
        and (d.Zone in (select ZoneArea from #RTA_Compliance_ZoneAreas) or @ZoneArea is null or @ZoneArea = '' or @ZoneArea like '00%')
+	 union all
+
+	-- MEAL book entries
+    SELECT EmpNum = emp.CardNum, EmpNameFirst = emp.NameFirst, EmpNameLast = emp.NameLast, EmpJobType = emp.JobType, 
+	       PktNum = ml.ParentEventID, evt.EventDisplay, Location = case when @UseAssetField = 1 then ml.Asset else ml.Location end,
+           Asn = 0, Acp = 0, Rsp = 0, Cmp = 0, CmpMobile = 0, RejMan = 0, RejAuto = 0, RspRTA = 0, RspCard = 0, RspRTAandCard = 0, RspTmSec = 0, OverallTmSec = 0, AsnOther = 0,
+		   s.ShiftName, ShiftOrder = s.ShiftColumn, CustTier = evt.CustTierLevel, tOutHour = datepart(hour,ml.tOut), EvtDay = cast(ml.tOut as date),
+	       MEALbkEntries = 1, MEALbkSignatures = 0
+	  FROM SQLA_MEAL as ml
+	 inner join SQLA_Employees as emp
+	    on emp.CardNum = ml.EmpNum
+	  left join SQLA_EventDetails as evt
+		on evt.PktNum = ml.ParentEventID
+	  left join SQLA_ShiftHours as s
+	    ON s.StartHour = datepart(hour,ml.tOut)
+	 WHERE ml.tOut >= @StartDt1 and ml.tOut < @EndDt1
+	   and (emp.JobType in (select JobType from #RTA_Compliance_JobTypes) or @EmpJobType1 is null or @EmpJobType1 = '' or @EmpJobType1 = 'All')
+	   and (evt.EventDisplay is null or evt.EventDisplay in (select EventType from #RTA_Compliance_EventTypes) or @EventType1 is null or @EventType1 = '')
+       and (ml.Zone in (select ZoneArea from #RTA_Compliance_ZoneAreas) or @ZoneArea is null or @ZoneArea = '' or @ZoneArea like '00%')
+	   and (    (evt.CustTierLevel in (select CustTier from #RTA_Compliance_CustTiers))
+	         or ((evt.CustTierLevel = '' or evt.CustTierLevel is null) and 'NUL' in (select CustTier from #RTA_Compliance_CustTiers))
+	         or (@CustTier is null or @CustTier = ''))
+	 union all
+    SELECT EmpNum = emp.CardNum, EmpNameFirst = emp.NameFirst, EmpNameLast = emp.NameLast, EmpJobType = emp.JobType, 
+	       PktNum = ml.ParentEventID, evt.EventDisplay, Location = case when @UseAssetField = 1 then ml.Asset else ml.Location end,
+           Asn = 0, Acp = 0, Rsp = 0, Cmp = 0, CmpMobile = 0, RejMan = 0, RejAuto = 0, RspRTA = 0, RspCard = 0, RspRTAandCard = 0, RspTmSec = 0, OverallTmSec = 0, AsnOther = 0,
+		   s.ShiftName, ShiftOrder = s.ShiftColumn, CustTier = evt.CustTierLevel, tOutHour = datepart(hour,ml.tOut), EvtDay = cast(ml.tOut as date),
+	       MEALbkEntries = 0, MEALbkSignatures = 1
+	  FROM SQLA_MEAL as ml
+	 inner join SQLA_Employees as emp
+	    on emp.CardNum = ml.EmpNumWitness1
+	  left join SQLA_EventDetails as evt
+		on evt.PktNum = ml.ParentEventID
+	  left join SQLA_ShiftHours as s
+	    ON s.StartHour = datepart(hour,ml.tOut)
+	 WHERE ml.tOut >= @StartDt1 and ml.tOut < @EndDt1
+	   and (emp.JobType in (select JobType from #RTA_Compliance_JobTypes) or @EmpJobType1 is null or @EmpJobType1 = '' or @EmpJobType1 = 'All')
+	   and (evt.EventDisplay is null or evt.EventDisplay in (select EventType from #RTA_Compliance_EventTypes) or @EventType1 is null or @EventType1 = '')
+       and (ml.Zone in (select ZoneArea from #RTA_Compliance_ZoneAreas) or @ZoneArea is null or @ZoneArea = '' or @ZoneArea like '00%')
+	   and (    (evt.CustTierLevel in (select CustTier from #RTA_Compliance_CustTiers))
+	         or ((evt.CustTierLevel = '' or evt.CustTierLevel is null) and 'NUL' in (select CustTier from #RTA_Compliance_CustTiers))
+	         or (@CustTier is null or @CustTier = ''))
+	 union all
+    SELECT EmpNum = emp.CardNum, EmpNameFirst = emp.NameFirst, EmpNameLast = emp.NameLast, EmpJobType = emp.JobType, 
+	       PktNum = ml.ParentEventID, evt.EventDisplay, Location = case when @UseAssetField = 1 then ml.Asset else ml.Location end,
+           Asn = 0, Acp = 0, Rsp = 0, Cmp = 0, CmpMobile = 0, RejMan = 0, RejAuto = 0, RspRTA = 0, RspCard = 0, RspRTAandCard = 0, RspTmSec = 0, OverallTmSec = 0, AsnOther = 0,
+		   s.ShiftName, ShiftOrder = s.ShiftColumn, CustTier = evt.CustTierLevel, tOutHour = datepart(hour,ml.tOut), EvtDay = cast(ml.tOut as date),
+	       MEALbkEntries = 0, MEALbkSignatures = 1
+	  FROM SQLA_MEAL as ml
+	 inner join SQLA_Employees as emp
+	    on emp.CardNum = ml.EmpNumWitness2
+	  left join SQLA_EventDetails as evt
+		on evt.PktNum = ml.ParentEventID
+	  left join SQLA_ShiftHours as s
+	    ON s.StartHour = datepart(hour,ml.tOut)
+	 WHERE ml.tOut >= @StartDt1 and ml.tOut < @EndDt1
+	   and (emp.JobType in (select JobType from #RTA_Compliance_JobTypes) or @EmpJobType1 is null or @EmpJobType1 = '' or @EmpJobType1 = 'All')
+	   and (evt.EventDisplay is null or evt.EventDisplay in (select EventType from #RTA_Compliance_EventTypes) or @EventType1 is null or @EventType1 = '')
+       and (ml.Zone in (select ZoneArea from #RTA_Compliance_ZoneAreas) or @ZoneArea is null or @ZoneArea = '' or @ZoneArea like '00%')
+	   and (    (evt.CustTierLevel in (select CustTier from #RTA_Compliance_CustTiers))
+	         or ((evt.CustTierLevel = '' or evt.CustTierLevel is null) and 'NUL' in (select CustTier from #RTA_Compliance_CustTiers))
+	         or (@CustTier is null or @CustTier = ''))
+	 union all
+    SELECT EmpNum = emp.CardNum, EmpNameFirst = emp.NameFirst, EmpNameLast = emp.NameLast, EmpJobType = emp.JobType, 
+	       PktNum = ml.ParentEventID, evt.EventDisplay, Location = case when @UseAssetField = 1 then ml.Asset else ml.Location end,
+           Asn = 0, Acp = 0, Rsp = 0, Cmp = 0, CmpMobile = 0, RejMan = 0, RejAuto = 0, RspRTA = 0, RspCard = 0, RspRTAandCard = 0, RspTmSec = 0, OverallTmSec = 0, AsnOther = 0,
+		   s.ShiftName, ShiftOrder = s.ShiftColumn, CustTier = evt.CustTierLevel, tOutHour = datepart(hour,ml.tOut), EvtDay = cast(ml.tOut as date),
+	       MEALbkEntries = 0, MEALbkSignatures = 1
+	  FROM SQLA_MEAL as ml
+	 inner join SQLA_Employees as emp
+	    on emp.CardNum = ml.EmpNumWitness3
+	  left join SQLA_EventDetails as evt
+		on evt.PktNum = ml.ParentEventID
+	  left join SQLA_ShiftHours as s
+	    ON s.StartHour = datepart(hour,ml.tOut)
+	 WHERE ml.tOut >= @StartDt1 and ml.tOut < @EndDt1
+	   and (emp.JobType in (select JobType from #RTA_Compliance_JobTypes) or @EmpJobType1 is null or @EmpJobType1 = '' or @EmpJobType1 = 'All')
+	   and (evt.EventDisplay is null or evt.EventDisplay in (select EventType from #RTA_Compliance_EventTypes) or @EventType1 is null or @EventType1 = '')
+       and (ml.Zone in (select ZoneArea from #RTA_Compliance_ZoneAreas) or @ZoneArea is null or @ZoneArea = '' or @ZoneArea like '00%')
+	   and (    (evt.CustTierLevel in (select CustTier from #RTA_Compliance_CustTiers))
+	         or ((evt.CustTierLevel = '' or evt.CustTierLevel is null) and 'NUL' in (select CustTier from #RTA_Compliance_CustTiers))
+	         or (@CustTier is null or @CustTier = ''))
+	 union all
+    SELECT EmpNum = emp.CardNum, EmpNameFirst = emp.NameFirst, EmpNameLast = emp.NameLast, EmpJobType = emp.JobType, 
+	       PktNum = ml.ParentEventID, evt.EventDisplay, Location = case when @UseAssetField = 1 then ml.Asset else ml.Location end,
+           Asn = 0, Acp = 0, Rsp = 0, Cmp = 0, CmpMobile = 0, RejMan = 0, RejAuto = 0, RspRTA = 0, RspCard = 0, RspRTAandCard = 0, RspTmSec = 0, OverallTmSec = 0, AsnOther = 0,
+		   s.ShiftName, ShiftOrder = s.ShiftColumn, CustTier = evt.CustTierLevel, tOutHour = datepart(hour,ml.tOut), EvtDay = cast(ml.tOut as date),
+	       MEALbkEntries = 0, MEALbkSignatures = 1
+	  FROM SQLA_MEAL as ml
+	 inner join SQLA_Employees as emp
+	    on emp.CardNum = ml.EmpNumWitness4
+	  left join SQLA_EventDetails as evt
+		on evt.PktNum = ml.ParentEventID
+	  left join SQLA_ShiftHours as s
+	    ON s.StartHour = datepart(hour,ml.tOut)
+	 WHERE ml.tOut >= @StartDt1 and ml.tOut < @EndDt1
+	   and (emp.JobType in (select JobType from #RTA_Compliance_JobTypes) or @EmpJobType1 is null or @EmpJobType1 = '' or @EmpJobType1 = 'All')
+	   and (evt.EventDisplay is null or evt.EventDisplay in (select EventType from #RTA_Compliance_EventTypes) or @EventType1 is null or @EventType1 = '')
+       and (ml.Zone in (select ZoneArea from #RTA_Compliance_ZoneAreas) or @ZoneArea is null or @ZoneArea = '' or @ZoneArea like '00%')
+	   and (    (evt.CustTierLevel in (select CustTier from #RTA_Compliance_CustTiers))
+	         or ((evt.CustTierLevel = '' or evt.CustTierLevel is null) and 'NUL' in (select CustTier from #RTA_Compliance_CustTiers))
+	         or (@CustTier is null or @CustTier = ''))
 END
 
 GO

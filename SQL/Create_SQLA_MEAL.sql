@@ -67,6 +67,9 @@ GO
 --4/6/2017
 ALTER TABLE [dbo].[SQLA_MEAL] ALTER COLUMN [Source] [nvarchar](11) NULL
 GO
+--8/16/2017
+ALTER TABLE [dbo].[SQLA_MEAL] ADD [tComplete] [datetime] NULL
+GO
 
 
 SET ANSI_PADDING OFF

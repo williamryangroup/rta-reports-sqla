@@ -61,6 +61,7 @@ BEGIN
 	DECLARE @ActivityType1 int = @ActivityType
 		
 	DECLARE @ServerIP varchar(15) = isnull((select ltrim(rtrim(Setting)) from RTSS.dbo.SYSTEMSETTINGS WITH (NOLOCK) where ConfigSection = 'RTSSHH' and ConfigParam = 'WSSIP'),'0.0.0.0')
+	DECLARE @UseAssetField char(1) = isnull((select case when Setting = 'Asset' then '1' else '0' end from RTSS.dbo.SYSTEMSETTINGS WITH (NOLOCK) where ConfigSection = 'RTSSHH' and ConfigParam = 'EventLocationOrAssetFieldName'),'0')
 	
 	
 	-- CREATE TABLE OF ZoneAreas
@@ -467,6 +468,216 @@ BEGIN
 		END
 	END	
 	
+	
+	-- MEAL BOOK transactions
+	IF (@ActivityType1 = 0 or @ActivityType1 = 12)
+	BEGIN
+	
+		-- DOOR OPEN
+		insert into #RTA_FloorActivity_Tmp (Time, State, Activity, Location, PktNum, Tier, EmpNum, EmpName, JobType, Source, LastArea, AsnArea, ActivityTypeID, LastLocation, EmpStatusM, EmpStatusJ)
+		select Time = m.tOut,
+			   State = 'Door Open',
+			   Activity = isnull(e.EventDisplay,m.EntryReason),
+			   Location = case when @UseAssetField = 1 then m.Asset else m.Location end,
+			   PktNum = m.ParentEventID,
+			   Tier = isnull(e.CustTierLevel,'NUL'),
+			   EmpNum = m.EmpNum,
+			   EmpName = m.EmpName,
+			   JobType = p.JobType,
+			   Source = m.Source,
+			   LastArea = '',
+			   AsnArea = '',
+			   ActivityTypeID = 12,
+			   LastLocation = '',
+			   EmpStatusM = 0,
+			   EmpStatusJ = 0
+		  from SQLA_MEAL as m
+		  left join SQLA_EventDetails as e
+			on e.PktNum = m.ParentEventID
+		   and (    (e.SourceTable = 'EVENT1' and m.Source = 'SLOT')
+				 or (e.SourceTable = 'EVENT1_ST' and m.Source = 'TECH')
+				 or (m.Source not in ('SLOT','TECH')) )
+		  left join SQLA_Employees as p
+			on p.CardNum = m.EmpNum
+		 where m.tOut is not null
+		   and (@EmpNum1 = '' or @EmpNum1 = m.EmpNum)
+		   and (    (@ActivityType1 = 12 and (@PktNum1 = 0 or @PktNum1 = m.ParentEventID))
+		         or (     @ActivityType1 <> 12
+		              and exists
+			            ( select null from #RTA_FloorActivity_Tmp as a
+			               where a.PktNum = m.ParentEventID ) ) )
+
+		-- DOOR CLOSE
+		insert into #RTA_FloorActivity_Tmp (Time, State, Activity, Location, PktNum, Tier, EmpNum, EmpName, JobType, Source, LastArea, AsnArea, ActivityTypeID, LastLocation, EmpStatusM, EmpStatusJ)
+		select Time = m.tComplete,
+			   State = 'Door Close',
+			   Activity = isnull(e.EventDisplay,m.EntryReason),
+			   Location = case when @UseAssetField = 1 then m.Asset else m.Location end,
+			   PktNum = m.ParentEventID,
+			   Tier = isnull(e.CustTierLevel,'NUL'),
+			   EmpNum = m.EmpNum,
+			   EmpName = m.EmpName,
+			   JobType = p.JobType,
+			   Source = m.Source,
+			   LastArea = '',
+			   AsnArea = '',
+			   ActivityTypeID = 12,
+			   LastLocation = '',
+			   EmpStatusM = 0,
+			   EmpStatusJ = 0
+		  from SQLA_MEAL as m
+		  left join SQLA_EventDetails as e
+			on e.PktNum = m.ParentEventID
+		   and (    (e.SourceTable = 'EVENT1' and m.Source = 'SLOT')
+				 or (e.SourceTable = 'EVENT1_ST' and m.Source = 'TECH')
+				 or (m.Source not in ('SLOT','TECH')) )
+		  left join SQLA_Employees as p
+			on p.CardNum = m.EmpNum
+		 where m.tComplete is not null
+		   and (@EmpNum1 = '' or @EmpNum1 = m.EmpNum)
+		   and (    (@ActivityType1 = 12 and (@PktNum1 = 0 or @PktNum1 = m.ParentEventID))
+		         or (     @ActivityType1 <> 12
+		              and exists
+			            ( select null from #RTA_FloorActivity_Tmp as a
+			               where a.PktNum = m.ParentEventID ) ) )
+
+		-- WITNESS SIGNATURE 1
+		insert into #RTA_FloorActivity_Tmp (Time, State, Activity, Location, PktNum, Tier, EmpNum, EmpName, JobType, Source, LastArea, AsnArea, ActivityTypeID, LastLocation, EmpStatusM, EmpStatusJ)
+		select Time = m.tWitness1,
+			   State = 'Witness Signature',
+			   Activity = isnull(e.EventDisplay,m.EntryReason),
+			   Location = case when @UseAssetField = 1 then m.Asset else m.Location end,
+			   PktNum = m.ParentEventID,
+			   Tier = isnull(e.CustTierLevel,'NUL'),
+			   EmpNum = m.EmpNumWitness1,
+			   EmpName = m.EmpNameWitness1,
+			   JobType = p.JobType,
+			   Source = m.Source,
+			   LastArea = '',
+			   AsnArea = '',
+			   ActivityTypeID = 12,
+			   LastLocation = '',
+			   EmpStatusM = 0,
+			   EmpStatusJ = 0
+		  from SQLA_MEAL as m
+		  left join SQLA_EventDetails as e
+			on e.PktNum = m.ParentEventID
+		   and (    (e.SourceTable = 'EVENT1' and m.Source = 'SLOT')
+				 or (e.SourceTable = 'EVENT1_ST' and m.Source = 'TECH')
+				 or (m.Source not in ('SLOT','TECH')) )
+		  left join SQLA_Employees as p
+			on p.CardNum = m.EmpNumWitness1
+		 where m.tWitness1 is not null
+		   and (@EmpNum1 = '' or @EmpNum1 = m.EmpNumWitness1)
+		   and (    (@ActivityType1 = 12 and (@PktNum1 = 0 or @PktNum1 = m.ParentEventID))
+		         or (     @ActivityType1 <> 12
+		              and exists
+			            ( select null from #RTA_FloorActivity_Tmp as a
+			               where a.PktNum = m.ParentEventID ) ) )
+
+		-- WITNESS SIGNATURE 2
+		insert into #RTA_FloorActivity_Tmp (Time, State, Activity, Location, PktNum, Tier, EmpNum, EmpName, JobType, Source, LastArea, AsnArea, ActivityTypeID, LastLocation, EmpStatusM, EmpStatusJ)
+		select Time = m.tWitness2,
+			   State = 'Witness Signature',
+			   Activity = isnull(e.EventDisplay,m.EntryReason),
+			   Location = case when @UseAssetField = 1 then m.Asset else m.Location end,
+			   PktNum = m.ParentEventID,
+			   Tier = isnull(e.CustTierLevel,'NUL'),
+			   EmpNum = m.EmpNumWitness2,
+			   EmpName = m.EmpNameWitness2,
+			   JobType = p.JobType,
+			   Source = m.Source,
+			   LastArea = '',
+			   AsnArea = '',
+			   ActivityTypeID = 12,
+			   LastLocation = '',
+			   EmpStatusM = 0,
+			   EmpStatusJ = 0
+		  from SQLA_MEAL as m
+		  left join SQLA_EventDetails as e
+			on e.PktNum = m.ParentEventID
+		   and (    (e.SourceTable = 'EVENT1' and m.Source = 'SLOT')
+				 or (e.SourceTable = 'EVENT1_ST' and m.Source = 'TECH')
+				 or (m.Source not in ('SLOT','TECH')) )
+		  left join SQLA_Employees as p
+			on p.CardNum = m.EmpNumWitness2
+		 where m.tWitness2 is not null
+		   and (@EmpNum1 = '' or @EmpNum1 = m.EmpNumWitness2)
+		   and (    (@ActivityType1 = 12 and (@PktNum1 = 0 or @PktNum1 = m.ParentEventID))
+		         or (     @ActivityType1 <> 12
+		              and exists
+			            ( select null from #RTA_FloorActivity_Tmp as a
+			               where a.PktNum = m.ParentEventID ) ) )
+
+		-- WITNESS SIGNATURE 3
+		insert into #RTA_FloorActivity_Tmp (Time, State, Activity, Location, PktNum, Tier, EmpNum, EmpName, JobType, Source, LastArea, AsnArea, ActivityTypeID, LastLocation, EmpStatusM, EmpStatusJ)
+		select Time = m.tWitness3,
+			   State = 'Witness Signature',
+			   Activity = isnull(e.EventDisplay,m.EntryReason),
+			   Location = case when @UseAssetField = 1 then m.Asset else m.Location end,
+			   PktNum = m.ParentEventID,
+			   Tier = isnull(e.CustTierLevel,'NUL'),
+			   EmpNum = m.EmpNumWitness3,
+			   EmpName = m.EmpNameWitness3,
+			   JobType = p.JobType,
+			   Source = m.Source,
+			   LastArea = '',
+			   AsnArea = '',
+			   ActivityTypeID = 12,
+			   LastLocation = '',
+			   EmpStatusM = 0,
+			   EmpStatusJ = 0
+		  from SQLA_MEAL as m
+		  left join SQLA_EventDetails as e
+			on e.PktNum = m.ParentEventID
+		   and (    (e.SourceTable = 'EVENT1' and m.Source = 'SLOT')
+				 or (e.SourceTable = 'EVENT1_ST' and m.Source = 'TECH')
+				 or (m.Source not in ('SLOT','TECH')) )
+		  left join SQLA_Employees as p
+			on p.CardNum = m.EmpNumWitness3
+		 where m.tWitness3 is not null
+		   and (@EmpNum1 = '' or @EmpNum1 = m.EmpNumWitness3)
+		   and (    (@ActivityType1 = 12 and (@PktNum1 = 0 or @PktNum1 = m.ParentEventID))
+		         or (     @ActivityType1 <> 12
+		              and exists
+			            ( select null from #RTA_FloorActivity_Tmp as a
+			               where a.PktNum = m.ParentEventID ) ) )
+
+		-- WITNESS SIGNATURE 4
+		insert into #RTA_FloorActivity_Tmp (Time, State, Activity, Location, PktNum, Tier, EmpNum, EmpName, JobType, Source, LastArea, AsnArea, ActivityTypeID, LastLocation, EmpStatusM, EmpStatusJ)
+		select Time = m.tWitness4,
+			   State = 'Witness Signature',
+			   Activity = isnull(e.EventDisplay,m.EntryReason),
+			   Location = case when @UseAssetField = 1 then m.Asset else m.Location end,
+			   PktNum = m.ParentEventID,
+			   Tier = isnull(e.CustTierLevel,'NUL'),
+			   EmpNum = m.EmpNumWitness4,
+			   EmpName = m.EmpNameWitness4,
+			   JobType = p.JobType,
+			   Source = m.Source,
+			   LastArea = '',
+			   AsnArea = '',
+			   ActivityTypeID = 12,
+			   LastLocation = '',
+			   EmpStatusM = 0,
+			   EmpStatusJ = 0
+		  from SQLA_MEAL as m
+		  left join SQLA_EventDetails as e
+			on e.PktNum = m.ParentEventID
+		   and (    (e.SourceTable = 'EVENT1' and m.Source = 'SLOT')
+				 or (e.SourceTable = 'EVENT1_ST' and m.Source = 'TECH')
+				 or (m.Source not in ('SLOT','TECH')) )
+		  left join SQLA_Employees as p
+			on p.CardNum = m.EmpNumWitness4
+		 where m.tWitness4 is not null
+		   and (@EmpNum1 = '' or @EmpNum1 = m.EmpNumWitness4)
+		   and (    (@ActivityType1 = 12 and (@PktNum1 = 0 or @PktNum1 = m.ParentEventID))
+		         or (     @ActivityType1 <> 12
+		              and exists
+			            ( select null from #RTA_FloorActivity_Tmp as a
+			               where a.PktNum = m.ParentEventID ) ) )
+	
+	END
 	
 	
 	IF (@RspVar <> '' and @RspVar <> 'All')

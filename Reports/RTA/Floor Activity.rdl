@@ -1768,6 +1768,10 @@
             <Value>11</Value>
             <Label>Rejects - Auto</Label>
           </ParameterValue>
+          <ParameterValue>
+            <Value>12</Value>
+            <Label>MEAL Book</Label>
+          </ParameterValue>
         </ParameterValues>
       </ValidValues>
     </ReportParameter>

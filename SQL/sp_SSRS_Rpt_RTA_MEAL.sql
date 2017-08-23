@@ -37,7 +37,7 @@ BEGIN
 		   PktNumWitness2, PktNumSourceWitness2, EmpNumWitness2, EmpNameWitness2, EmpLicNumWitness2, tWitness2,
 		   PktNumWitness3, PktNumSourceWitness3, EmpNumWitness3, EmpNameWitness3, EmpLicNumWitness3, tWitness3,
 		   PktNumWitness4, PktNumSourceWitness4, EmpNumWitness4, EmpNameWitness4, EmpLicNumWitness4, tWitness4,
-		   EventComment, Asset, EventDescription = isnull(r.EventDescription,m.EventDescription)
+		   EventComment, Asset, EventDescription = isnull(r.EventDescription,m.CardInEvtDesc)
 	  FROM SQLA_MEAL as m
 	  left join SQLA_CardInReasons as r
 	    on r.Dept = m.Source

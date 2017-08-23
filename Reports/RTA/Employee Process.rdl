@@ -167,6 +167,10 @@
           <DataField>AsnOther</DataField>
           <rd:UserDefined>true</rd:UserDefined>
         </Field>
+        <Field Name="ShiftName">
+          <DataField>ShiftName</DataField>
+          <rd:UserDefined>true</rd:UserDefined>
+        </Field>
         <Field Name="AsnRsp">
           <Value>=iif(Fields!Asn.Value&gt;0 and Fields!Rsp.Value&gt;0,1,0)</Value>
         </Field>
@@ -196,6 +200,30 @@
         </Field>
         <Field Name="OOSTmSec">
           <Value>=iif(Fields!EventDisplay.Value = "OOS" or Fields!EventDisplay.Value = "10 6",Fields!OverallTmSec.Value,0)</Value>
+        </Field>
+        <Field Name="ShiftOrder">
+          <DataField>ShiftOrder</DataField>
+          <rd:UserDefined>true</rd:UserDefined>
+        </Field>
+        <Field Name="CustTier">
+          <DataField>CustTier</DataField>
+          <rd:UserDefined>true</rd:UserDefined>
+        </Field>
+        <Field Name="tOutHour">
+          <DataField>tOutHour</DataField>
+          <rd:UserDefined>true</rd:UserDefined>
+        </Field>
+        <Field Name="EvtDay">
+          <DataField>EvtDay</DataField>
+          <rd:UserDefined>true</rd:UserDefined>
+        </Field>
+        <Field Name="MEALbkEntries">
+          <DataField>MEALbkEntries</DataField>
+          <rd:UserDefined>true</rd:UserDefined>
+        </Field>
+        <Field Name="MEALbkSignatures">
+          <DataField>MEALbkSignatures</DataField>
+          <rd:UserDefined>true</rd:UserDefined>
         </Field>
       </Fields>
     </DataSet>
@@ -257,6 +285,22 @@
         </Field>
       </Fields>
     </DataSet>
+    <DataSet Name="RTA_MealBookMode">
+      <Query>
+        <DataSourceName>RTSS</DataSourceName>
+        <CommandText>select top 1 Setting from (
+select Setting = ltrim(rtrim(Setting)) from SYSTEMSETTINGS where ConfigSection = 'SYSTEM' and ConfigParam = 'MealBookMode'
+ union
+select Setting = 0) as t
+order by Setting desc</CommandText>
+      </Query>
+      <Fields>
+        <Field Name="Setting">
+          <DataField>Setting</DataField>
+          <rd:UserDefined>true</rd:UserDefined>
+        </Field>
+      </Fields>
+    </DataSet>
   </DataSets>
   <ReportSections>
     <ReportSection>
@@ -308,7 +352,7 @@
                   <Width>0.6in</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>1.31in</Width>
+                  <Width>1.3in</Width>
                 </TablixColumn>
                 <TablixColumn>
                   <Width>0.6in</Width>
@@ -320,10 +364,16 @@
                   <Width>0.5in</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>0.8in</Width>
+                  <Width>0.9in</Width>
                 </TablixColumn>
                 <TablixColumn>
                   <Width>0.5in</Width>
+                </TablixColumn>
+                <TablixColumn>
+                  <Width>0.7in</Width>
+                </TablixColumn>
+                <TablixColumn>
+                  <Width>0.7in</Width>
                 </TablixColumn>
                 <TablixColumn>
                   <Width>0.1in</Width>
@@ -1207,6 +1257,82 @@
                           </Paragraphs>
                           <rd:DefaultName>Textbox89</rd:DefaultName>
                           <ToolTip># events completed by employee</ToolTip>
+                          <Style>
+                            <Border>
+                              <Color>#7292cc</Color>
+                              <Style>Solid</Style>
+                            </Border>
+                            <BackgroundColor>#4c68a2</BackgroundColor>
+                            <PaddingLeft>2pt</PaddingLeft>
+                            <PaddingRight>2pt</PaddingRight>
+                            <PaddingTop>2pt</PaddingTop>
+                            <PaddingBottom>2pt</PaddingBottom>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                    <TablixCell>
+                      <CellContents>
+                        <Textbox Name="Textbox57">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value>ML Ent</Value>
+                                  <Style>
+                                    <FontFamily>Tahoma</FontFamily>
+                                    <FontSize>11pt</FontSize>
+                                    <FontWeight>Bold</FontWeight>
+                                    <Color>White</Color>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style>
+                                <TextAlign>Center</TextAlign>
+                              </Style>
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>Textbox57</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Color>#7292cc</Color>
+                              <Style>Solid</Style>
+                            </Border>
+                            <BackgroundColor>#4c68a2</BackgroundColor>
+                            <PaddingLeft>2pt</PaddingLeft>
+                            <PaddingRight>2pt</PaddingRight>
+                            <PaddingTop>2pt</PaddingTop>
+                            <PaddingBottom>2pt</PaddingBottom>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                    <TablixCell>
+                      <CellContents>
+                        <Textbox Name="Textbox47">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value>ML Sig</Value>
+                                  <Style>
+                                    <FontFamily>Tahoma</FontFamily>
+                                    <FontSize>11pt</FontSize>
+                                    <FontWeight>Bold</FontWeight>
+                                    <Color>White</Color>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style>
+                                <TextAlign>Center</TextAlign>
+                              </Style>
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>Textbox47</rd:DefaultName>
                           <Style>
                             <Border>
                               <Color>#7292cc</Color>
@@ -2433,6 +2559,76 @@
                     </TablixCell>
                     <TablixCell>
                       <CellContents>
+                        <Textbox Name="MEALbkEntries">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value>=sum(Fields!MEALbkEntries.Value)</Value>
+                                  <Style>
+                                    <FontFamily>Tahoma</FontFamily>
+                                    <Color>#4d4d4d</Color>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style>
+                                <TextAlign>Center</TextAlign>
+                              </Style>
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>MEALbkEntries</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Color>#e5e5e5</Color>
+                              <Style>Solid</Style>
+                            </Border>
+                            <PaddingLeft>2pt</PaddingLeft>
+                            <PaddingRight>2pt</PaddingRight>
+                            <PaddingTop>2pt</PaddingTop>
+                            <PaddingBottom>2pt</PaddingBottom>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                    <TablixCell>
+                      <CellContents>
+                        <Textbox Name="MEALbkSignatures">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value>=sum(Fields!MEALbkSignatures.Value)</Value>
+                                  <Style>
+                                    <FontFamily>Tahoma</FontFamily>
+                                    <Color>#4d4d4d</Color>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style>
+                                <TextAlign>Center</TextAlign>
+                              </Style>
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>MEALbkSignatures</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Color>#e5e5e5</Color>
+                              <Style>Solid</Style>
+                            </Border>
+                            <PaddingLeft>2pt</PaddingLeft>
+                            <PaddingRight>2pt</PaddingRight>
+                            <PaddingTop>2pt</PaddingTop>
+                            <PaddingBottom>2pt</PaddingBottom>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                    <TablixCell>
+                      <CellContents>
                         <Textbox Name="Textbox27">
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
@@ -3523,6 +3719,7 @@
                             <PaddingBottom>2pt</PaddingBottom>
                           </Style>
                         </Textbox>
+                        <rd:Selected>true</rd:Selected>
                       </CellContents>
                     </TablixCell>
                     <TablixCell>
@@ -3584,6 +3781,78 @@
                             </Paragraph>
                           </Paragraphs>
                           <rd:DefaultName>Textbox67</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Color>#c6daf8</Color>
+                              <Style>Solid</Style>
+                            </Border>
+                            <BackgroundColor>#9eb6e4</BackgroundColor>
+                            <PaddingLeft>2pt</PaddingLeft>
+                            <PaddingRight>2pt</PaddingRight>
+                            <PaddingTop>2pt</PaddingTop>
+                            <PaddingBottom>2pt</PaddingBottom>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                    <TablixCell>
+                      <CellContents>
+                        <Textbox Name="MEALbkEntries1">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value>=sum(Fields!MEALbkEntries.Value)</Value>
+                                  <Style>
+                                    <FontFamily>Tahoma</FontFamily>
+                                    <Color>#4d4d4d</Color>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style>
+                                <TextAlign>Center</TextAlign>
+                              </Style>
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>MEALbkEntries1</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Color>#c6daf8</Color>
+                              <Style>Solid</Style>
+                            </Border>
+                            <BackgroundColor>#9eb6e4</BackgroundColor>
+                            <PaddingLeft>2pt</PaddingLeft>
+                            <PaddingRight>2pt</PaddingRight>
+                            <PaddingTop>2pt</PaddingTop>
+                            <PaddingBottom>2pt</PaddingBottom>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                    <TablixCell>
+                      <CellContents>
+                        <Textbox Name="MEALbkSignatures1">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value>=sum(Fields!MEALbkSignatures.Value)</Value>
+                                  <Style>
+                                    <FontFamily>Tahoma</FontFamily>
+                                    <Color>#4d4d4d</Color>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style>
+                                <TextAlign>Center</TextAlign>
+                              </Style>
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>MEALbkSignatures1</rd:DefaultName>
                           <Style>
                             <Border>
                               <Color>#c6daf8</Color>
@@ -4059,6 +4328,16 @@
                 <TablixMember />
                 <TablixMember>
                   <Visibility>
+                    <Hidden>=iif(Parameters!MealBookMode.Value=1,false,true)</Hidden>
+                  </Visibility>
+                </TablixMember>
+                <TablixMember>
+                  <Visibility>
+                    <Hidden>=iif(Parameters!MealBookMode.Value=1,false,true)</Hidden>
+                  </Visibility>
+                </TablixMember>
+                <TablixMember>
+                  <Visibility>
                     <Hidden>=iif(Parameters!DistAvg.Value=1,TRUE,FALSE)</Hidden>
                   </Visibility>
                 </TablixMember>
@@ -4297,7 +4576,7 @@
             <DataSetName>RTA_Compliance_Employee</DataSetName>
             <Top>1.35833in</Top>
             <Height>0.75in</Height>
-            <Width>26.81in</Width>
+            <Width>28.3in</Width>
             <Style>
               <Border>
                 <Style>None</Style>
@@ -4339,7 +4618,7 @@
           <Line Name="Line3">
             <Top>0.45in</Top>
             <Height>0in</Height>
-            <Width>17.08in</Width>
+            <Width>17.01in</Width>
             <ZIndex>2</ZIndex>
             <Style>
               <Border>
@@ -4450,7 +4729,7 @@
             <Top>0.5in</Top>
             <Left>5.89584in</Left>
             <Height>0.25in</Height>
-            <Width>11.21416in</Width>
+            <Width>11.11416in</Width>
             <ZIndex>5</ZIndex>
             <Style>
               <Border>
@@ -4485,7 +4764,7 @@
             <rd:DefaultName>Textbox8</rd:DefaultName>
             <Top>0.78888in</Top>
             <Height>0.25in</Height>
-            <Width>17.11in</Width>
+            <Width>17.01in</Width>
             <ZIndex>6</ZIndex>
             <Style>
               <Border>
@@ -4657,7 +4936,7 @@
           </Border>
         </Style>
       </Body>
-      <Width>26.81in</Width>
+      <Width>28.33646in</Width>
       <Page>
         <PageFooter>
           <Height>0.45in</Height>
@@ -4902,6 +5181,24 @@
         </DataSetReference>
       </ValidValues>
       <MultiValue>true</MultiValue>
+    </ReportParameter>
+    <ReportParameter Name="MealBookMode">
+      <DataType>Integer</DataType>
+      <DefaultValue>
+        <DataSetReference>
+          <DataSetName>RTA_MealBookMode</DataSetName>
+          <ValueField>Setting</ValueField>
+        </DataSetReference>
+      </DefaultValue>
+      <Prompt>MealBookMode</Prompt>
+      <Hidden>true</Hidden>
+      <ValidValues>
+        <DataSetReference>
+          <DataSetName>RTA_MealBookMode</DataSetName>
+          <ValueField>Setting</ValueField>
+          <LabelField>Setting</LabelField>
+        </DataSetReference>
+      </ValidValues>
     </ReportParameter>
   </ReportParameters>
   <rd:ReportUnitType>Inch</rd:ReportUnitType>

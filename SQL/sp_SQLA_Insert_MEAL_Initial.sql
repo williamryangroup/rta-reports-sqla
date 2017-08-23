@@ -34,7 +34,7 @@ BEGIN
 	
 	truncate table SQLA_MEAL
 	
-	insert into SQLA_MEAL (PktNum, Location, Zone, EmpNum, EmpName, EmpLicNum, tOut, EntryReason, ParentEventID, PktNumWitness1, PktNumSourceWitness1, EmpNumWitness1, EmpNameWitness1, EmpLicNumWitness1, tWitness1, PktNumWitness2, PktNumSourceWitness2, EmpNumWitness2, EmpNameWitness2, EmpLicNumWitness2, tWitness2, PktNumWitness3, PktNumSourceWitness3, EmpNumWitness3, EmpNameWitness3, EmpLicNumWitness3, tWitness3, PktNumWitness4, PktNumSourceWitness4, EmpNumWitness4, EmpNameWitness4, EmpLicNumWitness4, tWitness4, EventComment, Asset, CardInEvtDisp, CardInEvtDesc, Source)
+	insert into SQLA_MEAL (PktNum, Location, Zone, EmpNum, EmpName, EmpLicNum, tOut, EntryReason, ParentEventID, PktNumWitness1, PktNumSourceWitness1, EmpNumWitness1, EmpNameWitness1, EmpLicNumWitness1, tWitness1, PktNumWitness2, PktNumSourceWitness2, EmpNumWitness2, EmpNameWitness2, EmpLicNumWitness2, tWitness2, PktNumWitness3, PktNumSourceWitness3, EmpNumWitness3, EmpNameWitness3, EmpLicNumWitness3, tWitness3, PktNumWitness4, PktNumSourceWitness4, EmpNumWitness4, EmpNameWitness4, EmpLicNumWitness4, tWitness4, EventComment, Asset, CardInEvtDisp, CardInEvtDesc, Source, tComplete)
 	select ml.PktNum, ml.Location, ml.Zone,
 	       EmpNum = case when ml.EmpNum is null or ml.EmpNum = '' then ISNULL(es.EmpNumComplete,et.EmpNumComplete) else ml.EmpNum end,
 		   EmpName = case when ml.EmpName is null or ml.EmpName = '' then ISNULL(es.EmpNameComplete,et.EmpNameComplete) else ml.EmpName end,
@@ -56,24 +56,25 @@ BEGIN
 		   Source = case when ml.PktCbMsg = 'RTA Offline' then 'RTA Offline'
 		                 when es.PktNum is not null then 'SLOT'
 						 when et.PktNum is not null then 'TECH'
-						 else '' end
-	  from RTSS.dbo.EVENT1_ML as ml
-	  left join RTSS.dbo.EVENT1 as es
+						 else '' end,
+		   ml.tComplete
+	  from RTSS.dbo.EVENT1_ML as ml with (nolock)
+	  left join RTSS.dbo.EVENT1 as es with (nolock)
 	    on (es.PktNum = ml.ParentEventID or (ml.ParentEventID = 0 and es.PktNum = ml.PktNumEvent))
 	   and es.Location = ml.Location
-	  left join RTSS.dbo.EVENT1_ST as et
+	  left join RTSS.dbo.EVENT1_ST as et with (nolock)
 	    on (et.PktNum = ml.ParentEventID or (ml.ParentEventID = 0 and et.PktNum = ml.PktNumEvent))
 	   and et.Location = ml.Location
-	  left join RTSS.dbo.CARDIN_REASON as crs
+	  left join RTSS.dbo.CARDIN_REASON as crs with (nolock)
 	    on es.ResolutionDesc = crs.EventDisplay
-	  left join RTSS.dbo.CARDIN_REASON_ST as crt
+	  left join RTSS.dbo.CARDIN_REASON_ST as crt with (nolock)
 	    on et.ResolutionDesc = crt.EventDisplay
-	  left join (select CmpReasonNum = cast(row_number() over(order by ConfigSection, ConfigParam)-1 as nvarchar), CompleteReason = Setting from RTSS.dbo.SYSTEMSETTINGS where ConfigSection = 'CompleteReason') as rds
+	  left join (select CmpReasonNum = cast(row_number() over(order by ConfigSection, ConfigParam)-1 as nvarchar), CompleteReason = Setting from RTSS.dbo.SYSTEMSETTINGS with (nolock) where ConfigSection = 'CompleteReason') as rds
 	    on rds.CmpReasonNum = es.ResolutionDesc
-	  left join (select CmpReasonNum = cast(row_number() over(order by ConfigSection, ConfigParam)-1 as nvarchar), CompleteReason = Setting from RTSS.dbo.SYSTEMSETTINGS where ConfigSection = 'CompleteReason_ST') as rdt
+	  left join (select CmpReasonNum = cast(row_number() over(order by ConfigSection, ConfigParam)-1 as nvarchar), CompleteReason = Setting from RTSS.dbo.SYSTEMSETTINGS with (nolock) where ConfigSection = 'CompleteReason_ST') as rdt
 	    on rdt.CmpReasonNum = et.ResolutionDesc
 	 where (@StartDt = null or ml.tOut >= @StartDt) and (ml.tOut is not NULL and isdate(ml.tOut) = 1 and ml.tOut > '1/2/1980')
-	   and (ml.PktCbMsg = 'RTA Offline' or es.PktNum is not null or et.PktNum is not null)
+	   and (ml.PktCbMsg = 'RTA Offline' or es.PktNum is not null or et.PktNum is not null or (es.PktNum is null and et.PktNum is null))
 
 END
 

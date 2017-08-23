@@ -107,7 +107,9 @@ BEGIN
 	       AlertRcd = SUM(AlertRcd),
 	       AlertAcp = SUM(AlertAcp),
 	       AlertRej = SUM(AlertRej),
-		   EventDisplay
+		   EventDisplay,
+		   MEALbkEntries = SUM(MEALbkEntries),
+		   MEALbkSignatures = SUM(MEALbkSignatures)
 	  from (
 	select EmpNum, EmpNameFirst = ltrim(rtrim(emp.NameFirst)), EmpNameLast = ltrim(rtrim(emp.NameLast)), EmpJobType = ltrim(rtrim(emp.JobType)),
 		   Asn = 0, Acp = 0, Rej = 0, Rsp = 0, Tkn = 0, ReaAcp = 0, ReaRej = 0,
@@ -123,7 +125,7 @@ BEGIN
 		   AlertRcd = 0,
 		   AlertAcp = SUM(case when ActivityTypeID = 9 and State like 'Alert Accept%' then 1 else 0 end),
 		   AlertRej = SUM(case when ActivityTypeID = 9 and State like 'Alert Dismiss%' then 1 else 0 end),
-		   EventDisplay = ''
+		   EventDisplay = '', MEALbkEntries = 0, MEALbkSignatures = 0
 	  from SQLA_FloorActivity as a
 	  left join SQLA_Employees as emp
 	    on emp.CardNum = a.EmpNum
@@ -144,7 +146,7 @@ BEGIN
 		   ReaRej = SUM(ReaRej),
 		   EmpBreakStart = 0, EmpBreakEnd = 0, EmpOOSStart = 0, EmpOOSEnd = 0, EmpLogout = 0, EmpChgArea = 0,
 		   EvtEsc = 0, EvtAsn = 0, EvtCmp = 0, AlertRcd = 0, AlertAcp = 0, AlertRej = 0,
-		   c.EventDisplay
+		   c.EventDisplay, MEALbkEntries = 0, MEALbkSignatures = 0
 	  from SQLA_EmployeeCompliance as c
 	  LEFT JOIN SQLA_EventDetails as d
 	    ON d.PktNum = c.PktNum
@@ -156,7 +158,83 @@ BEGIN
 	         or (@CustTier is null or @CustTier = ''))
 	   and (@EventType is null or @EventType = '' or c.EventDisplay in (select EventType from #RTA_Compliance_EventTypes))
        and (d.Zone in (select ZoneArea from #RTA_Compliance_ZoneAreas) or @ZoneArea is null or @ZoneArea = '' or @ZoneArea like '00%')
-	 group by EmpNum, EmpNameFirst, EmpNameLast, EmpJobType, c.EventDisplay ) as p
+	 group by EmpNum, EmpNameFirst, EmpNameLast, EmpJobType, c.EventDisplay 
+	 union all	 
+	 
+	 -- MEAL book entries
+	select EmpNum = CardNum, NameFirst, NameLast, JobType,
+		   Asn = 0, Acp = 0, Rej = 0, Rsp = 0, Tkn = 0, ReaAcp = 0, ReaRej = 0, 
+		   EmpBreakStart = 0, EmpBreakEnd = 0, EmpOOSStart = 0, EmpOOSEnd = 0, EmpLogout = 0,EmpChgArea = 0,
+		   EvtEsc = 0, EvtAsn = 0, EvtCmp = 0, AlertRcd = 0, AlertAcp = 0, AlertRej = 0, EventDisplay = EventDisplay,
+		   MEALbkEntries = sum(MEALbkEntries),
+		   MEALbkSignatures = sum(MEALbkSignatures)
+	  from (
+	select emp.CardNum, emp.NameFirst, emp.NameLast, emp.JobType, evt.EventDisplay, MEALbkEntries = 1, MEALbkSignatures = 0
+	  from SQLA_MEAL as ml
+	 inner join SQLA_Employees as emp
+		on emp.CardNum = ml.EmpNum
+	  left join SQLA_EventDetails as evt
+		on evt.PktNum = ml.ParentEventID
+	 where ml.tOut >= @StartDt and ml.tOut < @EndDt 
+	   and emp.JobType in (@SupervisorTitleText, @ManagerTitleText)
+	   and (    (evt.CustTierLevel in (select CustTier from #RTA_Compliance_CustTiers))
+			 or ((evt.CustTierLevel = '' or evt.CustTierLevel is null) and 'NUL' in (select CustTier from #RTA_Compliance_CustTiers))
+			 or (@CustTier is null or @CustTier = ''))
+	   and (@EventType is null or @EventType = '' or evt.EventDisplay is null or evt.EventDisplay in (select EventType from #RTA_Compliance_EventTypes))
+	 union all
+	 select emp.CardNum, emp.NameFirst, emp.NameLast, emp.JobType, evt.EventDisplay, MEALbkEntries = 0, MEALbkSignatures = 1
+	  from SQLA_MEAL as ml
+	 inner join SQLA_Employees as emp
+		on emp.CardNum = ml.EmpNumWitness1
+	  left join SQLA_EventDetails as evt
+		on evt.PktNum = ml.ParentEventID
+	 where ml.tOut >= @StartDt and ml.tOut < @EndDt 
+	   and emp.JobType in (@SupervisorTitleText, @ManagerTitleText)
+	   and (    (evt.CustTierLevel in (select CustTier from #RTA_Compliance_CustTiers))
+			 or ((evt.CustTierLevel = '' or evt.CustTierLevel is null) and 'NUL' in (select CustTier from #RTA_Compliance_CustTiers))
+			 or (@CustTier is null or @CustTier = ''))
+	   and (@EventType is null or @EventType = '' or evt.EventDisplay is null or evt.EventDisplay in (select EventType from #RTA_Compliance_EventTypes))
+	 union all
+	select emp.CardNum, emp.NameFirst, emp.NameLast, emp.JobType, evt.EventDisplay, MEALbkEntries = 0, MEALbkSignatures = 1
+	  from SQLA_MEAL as ml
+	 inner join SQLA_Employees as emp
+		on emp.CardNum = ml.EmpNumWitness2
+	  left join SQLA_EventDetails as evt
+		on evt.PktNum = ml.ParentEventID
+	 where ml.tOut >= @StartDt and ml.tOut < @EndDt 
+	   and emp.JobType in (@SupervisorTitleText, @ManagerTitleText)
+	   and (    (evt.CustTierLevel in (select CustTier from #RTA_Compliance_CustTiers))
+			 or ((evt.CustTierLevel = '' or evt.CustTierLevel is null) and 'NUL' in (select CustTier from #RTA_Compliance_CustTiers))
+			 or (@CustTier is null or @CustTier = ''))
+	   and (@EventType is null or @EventType = '' or evt.EventDisplay is null or evt.EventDisplay in (select EventType from #RTA_Compliance_EventTypes))
+	 union all
+	select emp.CardNum, emp.NameFirst, emp.NameLast, emp.JobType, evt.EventDisplay, MEALbkEntries = 0, MEALbkSignatures = 1
+	  from SQLA_MEAL as ml
+	 inner join SQLA_Employees as emp
+		on emp.CardNum = ml.EmpNumWitness3
+	  left join SQLA_EventDetails as evt
+		on evt.PktNum = ml.ParentEventID
+	 where ml.tOut >= @StartDt and ml.tOut < @EndDt 
+	   and emp.JobType in (@SupervisorTitleText, @ManagerTitleText)
+	   and (    (evt.CustTierLevel in (select CustTier from #RTA_Compliance_CustTiers))
+			 or ((evt.CustTierLevel = '' or evt.CustTierLevel is null) and 'NUL' in (select CustTier from #RTA_Compliance_CustTiers))
+			 or (@CustTier is null or @CustTier = ''))
+	   and (@EventType is null or @EventType = '' or evt.EventDisplay is null or evt.EventDisplay in (select EventType from #RTA_Compliance_EventTypes))
+	 union all
+	select emp.CardNum, emp.NameFirst, emp.NameLast, emp.JobType, evt.EventDisplay, MEALbkEntries = 0, MEALbkSignatures = 1
+	  from SQLA_MEAL as ml
+	 inner join SQLA_Employees as emp
+		on emp.CardNum = ml.EmpNumWitness4
+	  left join SQLA_EventDetails as evt
+		on evt.PktNum = ml.ParentEventID
+	 where ml.tOut >= @StartDt and ml.tOut < @EndDt 
+	   and emp.JobType in (@SupervisorTitleText, @ManagerTitleText)
+	   and (    (evt.CustTierLevel in (select CustTier from #RTA_Compliance_CustTiers))
+			 or ((evt.CustTierLevel = '' or evt.CustTierLevel is null) and 'NUL' in (select CustTier from #RTA_Compliance_CustTiers))
+			 or (@CustTier is null or @CustTier = ''))
+	   and (@EventType is null or @EventType = '' or evt.EventDisplay is null or evt.EventDisplay in (select EventType from #RTA_Compliance_EventTypes))
+		) as t
+	 group by CardNum, NameFirst, NameLast, JobType, EventDisplay ) as p
 	 group by EmpNum, EmpNameFirst, EmpNameLast, EmpJobType, EventDisplay
 END
 
