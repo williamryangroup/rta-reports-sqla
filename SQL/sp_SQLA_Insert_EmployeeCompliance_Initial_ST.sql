@@ -1,4 +1,4 @@
-USE [RTSS]
+USE [RTA_SQLA]
 GO
 
 /****** Object:  StoredProcedure [dbo].[sp_SQLA_Insert_EmployeeCompliance_Initial_ST]    Script Date: 06/15/2016 11:38:07 ******/
@@ -30,6 +30,10 @@ BEGIN
 	-- interfering with SELECT statements.
 	SET NOCOUNT ON;
 	
+	DECLARE @ServerIP varchar(15) = (select ltrim(rtrim(Setting)) from RTSS.dbo.SYSTEMSETTINGS WITH (NOLOCK) where ConfigSection = 'RTSSHH' and ConfigParam = 'WSSIP')
+	
+	
+			
 	insert into SQLA_EmployeeCompliance
 	select [EmpNum], [EmpNameFirst] = rtrim(emp.NameFirst), [EmpNameLast] = rtrim(emp.NameLast), [EmpJobType] = rtrim(JobType), [PktNum], [EventDisplay], [tOut] = p.tOut,
 		   [Asn] = case when tAssign is not null and (tAuthorize is null or (tAuthorize is not null and DATEDIFF(millisecond,tAssign,tAuthorize) >= 1000)) then 1 else 0 end, 
@@ -69,8 +73,11 @@ BEGIN
 	select l.EmpNum, l.PktNum, e.EventDisplay, CustTier = e.CustTierLevel, tOut = l.tEventState,
 		   tAssign = case when l.EventState in ('tAssign','tAssignSupervisor') then l.tEventState else null end,
 		   tAccept = case when l.EventState = 'tAcceptMobile' then l.tEventState else null end,
-		   tRejectManual = case when l.EventState = 'tReject' then l.tEventState else null end,
-		   tRejectAuto = case when l.EventState in ('tRejectAuto','tRejectAutoDevice','tRejectAutoServer') then l.tEventState else null end,
+		   tRejectManual = case when l.EventState = 'tReject' and l.EmpName <> @ServerIP and l.DeviceID = l.EventStateSource then l.tEventState
+	                            else null end,
+		   tRejectAuto = case when l.EventState in ('tRejectAuto','tRejectAutoDevice','tRejectAutoServer') then l.tEventState
+	                          when l.EventState = 'tReject' and l.EmpName = @ServerIP then l.tEventState
+							  else null end,
 		   tAuthorize = case when l.EventState = 'tAuthorize' then l.tEventState else null end,
 		   tRespondMobile = case when l.EventState = 'tRespondMobile' then l.tEventState else null end,
 		   tComplete = case when l.EventState = 'tComplete' then l.tEventState else null end,
@@ -99,8 +106,11 @@ BEGIN
 	select l.EmpNum, l.PktNum, e.EventDisplay, CustTier = e.CustTierLevel, tOut = l.tEventState,
 		   tAssign = case when l.EventState in ('tAssign','tAssignSupervisor') then l.tEventState else null end,
 		   tAccept = case when l.EventState = 'tAcceptMobile' then l.tEventState else null end,
-		   tRejectManual = case when l.EventState = 'tReject' then l.tEventState else null end,
-		   tRejectAuto = case when l.EventState in ('tRejectAuto','tRejectAutoDevice','tRejectAutoServer') then l.tEventState else null end,
+		   tRejectManual = case when l.EventState = 'tReject' and l.EmpName <> @ServerIP and l.DeviceID = l.EventStateSource then l.tEventState
+	                            else null end,
+		   tRejectAuto = case when l.EventState in ('tRejectAuto','tRejectAutoDevice','tRejectAutoServer') then l.tEventState
+	                          when l.EventState = 'tReject' and l.EmpName = @ServerIP then l.tEventState
+							  else null end,
 		   tAuthorize = case when l.EventState = 'tAuthorize' then l.tEventState else null end,
 		   tRespondMobile = case when l.EventState = 'tRespondMobile' then l.tEventState else null end,
 		   tComplete = case when l.EventState = 'tComplete' then l.tEventState else null end,
@@ -124,7 +134,7 @@ BEGIN
 							'tReassignAttendant','tReassignSupervisor','tReAssign',
 							'tRejectRA','tRejectRASupervisor')
 	 union all
-	
+	 
 	-- EVENT - Assign
 	select EmpNumAssign, PktNum, EventDisplay, CustTierLevel, tOut, tAssign, tAcceptMobile = null, tRejectManual = null, tRejectAuto = null, tAuthorize = null, tRespondMobile = null, tComplete = null, AuthPktNum = null, DeviceIDComplete = null, ClosePktNum = null, tReassign = null, tReassignRej = null
 	  from RTSS.dbo.EVENT1_ST as e WITH (NOLOCK)
@@ -143,6 +153,7 @@ BEGIN
 	select EmpNumAuthorize, PktNum, EventDisplay, CustTierLevel, tOut, tAssign = null, tAcceptMobile = null, tRejectManual = null, tRejectAuto = null, tAuthorize, tRespondMobile = null, tComplete = null, AuthPktNum, DeviceIDComplete = null, ClosePktNum = null, tReassign = null, tReassignRej = null
 	  from RTSS.dbo.EVENT1_ST as e WITH (NOLOCK)
 	 where tOut is not null and tAuthorize is not null and EmpNumAuthorize is not null and EmpNumAuthorize <> ''
+	   --and exists (select null from RTSS.dbo.EVENT_STATE_LOG1 as l2 WITH (NOLOCK) where l2.PktNum = e.PktNum)
 	   and (@StartDt = null or tOut >= @StartDt)
 	 union all
 	 

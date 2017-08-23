@@ -603,9 +603,9 @@ BEGIN
 		select Time = a.tDismiss, 9, State = 'Alert Resolved', Activity = ltrim(rtrim(alertType)), Location = ltrim(rtrim(a.location)), l.Zone, PktNum = EventTablePktNum, Tier = ltrim(rtrim(priority)), EmpNum = '', EmpName = '', [Source] = '', ID, '', 'ALERT1', ID, '', '', ''
 		  from RTSS.dbo.ALERT1 as a WITH (NOLOCK)
 		  left join RTSS.dbo.SYSTEMLOG1 as s WITH (NOLOCK)
-			on s.EvtDetail3 = a.ID and s.EvtType = 'SupervProcAlert'
+			  on s.EvtDetail3 = a.ID and s.EvtType = 'SupervProcAlert'
 		  left join RTSS.dbo.LOCZONE as l WITH (NOLOCK)
-			on l.Location = a.location
+			  on l.Location = a.location
 		  left join RTSS.dbo.EVENT2 as e WITH (NOLOCK)
 		    on a.EventTablePktNum = e.PktNum
 		   and a.tDismiss >= e.tComplete
@@ -713,5 +713,3 @@ END
 
 
 GO
-
-

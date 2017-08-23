@@ -1,4 +1,4 @@
-USE [RTSS]
+USE [RTA_SQLA]
 GO
 
 /****** Object:  StoredProcedure [dbo].[sp_SQLA_Insert_FloorActivity_Initial_ST]    Script Date: 06/15/2016 11:38:40 ******/
@@ -40,7 +40,9 @@ BEGIN
 	DECLARE @SupTrackAdmin int = isnull((select Setting from RTSS.dbo.SYSTEMSETTINGS WITH (NOLOCK) where ConfigSection = 'RTSSHH' and ConfigParam = 'SupervisorTrackAdmin'),1)
 	DECLARE @CheckAlertsPollInterval int = isnull((select Setting from RTSS.dbo.SYSTEMSETTINGS WITH (NOLOCK) where ConfigSection = 'RTSSHH' and ConfigParam = 'CheckAlertsPollInterval'),5500)
 	DECLARE @CaptAllGetEvents int = isnull((select Setting from RTSS.dbo.SYSTEMSETTINGS WITH (NOLOCK) where ConfigSection = 'RTSSHH' and ConfigParam = 'CaptAllGetEvents'),0)
+	DECLARE @AutoDispatchLogging int = isnull((select Setting from RTSS.dbo.SYSTEMSETTINGS WITH (NOLOCK) where ConfigSection = 'SYSTEM' and ConfigParam = 'AutoDispatchLogging'),0)
 	
+
 	
 	-- EVENT - OOS/10 6 - Start
 	insert into SQLA_FloorActivity
@@ -115,6 +117,19 @@ BEGIN
 		   case when @UseAssetAsLocation = 1 then Asset else Location end, Zone, PktNum, CustTierLevel, EmpNumInitialResponse, EmpNameInitialResponse, isnull(cast(AuthPktNum as varchar),DeviceIDInitialResponse), '', '','EVENT1_ST',PktNum, '', '', ''
 	  from RTSS.dbo.EVENT1_ST as e WITH (NOLOCK)
 	 where tInitialResponse is not null and tInitialResponse > '1/2/1980' and EventDisplay not in ('OOS','10 6')
+	   and (@StartDt = null or tOut >= @StartDt)
+	
+	
+	-- EVENT - Authorize - no initial
+	insert into SQLA_FloorActivity
+	select tAuthorize, 5, 'Authorize' + case when AuthPktNum is not null then ' Card In'
+	                                         when DeviceIDRespond is not null and DeviceIDRespond <> '' and DeviceIDRespond <> @ServerIP then ' Mobile' end, 
+	       EventDisplay = EventDisplay + case when EventDisplay = 'EMPCARD' and DeviceIDComplete is not null then ' ' + ltrim(rtrim(isnull(ResolutionDesc,'')))
+	                                          when EventDisplay in ('JKPT','PJ','JP','PROG') then ' ' + isnull(AmtEvent,'')
+	                                          else '' end,
+	       case when @UseAssetAsLocation = 1 then Asset else Location end, Zone, PktNum, CustTierLevel, EmpNumAuthorize, EmpNameAuthorize, isnull(cast(AuthPktNum as varchar),DeviceIDRespond), '', '','EVENT1_ST',PktNum, '', '', ''
+	  from RTSS.dbo.EVENT1_ST as e WITH (NOLOCK)
+	 where (tInitialResponse is null or tInitialResponse <= '1/2/1980') and tAuthorize is not null and tAuthorize > '1/2/1980' and EventDisplay not in ('OOS','10 6')
 	   and (@StartDt = null or tOut >= @StartDt)
 	
 	
@@ -197,6 +212,7 @@ BEGIN
 					when l.EventState = 'EventMainButton' then 'Main Menu Button'
 					when l.EventState = 'EventAssignedRemove' then 'Event Assigned Remove'
 					when l.EventState = 'tReassignPrior' then 'Reassigned to Prior Event'
+					when l.EventState = 'tJackpotVerify' then 'Jackpot Verify'
 					else l.EventState end,
 			   EventDisplay = EventDisplay + case when EventDisplay = 'EMPCARD' and DeviceIDComplete is not null then ' ' + ltrim(rtrim(isnull(ResolutionDesc,'')))
 												  when EventDisplay in ('JKPT','PJ','JP','PROG') then ' ' + isnull(AmtEvent,'')
@@ -296,7 +312,8 @@ BEGIN
 		  from RTSS.dbo.SYSTEMLOG1 as s WITH (NOLOCK)
 		 inner join RTSS.dbo.EVENT1_ST as e WITH (NOLOCK)
 			on e.PktNum = cast(s.EvtDetail1 as int)
-		 where EvtType = 'AutoDispatch' and (@StartDt = null or EvtTime >= @StartDt)
+		 where EvtType = 'AutoDispatch'
+		   and (@StartDt = null or EvtTime >= @StartDt)
 	END
 	
 	
@@ -306,7 +323,7 @@ BEGIN
 		insert into SQLA_FloorActivity
 		select Time = e.tComplete, 9, State = 'Alert Resolved/Evt Cmp', Activity = ltrim(rtrim(alertType)), Location = ltrim(rtrim(a.location)), Zone, PktNum = EventTablePktNum, Tier = ltrim(rtrim(priority)), EmpNum = '', EmpName = '', [Source] = '', ID, '', 'ALERT1', ID, '', '', ''
 		  from RTSS.dbo.ALERT1 as a WITH (NOLOCK)
-		 inner join dbo.EVENT1_ST as e WITH (NOLOCK)
+		 inner join RTSS.dbo.EVENT1_ST as e WITH (NOLOCK)
 		    on a.EventTablePktNum = e.PktNum
 		 where a.alertType <> 'EVENT' and (@StartDt = null or tCreate >= @StartDt)
 		   and (    (a.tNotify is null and a.tDismiss is null) 
@@ -317,18 +334,18 @@ BEGIN
 		select Time = a.tDismiss, 9, State = 'Alert Resolved', Activity = ltrim(rtrim(alertType)), Location = ltrim(rtrim(a.location)), l.Zone, PktNum = EventTablePktNum, Tier = ltrim(rtrim(priority)), EmpNum = '', EmpName = '', [Source] = '', ID, '', 'ALERT1', ID, '', '', ''
 		  from RTSS.dbo.ALERT1 as a WITH (NOLOCK)
 		  left join RTSS.dbo.SYSTEMLOG1 as s WITH (NOLOCK)
-			on s.EvtDetail3 = a.ID and s.EvtType = 'SupervProcAlert'
+			  on s.EvtDetail3 = a.ID and s.EvtType = 'SupervProcAlert'
 		  left join RTSS.dbo.LOCZONE as l WITH (NOLOCK)
-			on l.Location = a.location
-		  left join dbo.EVENT1_ST as e WITH (NOLOCK)
+			  on l.Location = a.location
+		  left join RTSS.dbo.EVENT1_ST as e WITH (NOLOCK)
 		    on a.EventTablePktNum = e.PktNum
 		   and a.tDismiss >= e.tComplete
 		 where a.alertType <> 'EVENT' and (@StartDt = null or tCreate >= @StartDt)
 		   and a.tDismiss is not null and s.EvtNum is null and e.PktNum is null
 	END
+
 	
-	
-	-- EVENT - Auto Reject - EventReject1/EVENT1_ST/EventStateLog1
+	-- EVENT - Auto Reject - EventReject1/Event1_ST/EventStateLog1
 	insert into SQLA_FloorActivity
 	select tOut = er.tReject,
 	       ActivityTypeID = 5,
@@ -342,11 +359,11 @@ BEGIN
 	       EmpName = er.EmpNameReject,
 	       Source = er.DeviceIDReject,
 	       Description = er.RejectReason,
-		   AfterDisplay = case when l.PktNum is null then 'N' else 'Y' end,
-		   'EVENTREJECT1_ST', er.PktNum, '', '', ''
+		     AfterDisplay = case when l.PktNum is null then 'N' else 'Y' end,
+		     'EVENTREJECT1_ST', er.PktNum, '', '', ''
 	  from RTSS.dbo.EVENTREJECT1_ST as er WITH (NOLOCK)
 	 inner join RTSS.dbo.EVENT1_ST as ev WITH (NOLOCK)
-		on ev.PktNum = er.PktNum
+		  on ev.PktNum = er.PktNum
 	  left join RTSS.dbo.EVENT_STATE_LOG1 as l WITH (NOLOCK)
 	    on l.PktNum = er.PktNum and l.EventTable = 'EVENT_ST'
 	   and l.EmpNum = er.EmpNumReject
@@ -359,7 +376,7 @@ BEGIN
 	       Zone, er.PktNum, ev.CustTierLevel, er.EmpNumReject, er.EmpNameReject, er.DeviceIDReject, er.RejectReason, l.PktNum
 	
 	
-	-- EVENT - Auto Reject - EventReject/EVENT1_ST/EventStateLog1
+	-- EVENT - Auto Reject - EventReject/Event1_ST/EventStateLog1
 	insert into SQLA_FloorActivity
 	select tOut = er.tReject,
 	       ActivityTypeID = 5,
@@ -373,8 +390,8 @@ BEGIN
 	       EmpName = er.EmpNameReject,
 	       Source = er.DeviceIDReject,
 	       Description = er.RejectReason,
-		   AfterDisplay = case when l.PktNum is null then 'N' else 'Y' end,
-		   'EVENTREJECT_ST', er.PktNum, '', '', ''
+		     AfterDisplay = case when l.PktNum is null then 'N' else 'Y' end,
+		     'EVENTREJECT_ST', er.PktNum, '', '', ''
 	  from RTSS.dbo.EVENTREJECT_ST as er WITH (NOLOCK)
 	 inner join RTSS.dbo.EVENT1_ST as ev WITH (NOLOCK)
 		on ev.PktNum = er.PktNum
@@ -409,8 +426,8 @@ BEGIN
 	  from RTSS.dbo.EVENT1_ST as er
 	 inner join (select RejPktNum = cast(left(right(rtrim([DESC]), LEN([DESC])-18), len(RIGHT(rtrim([DESC]),LEN([DESC])-18))-1) as int),
 	                    PktNum, Asset, Location, EventDisplay, CustTierLevel, Zone
-	 		       from RTSS.dbo.EVENT1_ST WITH (NOLOCK)
-			      where [DESC] like '~r:AssignedRemove%') as ev
+	 		           from RTSS.dbo.EVENT1_ST WITH (NOLOCK)
+			          where [DESC] like '~r:AssignedRemove%') as ev
 	    on ev.RejPktNum = er.PktNum
 	  left join RTSS.dbo.EVENT_STATE_LOG1 as l WITH (NOLOCK)
 	    on l.PktNum = ev.PktNum and l.EventTable = 'EVENT_ST'
@@ -427,4 +444,3 @@ END
 
 
 GO
-

@@ -1,4 +1,4 @@
-USE [RTSS]
+USE [RTA_SQLA]
 GO
 
 /****** Object:  StoredProcedure [dbo].[sp_SQLA_Insert_EmployeeCompliance_ST]    Script Date: 06/15/2016 11:38:17 ******/
@@ -30,6 +30,7 @@ BEGIN
 	SET NOCOUNT ON;
 	
 	--DECLARE @MinPktNum int = (select isnull(MAX(PktNum),0) from SQLA_EmployeeCompliance)
+	DECLARE @ServerIP varchar(15) = (select ltrim(rtrim(Setting)) from RTSS.dbo.SYSTEMSETTINGS WITH (NOLOCK) where ConfigSection = 'RTSSHH' and ConfigParam = 'WSSIP')
 	
 	-- Capture new EVENTS purged from RTSS since last SQLA insert
 	truncate table SQLA_New_Events
@@ -81,8 +82,11 @@ BEGIN
 	select l.EmpNum, l.PktNum, e.EventDisplay, CustTier = e.CustTierLevel, tOut = l.tEventState,
 		   tAssign = case when l.EventState in ('tAssign','tAssignSupervisor') then l.tEventState else null end,
 		   tAccept = case when l.EventState = 'tAcceptMobile' then l.tEventState else null end,
-		   tRejectManual = case when l.EventState = 'tReject' then l.tEventState else null end,
-		   tRejectAuto = case when l.EventState in ('tRejectAuto','tRejectAutoDevice','tRejectAutoServer') then l.tEventState else null end,
+		   tRejectManual = case when l.EventState = 'tReject' and l.EmpName <> @ServerIP and l.DeviceID = l.EventStateSource then l.tEventState
+	                            else null end,
+		   tRejectAuto = case when l.EventState in ('tRejectAuto','tRejectAutoDevice','tRejectAutoServer') then l.tEventState
+	                          when l.EventState = 'tReject' and l.EmpName = @ServerIP then l.tEventState
+							  else null end,
 		   tAuthorize = case when l.EventState = 'tAuthorize' then l.tEventState else null end,
 		   tRespondMobile = case when l.EventState = 'tRespondMobile' then l.tEventState else null end,
 		   tComplete = case when l.EventState = 'tComplete' then l.tEventState else null end,
@@ -111,8 +115,11 @@ BEGIN
 	select l.EmpNum, l.PktNum, e.EventDisplay, CustTier = e.CustTierLevel, tOut = l.tEventState,
 		   tAssign = case when l.EventState in ('tAssign','tAssignSupervisor') then l.tEventState else null end,
 		   tAccept = case when l.EventState = 'tAcceptMobile' then l.tEventState else null end,
-		   tRejectManual = case when l.EventState = 'tReject' then l.tEventState else null end,
-		   tRejectAuto = case when l.EventState in ('tRejectAuto','tRejectAutoDevice','tRejectAutoServer') then l.tEventState else null end,
+		   tRejectManual = case when l.EventState = 'tReject' and l.EmpName <> @ServerIP and l.DeviceID = l.EventStateSource then l.tEventState
+	                            else null end,
+		   tRejectAuto = case when l.EventState in ('tRejectAuto','tRejectAutoDevice','tRejectAutoServer') then l.tEventState
+	                          when l.EventState = 'tReject' and l.EmpName = @ServerIP then l.tEventState
+							  else null end,
 		   tAuthorize = case when l.EventState = 'tAuthorize' then l.tEventState else null end,
 		   tRespondMobile = case when l.EventState = 'tRespondMobile' then l.tEventState else null end,
 		   tComplete = case when l.EventState = 'tComplete' then l.tEventState else null end,
@@ -186,7 +193,6 @@ BEGIN
 	    on p.EmpNum = emp.CardNum
 	
 END
-
 
 
 

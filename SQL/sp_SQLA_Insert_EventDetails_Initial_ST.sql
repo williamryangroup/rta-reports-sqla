@@ -1,4 +1,4 @@
-USE [RTSS]
+USE [RTA_SQLA]
 GO
 
 /****** Object:  StoredProcedure [dbo].[sp_SQLA_Insert_EventDetails_Initial_ST]    Script Date: 06/15/2016 11:40:10 ******/
@@ -32,8 +32,13 @@ BEGIN
 	
 	--DECLARE @MinPktNum int = (select isnull(MAX(PktNum),0) from SQLA_EventDetails)
 	DECLARE @UseAssetField char(255) = isnull((select case when Setting = 'Asset' then '1' else '0' end from RTSS.dbo.SYSTEMSETTINGS WITH (NOLOCK) where ConfigSection = 'RTSSHH' and ConfigParam = 'EventLocationOrAssetFieldName'),'0')
+	DECLARE @ProcessProgJP int = isnull((select cast(Setting as int) from RTSS.dbo.SYSTEMSETTINGS WITH (NOLOCK) where ConfigSection = 'MGAM' and ConfigParam = 'ProcessProgJP'),1)
+	DECLARE @ProcessTilt int = isnull((select cast(Setting as int) from RTSS.dbo.SYSTEMSETTINGS WITH (NOLOCK) where ConfigSection = 'MGAM' and ConfigParam = 'ProcessTilt'),1)
+	DECLARE @FeedType char(255) = isnull((select Setting from RTSS.dbo.SYSTEMSETTINGS WITH (NOLOCK) where ConfigSection = 'SYSTEM' and ConfigParam = 'FeedType'),'')
 	
-	insert into SQLA_EventDetails
+	
+	
+	insert into SQLA_EventDetails (PktNum, tOut, tOutHour, CustNum, CustName, CustTierLevel, CustPriorityLevel, Location, Zone, EventDisplay, tAssign, tAccept, tAuthorize, tComplete, CompCode, HasReject, EmpNumAsn, EmpNameAsn, EmpNumRsp, EmpNameRsp, EmpNumCmp, EmpNameCmp, RspRTA, RspCard, CmpMobile, CmpGame, CmpWS, ResolutionDescID, ResolutionDesc, Reassign, ReassignSupervisor, FromZone, EmpJobTypeAsn, EmpJobTypeRsp, EmpJobTypeCmp, RspSecs, CmpSecs, TotSecs, AsnTakeID, AsnTake, SourceTable, AmtEvent)
 	select PktNum,
 	       tOut,
 	       tOutHour,
@@ -133,6 +138,10 @@ BEGIN
 	   and (e.tOut is not NULL and isdate(e.tOut) = 1 and e.tOut > '1/2/1980')
 	   and (e.tComplete is not NULL and isdate(e.tComplete)=1 and e.tComplete >= e.tOut)
 	   and ((e.tAuthorize is not null and isdate(e.tAuthorize)=1 and e.tAuthorize > '1/2/1980') or (e.tAuthorize is null))
+	   and (    (@FeedType <> 'MGAM')
+	         or (@FeedType = 'MGAM' and (    (EventDisplay not in ('PROG JP','TILT'))
+	                                      or (EventDisplay = 'PROG JP' and @ProcessProgJP = 1)
+			                              or (EventDisplay = 'TILT' and @ProcessTilt = 1))))
 	   and not exists
 	     ( select null from SQLA_FloorActivity as l2 WITH (NOLOCK)
 	        where l2.PktNum = l.PktNum

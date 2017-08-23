@@ -461,7 +461,7 @@ BEGIN
 		insert into SQLA_FloorActivity
 		select Time = e.tComplete, 9, State = 'Alert Resolved/Evt Cmp', Activity = ltrim(rtrim(alertType)), Location = ltrim(rtrim(a.location)), Zone, PktNum = EventTablePktNum, Tier = ltrim(rtrim(priority)), EmpNum = '', EmpName = '', [Source] = '', ID, '', 'ALERT1', ID, '', '', ''
 		  from RTSS.dbo.ALERT1 as a WITH (NOLOCK)
-		 inner join dbo.EVENT1 as e WITH (NOLOCK)
+		 inner join RTSS.dbo.EVENT1 as e WITH (NOLOCK)
 		    on a.EventTablePktNum = e.PktNum
 		 where a.alertType <> 'EVENT' and (@StartDt = null or tCreate >= @StartDt)
 		   and (    (a.tNotify is null and a.tDismiss is null) 
@@ -472,16 +472,16 @@ BEGIN
 		select Time = a.tDismiss, 9, State = 'Alert Resolved', Activity = ltrim(rtrim(alertType)), Location = ltrim(rtrim(a.location)), l.Zone, PktNum = EventTablePktNum, Tier = ltrim(rtrim(priority)), EmpNum = '', EmpName = '', [Source] = '', ID, '', 'ALERT1', ID, '', '', ''
 		  from RTSS.dbo.ALERT1 as a WITH (NOLOCK)
 		  left join RTSS.dbo.SYSTEMLOG1 as s WITH (NOLOCK)
-			on s.EvtDetail3 = a.ID and s.EvtType = 'SupervProcAlert'
+			  on s.EvtDetail3 = a.ID and s.EvtType = 'SupervProcAlert'
 		  left join RTSS.dbo.LOCZONE as l WITH (NOLOCK)
-			on l.Location = a.location
-		  left join dbo.EVENT1 as e WITH (NOLOCK)
+			  on l.Location = a.location
+		  left join RTSS.dbo.EVENT1 as e WITH (NOLOCK)
 		    on a.EventTablePktNum = e.PktNum
 		   and a.tDismiss >= e.tComplete
 		 where a.alertType <> 'EVENT' and (@StartDt = null or tCreate >= @StartDt)
 		   and a.tDismiss is not null and s.EvtNum is null and e.PktNum is null
 	END
-		
+
 	
 	-- EVENT - Auto Reject - EventReject1/Event1/EventStateLog1
 	insert into SQLA_FloorActivity
@@ -497,11 +497,11 @@ BEGIN
 	       EmpName = er.EmpNameReject,
 	       Source = er.DeviceIDReject,
 	       Description = er.RejectReason,
-		   AfterDisplay = case when l.PktNum is null then 'N' else 'Y' end,
-		   'EVENTREJECT1', er.PktNum, '', '', ''
+		     AfterDisplay = case when l.PktNum is null then 'N' else 'Y' end,
+		     'EVENTREJECT1', er.PktNum, '', '', ''
 	  from RTSS.dbo.EVENTREJECT1 as er WITH (NOLOCK)
 	 inner join RTSS.dbo.EVENT1 as ev WITH (NOLOCK)
-		on ev.PktNum = er.PktNum
+		  on ev.PktNum = er.PktNum
 	  left join RTSS.dbo.EVENT_STATE_LOG1 as l WITH (NOLOCK)
 	    on l.PktNum = er.PktNum and l.EventTable = 'EVENT'
 	   and l.EmpNum = er.EmpNumReject
@@ -528,8 +528,8 @@ BEGIN
 	       EmpName = er.EmpNameReject,
 	       Source = er.DeviceIDReject,
 	       Description = er.RejectReason,
-		   AfterDisplay = case when l.PktNum is null then 'N' else 'Y' end,
-		   'EVENTREJECT', er.PktNum, '', '', ''
+		     AfterDisplay = case when l.PktNum is null then 'N' else 'Y' end,
+		     'EVENTREJECT', er.PktNum, '', '', ''
 	  from RTSS.dbo.EVENTREJECT as er WITH (NOLOCK)
 	 inner join RTSS.dbo.EVENT1 as ev WITH (NOLOCK)
 		on ev.PktNum = er.PktNum
@@ -564,8 +564,8 @@ BEGIN
 	  from RTSS.dbo.EVENT1 as er
 	 inner join (select RejPktNum = cast(left(right(rtrim([DESC]), LEN([DESC])-18), len(RIGHT(rtrim([DESC]),LEN([DESC])-18))-1) as int),
 	                    PktNum, Asset, Location, EventDisplay, CustTierLevel, Zone
-	 		       from RTSS.dbo.EVENT1 WITH (NOLOCK)
-			      where [DESC] like '~r:AssignedRemove%') as ev
+	 		           from RTSS.dbo.EVENT1 WITH (NOLOCK)
+			          where [DESC] like '~r:AssignedRemove%') as ev
 	    on ev.RejPktNum = er.PktNum
 	  left join RTSS.dbo.EVENT_STATE_LOG1 as l WITH (NOLOCK)
 	    on l.PktNum = ev.PktNum and l.EventTable = 'EVENT'
@@ -581,7 +581,4 @@ END
 
 
 
-
 GO
-
-
