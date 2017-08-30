@@ -36,7 +36,7 @@ BEGIN
 	truncate table SQLA_New_Events
 	
 	insert into SQLA_New_Events (PktNum)
-	select e.PktNum from RTSS.dbo.EVENT2 as e WITH (NOLOCK)
+	select e.PktNum from RTSS.dbo.EVENT4 as e WITH (NOLOCK)
 	 where not exists 
 		 ( select null from SQLA_EmployeeCompliance as c WITH (NOLOCK)
 			where c.PktNum = e.PktNum
@@ -96,7 +96,7 @@ BEGIN
 		   tReassign = case when l.EventState in ('tReassignAttendant','tReassignSupervisor','tReAssign') then l.tEventState else null end,
 		   tReassignRej = case when l.EventState in ('tRejectRA','tRejectRASupervisor') then l.tEventState else null end
 	  from RTSS.dbo.EVENT_STATE_LOG1 as l WITH (NOLOCK)
-	 inner join RTSS.dbo.EVENT2 as e WITH (NOLOCK)
+	 inner join RTSS.dbo.EVENT4 as e WITH (NOLOCK)
 		on e.PktNum = l.PktNum and l.EventTable = 'EVENT'
 	 where tOut is not null and l.EmpNum is not null and l.EmpNum <> '' and l.EmpName not in ('MGR CLEAR ALL')
 	   and e.PktNum in (select PktNum from SQLA_New_Events)
@@ -129,7 +129,7 @@ BEGIN
 		   tReassign = case when l.EventState in ('tReassignAttendant','tReassignSupervisor','tReAssign') then l.tEventState else null end,
 		   tReassignRej = case when l.EventState in ('tRejectRA','tRejectRASupervisor') then l.tEventState else null end
 	  from RTSS.dbo.EVENT_STATE_LOG as l WITH (NOLOCK)
-	 inner join RTSS.dbo.EVENT2 as e WITH (NOLOCK)
+	 inner join RTSS.dbo.EVENT4 as e WITH (NOLOCK)
 		on e.PktNum = l.PktNum and l.EventTable = 'EVENT'
 	 where tOut is not null and l.EmpNum is not null and l.EmpNum <> '' and l.EmpName not in ('MGR CLEAR ALL')
 	   and e.PktNum in (select PktNum from SQLA_New_Events)
@@ -146,42 +146,42 @@ BEGIN
 	
 	-- EVENT - Assign
 	select EmpNumAssign, PktNum, EventDisplay, CustTierLevel, tOut, tAssign, tAcceptMobile = null, tRejectManual = null, tRejectAuto = null, tAuthorize = null, tRespondMobile = null, tComplete = null, AuthPktNum = null, DeviceIDComplete = null, ClosePktNum = null, tReassign = null, tReassignRej = null
-	  from RTSS.dbo.EVENT2 as e WITH (NOLOCK)
+	  from RTSS.dbo.EVENT4 as e WITH (NOLOCK)
 	 where tOut is not null and tAssign is not null and EmpNumAssign is not null and EmpNumAssign <> ''
 	   and PktNum in (select PktNum from SQLA_New_Events)
 	 union all
 	 
 	-- EVENT - Accept
 	select EmpNumAccept, PktNum, EventDisplay, CustTierLevel, tOut, tAssign = null, tAcceptMobile, tRejectManual = null, tRejectAuto = null, tAuthorize = null, tRespondMobile = null, tComplete = null, AuthPktNum = null, DeviceIDComplete = null, ClosePktNum = null, tReassign = null, tReassignRej = null
-	  from RTSS.dbo.EVENT2 as e WITH (NOLOCK)
+	  from RTSS.dbo.EVENT4 as e WITH (NOLOCK)
 	 where tOut is not null and tAcceptMobile is not null and EmpNumAccept is not null and EmpNumAccept <> ''
 	   and PktNum in (select PktNum from SQLA_New_Events)
 	 union all
 	 
 	-- EVENT - Authorize
 	select EmpNumAuthorize, PktNum, EventDisplay, CustTierLevel, tOut, tAssign = null, tAcceptMobile = null, tRejectManual = null, tRejectAuto = null, tAuthorize, tRespondMobile = null, tComplete = null, AuthPktNum, DeviceIDComplete = null, ClosePktNum = null, tReassign = null, tReassignRej = null
-	  from RTSS.dbo.EVENT2 as e WITH (NOLOCK)
+	  from RTSS.dbo.EVENT4 as e WITH (NOLOCK)
 	 where tOut is not null and tAuthorize is not null and EmpNumAuthorize is not null and EmpNumAuthorize <> ''
 	   and PktNum in (select PktNum from SQLA_New_Events)
 	 union all
 	 
 	-- EVENT - Respond Mobile
 	select EmpNumRespond, PktNum, EventDisplay, CustTierLevel, tOut, tAssign = null, tAcceptMobile = null, tRejectManual = null, tRejectAuto = null, tAuthorize = null, tRespondMobile, tComplete = null, AuthPktNum = null, DeviceIDComplete = null, ClosePktNum = null, tReassign = null, tReassignRej = null
-	  from RTSS.dbo.EVENT2 as e WITH (NOLOCK)
+	  from RTSS.dbo.EVENT4 as e WITH (NOLOCK)
 	 where tOut is not null and tRespondMobile is not null and EmpNumRespond is not null and EmpNumRespond <> ''
 	   and PktNum in (select PktNum from SQLA_New_Events)
 	 union all
 	 
 	-- EVENT - Complete
 	select EmpNumComplete, PktNum, EventDisplay, CustTierLevel, tOut, tAssign = null, tAcceptMobile = null, tRejectManual = null, tRejectAuto = null, tAuthorize = null, tRespondMobile = null, tComplete, AuthPktNum = null, DeviceIDComplete, ClosePktNum, tReassign = null, tReassignRej = null
-	  from RTSS.dbo.EVENT2 as e WITH (NOLOCK)
+	  from RTSS.dbo.EVENT4 as e WITH (NOLOCK)
 	 where tOut is not null and tComplete is not null and EmpNumComplete is not null and EmpNumComplete <> ''
 	   and PktNum in (select PktNum from SQLA_New_Events)
 	 union all
 	 
 	-- EVENT - Complete (from Authorize)
 	select EmpNumAuthorize, PktNum, EventDisplay, CustTierLevel, tOut, tAssign = null, tAcceptMobile = null, tRejectManual = null, tRejectAuto = null, tAuthorize = null, tRespondMobile = null, tComplete, AuthPktNum = null, DeviceIDComplete, ClosePktNum, tReassign = null, tReassignRej = null
-	  from RTSS.dbo.EVENT2 as e WITH (NOLOCK)
+	  from RTSS.dbo.EVENT4 as e WITH (NOLOCK)
 	 where tOut is not null and tComplete is not null 
 	   and (EmpNumComplete is null or EmpNumComplete = '' or EmpNumComplete = '0') and ClosePktNum is not null and EmpNumAuthorize is not null and EmpNumAuthorize <> ''
 	   and PktNum in (select PktNum from SQLA_New_Events)

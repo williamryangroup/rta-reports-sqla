@@ -122,7 +122,7 @@ BEGIN
 		   ReassignSupervisor = case when tReassignSupervisor is null or tReassignSupervisor = '' then 0 else 1 end,
 		   FromZone = e.AssocArea,
 		   e.AmtEvent
-	  from RTSS.dbo.EVENT2_CE as e WITH (NOLOCK)
+	  from RTSS.dbo.EVENT4_CE as e WITH (NOLOCK)
 	  left join SQLA_FloorActivity as l WITH (NOLOCK)
 	    on l.PktNum = e.PktNum
 	   and l.State = 'Assign'

@@ -36,7 +36,7 @@ BEGIN
 	
 	insert into SQLA_New_SEQ (SEQ)
 	select l.SEQ from RTSS.dbo.EVENT_STATE_LOG1 as l WITH (NOLOCK)
-	 inner join RTSS.dbo.EVENT2_ST as e WITH (NOLOCK)
+	 inner join RTSS.dbo.EVENT4_ST as e WITH (NOLOCK)
 		on e.PktNum = l.PktNum and l.EventTable = 'EVENT_ST'
 	 where l.tEventState is not null and e.EventDisplay not in ('OOS','10 6')
 	   and EventState not in ('tRecd','tOut','tDisplay','tInitialResponse','tRemove','tComplete','tRejectAuto')
@@ -49,7 +49,7 @@ BEGIN
 	truncate table SQLA_New_Events
 	
 	insert into SQLA_New_Events (PktNum)
-	select e.PktNum from RTSS.dbo.EVENT2_ST as e WITH (NOLOCK)
+	select e.PktNum from RTSS.dbo.EVENT4_ST as e WITH (NOLOCK)
 	 where not exists 
 		 ( select null from SQLA_FloorActivity as f WITH (NOLOCK)
 			where f.SourceTable = 'EVENT1_ST' and f.SourceTableID = e.PktNum)
@@ -80,14 +80,14 @@ BEGIN
     -- EVENT - OOS/10 6 - Start
 	insert into SQLA_FloorActivity
 	select tOut, 2, 'Start', PktCbMsg, '', '', PktNum, '', EmpNumAuthorize, EmpNameAuthorize, DeviceIDRespond, '', '','EVENT1_ST',PktNum, '', '', ''
-	  from RTSS.dbo.EVENT2_ST as e WITH (NOLOCK)
+	  from RTSS.dbo.EVENT4_ST as e WITH (NOLOCK)
 	 where tOut is not null and tOut > '1/2/1980' and EventDisplay in ('OOS','10 6')
 	   and PktNum in (select PktNum from SQLA_New_Events)
 	   
 	-- EVENT - OOS/10 6 - End
 	insert into SQLA_FloorActivity
 	select tComplete, 2, 'End', PktCbMsg, '', '', PktNum, '', EmpNumAuthorize, EmpNameAuthorize, isnull(DeviceIDComplete,ClosePktNum), ResolutionDesc, '','EVENT1_ST',PktNum, '', '', ''
-	  from RTSS.dbo.EVENT2_ST as e WITH (NOLOCK)
+	  from RTSS.dbo.EVENT4_ST as e WITH (NOLOCK)
 	 where tComplete is not null and tComplete > '1/2/1980' and EventDisplay in ('OOS','10 6')
 	   and PktNum in (select PktNum from SQLA_New_Events)
 
@@ -100,7 +100,7 @@ BEGIN
 	                                          when EventDisplay in ('JKPT','PJ','JP','PROG') then ' ' + isnull(AmtEvent,'')
 	                                          else '' end,
 	       case when @UseAssetAsLocation = 1 then Asset else Location end, Zone, PktNum, CustTierLevel, '', '', '', '', '','EVENT1_ST',PktNum, '', '', ''
-	  from RTSS.dbo.EVENT2_ST as e WITH (NOLOCK)
+	  from RTSS.dbo.EVENT4_ST as e WITH (NOLOCK)
 	 where tRecd is not null and tRecd > '1/2/1980' and EventDisplay not in ('OOS','10 6')
 	   and exists (select null from RTSS.dbo.EVENT_STATE_LOG1 as l2 where l2.PktNum = e.PktNum and l2.EventTable = 'EVENT_ST')
 	   and PktNum in (select PktNum from SQLA_New_Events)
@@ -113,7 +113,7 @@ BEGIN
 	                                          when EventDisplay in ('JKPT','PJ','JP','PROG') then ' ' + isnull(AmtEvent,'')
 	                                          else '' end,
 	       case when @UseAssetAsLocation = 1 then Asset else Location end, Zone, PktNum, CustTierLevel, '', '', '', '', '','EVENT1_ST',PktNum, '', '', ''
-	  from RTSS.dbo.EVENT2_ST as e WITH (NOLOCK)
+	  from RTSS.dbo.EVENT4_ST as e WITH (NOLOCK)
 	 where tOut is not null and tOut > '1/2/1980' and EventDisplay not in ('OOS','10 6')
 	   and PktNum in (select PktNum from SQLA_New_Events)
 	
@@ -125,7 +125,7 @@ BEGIN
 	                                          when EventDisplay in ('JKPT','PJ','JP','PROG') then ' ' + isnull(AmtEvent,'')
 	                                          else '' end,
 	       case when @UseAssetAsLocation = 1 then Asset else Location end, Zone, PktNum, CustTierLevel, '', '', '', '', '','EVENT1_ST',PktNum, '', '', ''
-	  from RTSS.dbo.EVENT2_ST as e WITH (NOLOCK)
+	  from RTSS.dbo.EVENT4_ST as e WITH (NOLOCK)
 	 where tDisplay is not null and tDisplay > '1/2/1980' and EventDisplay not in ('OOS','10 6')
 	   and PktNum in (select PktNum from SQLA_New_Events)
 	
@@ -137,7 +137,7 @@ BEGIN
 	                                          when EventDisplay in ('JKPT','PJ','JP','PROG') then ' ' + isnull(AmtEvent,'')
 	                                          else '' end,
 		   case when @UseAssetAsLocation = 1 then Asset else Location end, Zone, PktNum, CustTierLevel, EmpNumReject, EmpNameReject, DeviceIDReject, '', '','EVENT1_ST',PktNum, '', '', ''
-	  from RTSS.dbo.EVENT2_ST as e WITH (NOLOCK)
+	  from RTSS.dbo.EVENT4_ST as e WITH (NOLOCK)
 	 where tReject is not null and tReject > '1/2/1980' and EventDisplay not in ('OOS','10 6')
 	   and PktNum in (select PktNum from SQLA_New_Events)
 	
@@ -149,7 +149,7 @@ BEGIN
 	                                          when EventDisplay in ('JKPT','PJ','JP','PROG') then ' ' + isnull(AmtEvent,'')
 	                                          else '' end,
 	       case when @UseAssetAsLocation = 1 then Asset else Location end, Zone, PktNum, CustTierLevel, EmpNumInitialResponse, EmpNameInitialResponse, isnull(cast(AuthPktNum as varchar),DeviceIDInitialResponse), '', '','EVENT1_ST',PktNum, '', '', ''
-	  from RTSS.dbo.EVENT2_ST as e WITH (NOLOCK)
+	  from RTSS.dbo.EVENT4_ST as e WITH (NOLOCK)
 	 where tInitialResponse is not null and tInitialResponse > '1/2/1980' and EventDisplay not in ('OOS','10 6')
 	   and PktNum in (select PktNum from SQLA_New_Events)
 	
@@ -162,7 +162,7 @@ BEGIN
 	                                          when EventDisplay in ('JKPT','PJ','JP','PROG') then ' ' + isnull(AmtEvent,'')
 	                                          else '' end,
 	       case when @UseAssetAsLocation = 1 then Asset else Location end, Zone, PktNum, CustTierLevel, EmpNumAuthorize, EmpNameAuthorize, isnull(cast(AuthPktNum as varchar),DeviceIDRespond), '', '','EVENT1_ST',PktNum, '', '', ''
-	  from RTSS.dbo.EVENT2_ST as e WITH (NOLOCK)
+	  from RTSS.dbo.EVENT4_ST as e WITH (NOLOCK)
 	 where (tInitialResponse is null or tInitialResponse <= '1/2/1980') and tAuthorize is not null and tAuthorize > '1/2/1980' and EventDisplay not in ('OOS','10 6')
 	   and PktNum in (select PktNum from SQLA_New_Events)
 	
@@ -174,7 +174,7 @@ BEGIN
 	                                          when EventDisplay in ('JKPT','PJ','JP','PROG') then ' ' + isnull(AmtEvent,'')
 	                                          else '' end,
 	       case when @UseAssetAsLocation = 1 then Asset else Location end, Zone, PktNum, CustTierLevel, EmpNumAuthorize, EmpNameAuthorize, cast(AuthPktNum as varchar), '', '','EVENT1_ST',PktNum, '', '', ''
-	  from RTSS.dbo.EVENT2_ST as e WITH (NOLOCK)
+	  from RTSS.dbo.EVENT4_ST as e WITH (NOLOCK)
 	 where tAuthorize is not null and tAuthorize > '1/2/1980' and EventDisplay = 'EMPCARD'
 	   and PktNum in (select PktNum from SQLA_New_Events)
 	
@@ -186,7 +186,7 @@ BEGIN
 	                                          when EventDisplay in ('JKPT','PJ','JP','PROG') then ' ' + isnull(AmtEvent,'')
 	                                          else '' end,
 	       case when @UseAssetAsLocation = 1 then Asset else Location end, Zone, PktNum, CustTierLevel, EmpNumComplete, EmpNameComplete, DeviceIDComplete, '', '','EVENT1_ST',PktNum, '', '', ''
-	  from RTSS.dbo.EVENT2_ST as e WITH (NOLOCK)
+	  from RTSS.dbo.EVENT4_ST as e WITH (NOLOCK)
 	 where tRemove is not null and tRemove > '1/2/1980' and EventDisplay not in ('OOS','10 6')
 	   and PktNum in (select PktNum from SQLA_New_Events)
 	
@@ -207,7 +207,7 @@ BEGIN
 				when DeviceIDComplete is not null then DeviceIDComplete
 				when CloseBy911 is not null then cast(ClosePktNum as varchar)
 				when EmpNameComplete = 'RTSSGUI' then Address end, ltrim(rtrim(ResolutionDesc)), '','EVENT1_ST',PktNum, '', '', ''
-	  from RTSS.dbo.EVENT2_ST as e WITH (NOLOCK)
+	  from RTSS.dbo.EVENT4_ST as e WITH (NOLOCK)
 	 where tComplete is not null and tComplete > '1/2/1980' and EventDisplay not in ('OOS','10 6')
 	   and PktNum in (select PktNum from SQLA_New_Events)
 	   
@@ -267,7 +267,7 @@ BEGIN
 							  else '' end,
 			   'EVENT_STATE_LOG1', l.SEQ, '', '', ''
 		  from RTSS.dbo.EVENT_STATE_LOG1 as l WITH (NOLOCK)
-		 inner join RTSS.dbo.EVENT2_ST as e WITH (NOLOCK)
+		 inner join RTSS.dbo.EVENT4_ST as e WITH (NOLOCK)
 			on e.PktNum = l.PktNum and l.EventTable = 'EVENT_ST'
 		 where l.tEventState is not null and e.EventDisplay not in ('OOS','10 6')
 		   and EventState not in ('tRecd','tOut','tDisplay','tInitialResponse','tRemove','tComplete','tRejectAuto')
@@ -283,7 +283,7 @@ BEGIN
 			insert into SQLA_FloorActivity
 			select tNotifyPushed, 5, 'Device Notification Pushed', e.EventDisplay, case when @UseAssetAsLocation = 1 then e.Asset else e.Location end, Zone, n.PktNum, e.CustTierLevel, n.DeviceIDNotify, (select ltrim(rtrim(NameFirst)) + ' ' + ltrim(rtrim(NameLast)) from RTSS.dbo.EMPLOYEE WITH (NOLOCK) where CardNum = n.DeviceIDNotify), '', '', '', 'DEVICE_NOTIFICATION_TIMES', ID, '', '', ''
 			  from RTSS.dbo.DEVICE_NOTIFICATION_TIMES as n WITH (NOLOCK)
-			 inner join RTSS.dbo.EVENT2_ST as e WITH (NOLOCK)
+			 inner join RTSS.dbo.EVENT4_ST as e WITH (NOLOCK)
 				on e.PktNum = n.PktNum
 			 where tNotifyPushed is not null and tNotifyPushed > '1/2/1980' and EventDisplay not in ('OOS','10 6')
 			   and e.PktNum in (select PktNum from SQLA_New_Events)
@@ -293,7 +293,7 @@ BEGIN
 		insert into SQLA_FloorActivity
 		select tDeviceRespond, 5, 'Device Notification Respond', e.EventDisplay, case when @UseAssetAsLocation = 1 then e.Asset else e.Location end, Zone, n.PktNum, e.CustTierLevel, n.DeviceIDRespond, (select ltrim(rtrim(NameFirst)) + ' ' + ltrim(rtrim(NameLast)) from RTSS.dbo.EMPLOYEE WITH (NOLOCK) where CardNum = n.DeviceIDRespond), '', '', '', 'DEVICE_NOTIFICATION_TIMES', ID, '', '', ''
 		  from RTSS.dbo.DEVICE_NOTIFICATION_TIMES as n WITH (NOLOCK)
-		 inner join RTSS.dbo.EVENT2_ST as e WITH (NOLOCK)
+		 inner join RTSS.dbo.EVENT4_ST as e WITH (NOLOCK)
 			on e.PktNum = n.PktNum
 		 where tDeviceRespond is not null and tDeviceRespond > '1/2/1980' and EventDisplay not in ('OOS','10 6')
 		   and e.PktNum in (select PktNum from SQLA_New_Events)
@@ -304,7 +304,7 @@ BEGIN
 			insert into SQLA_FloorActivity
 			select tEventSent, 5, 'Event Notification Mobile', e.EventDisplay, case when @UseAssetAsLocation = 1 then e.Asset else e.Location end, Zone, n.PktNum, e.CustTierLevel, n.DeviceIDNotify, (select ltrim(rtrim(NameFirst)) + ' ' + ltrim(rtrim(NameLast)) from RTSS.dbo.EMPLOYEE WITH (NOLOCK) where CardNum = n.DeviceIDNotify), '', '', '', 'DEVICE_NOTIFICATION_TIMES', ID, '', '', ''
 			  from RTSS.dbo.DEVICE_NOTIFICATION_TIMES as n WITH (NOLOCK)
-			 inner join RTSS.dbo.EVENT2_ST as e WITH (NOLOCK)
+			 inner join RTSS.dbo.EVENT4_ST as e WITH (NOLOCK)
 				on e.PktNum = n.PktNum
 			 where tEventSent is not null and tEventSent > '1/2/1980' and EventDisplay not in ('OOS','10 6') and n.DeviceIDNotify is not null
 			   and e.PktNum in (select PktNum from SQLA_New_Events)
@@ -319,7 +319,7 @@ BEGIN
 		select Time = EvtTime, ActivityTypeID = 5, State = 'Get Event', Activity = e.EventDisplay, Location = case when @UseAssetAsLocation = 1 then e.Asset else e.Location end, Zone = e.Zone, PktNum = cast(EvtDetail1 as int),
 		       Tier = e.CustTierLevel, EmpNum = ltrim(rtrim(UserName)), EmpName = (select ltrim(rtrim(NameFirst)) + ' ' + ltrim(rtrim(NameLast)) from RTSS.dbo.EMPLOYEE WITH (NOLOCK) where CardNum = s.UserName), [Source] = ltrim(rtrim(MachineName)), '', '', 'SYSTEMLOG1', EvtNum, '', '', ''
 		  from RTSS.dbo.SYSTEMLOG1 as s WITH (NOLOCK)
-		 inner join RTSS.dbo.EVENT2_ST as e WITH (NOLOCK)
+		 inner join RTSS.dbo.EVENT4_ST as e WITH (NOLOCK)
 		    on e.PktNum = cast(s.EvtDetail1 as int)
 		 where EvtType = 'GetEvents' and EvtDetail1 <> '-1'
 		   and not exists (select null from SQLA_FloorActivity WITH (NOLOCK) where SourceTable = 'SYSTEMLOG1' and SourceTableID = EvtNum)
@@ -329,7 +329,7 @@ BEGIN
 		select Time = EvtTime, ActivityTypeID = 5, State = 'Get Event', Activity = e.EventDisplay, Location = case when @UseAssetAsLocation = 1 then e.Asset else e.Location end, Zone = e.Zone, PktNum = cast(EvtDetail2 as int),
 		       Tier = e.CustTierLevel, EmpNum = ltrim(rtrim(UserName)), EmpName = (select ltrim(rtrim(NameFirst)) + ' ' + ltrim(rtrim(NameLast)) from RTSS.dbo.EMPLOYEE WITH (NOLOCK) where CardNum = s.UserName), [Source] = ltrim(rtrim(MachineName)), '', '', 'SYSTEMLOG1', EvtNum, '', '', ''
 		  from RTSS.dbo.SYSTEMLOG1 as s WITH (NOLOCK)
-		 inner join RTSS.dbo.EVENT2_ST as e WITH (NOLOCK)
+		 inner join RTSS.dbo.EVENT4_ST as e WITH (NOLOCK)
 		    on e.PktNum = cast(s.EvtDetail2 as int)
 		 where EvtType = 'GetEvents' and EvtDetail2 <> '-1' and (EvtDetail4 is null or EvtDetail4 = '')
 		   and not exists (select null from SQLA_FloorActivity WITH (NOLOCK) where SourceTable = 'SYSTEMLOG1' and SourceTableID = EvtNum)
@@ -339,7 +339,7 @@ BEGIN
 		select Time = EvtTime, ActivityTypeID = 5, State = 'Get Event Popup', Activity = e.EventDisplay, Location = case when @UseAssetAsLocation = 1 then e.Asset else e.Location end, Zone = e.Zone, PktNum = cast(EvtDetail2 as int),
 		       Tier = e.CustTierLevel, EmpNum = ltrim(rtrim(UserName)), EmpName = (select ltrim(rtrim(NameFirst)) + ' ' + ltrim(rtrim(NameLast)) from RTSS.dbo.EMPLOYEE WITH (NOLOCK) where CardNum = s.UserName), [Source] = ltrim(rtrim(MachineName)), '', '', 'SYSTEMLOG1', EvtNum, '', '', ''
 		  from RTSS.dbo.SYSTEMLOG1 as s WITH (NOLOCK)
-		 inner join RTSS.dbo.EVENT2_ST as e WITH (NOLOCK)
+		 inner join RTSS.dbo.EVENT4_ST as e WITH (NOLOCK)
 		    on e.PktNum = cast(s.EvtDetail2 as int)
 		 where EvtType = 'GetEvents' and EvtDetail2 <> '-1' and EvtDetail4 is not null and EvtDetail4 <> '' 
 		   and not exists (select null from SQLA_FloorActivity WITH (NOLOCK) where SourceTable = 'SYSTEMLOG1' and SourceTableID = EvtNum)
@@ -353,7 +353,7 @@ BEGIN
 		select Time = EvtTime, ActivityTypeID = 5, State = 'Auto Dispatch', Activity = e.EventDisplay, Location = case when @UseAssetAsLocation = 1 then e.Asset else e.Location end,
 			   Zone = e.Zone, PktNum = cast(EvtDetail1 as int), Tier = e.CustTierLevel, EmpNum = '', EmpName = '', [Source] = 'RTSS', EvtDetail2, '', 'SYSTEMLOG1', EvtNum, '', '', ''
 		  from RTSS.dbo.SYSTEMLOG1 as s WITH (NOLOCK)
-		 inner join RTSS.dbo.EVENT2_ST as e WITH (NOLOCK)
+		 inner join RTSS.dbo.EVENT4_ST as e WITH (NOLOCK)
 			on e.PktNum = cast(s.EvtDetail1 as int)
 		 where EvtType = 'AutoDispatch'
 		   and not exists (select null from SQLA_FloorActivity WITH (NOLOCK) where SourceTable = 'SYSTEMLOG1' and SourceTableID = EvtNum)
@@ -366,7 +366,7 @@ BEGIN
 		insert into SQLA_FloorActivity
 		select Time = e.tComplete, 9, State = 'Alert Resolved/Evt Cmp', Activity = ltrim(rtrim(alertType)), Location = ltrim(rtrim(a.location)), Zone, PktNum = EventTablePktNum, Tier = ltrim(rtrim(priority)), EmpNum = '', EmpName = '', [Source] = '', ID, '', 'ALERT1', ID, '', '', ''
 		  from RTSS.dbo.ALERT1 as a WITH (NOLOCK)
-		 inner join RTSS.dbo.EVENT2_ST as e WITH (NOLOCK)
+		 inner join RTSS.dbo.EVENT4_ST as e WITH (NOLOCK)
 		    on a.EventTablePktNum = e.PktNum
 		 where a.ID > @MinAlert1ID and a.alertType <> 'EVENT'
 		   and (    (a.tNotify is null and a.tDismiss is null) 
@@ -380,7 +380,7 @@ BEGIN
 			  on s.EvtDetail3 = a.ID and s.EvtType = 'SupervProcAlert'
 		  left join RTSS.dbo.LOCZONE as l WITH (NOLOCK)
 			  on l.Location = a.location
-		  left join RTSS.dbo.EVENT2_ST as e WITH (NOLOCK)
+		  left join RTSS.dbo.EVENT4_ST as e WITH (NOLOCK)
 		    on a.EventTablePktNum = e.PktNum
 		   and a.tDismiss >= e.tComplete
 		 where a.ID > @MinAlert1ID and a.alertType <> 'EVENT'
@@ -405,7 +405,7 @@ BEGIN
 		   AfterDisplay = case when l.PktNum is null then 'N' else 'Y' end,
 		   'EVENTREJECT1_ST', er.PktNum, '', '', ''
 	  from RTSS.dbo.EVENTREJECT1_ST as er WITH (NOLOCK)
-	 inner join RTSS.dbo.EVENT2_ST as ev WITH (NOLOCK)
+	 inner join RTSS.dbo.EVENT4_ST as ev WITH (NOLOCK)
 		on ev.PktNum = er.PktNum
 	  left join RTSS.dbo.EVENT_STATE_LOG1 as l WITH (NOLOCK)
 	    on l.PktNum = er.PktNum and l.EventTable = 'EVENT_ST'
@@ -435,7 +435,7 @@ BEGIN
 		   AfterDisplay = case when l.PktNum is null then 'N' else 'Y' end,
 		   'EVENTREJECT_ST', er.PktNum, '', '', ''
 	  from RTSS.dbo.EVENTREJECT_ST as er WITH (NOLOCK)
-	 inner join RTSS.dbo.EVENT2_ST as ev WITH (NOLOCK)
+	 inner join RTSS.dbo.EVENT4_ST as ev WITH (NOLOCK)
 		on ev.PktNum = er.PktNum
 	  left join RTSS.dbo.EVENT_STATE_LOG1 as l WITH (NOLOCK)
 	    on l.PktNum = er.PktNum and l.EventTable = 'EVENT_ST'
@@ -464,10 +464,10 @@ BEGIN
 	       Description = 'EMPCARD REMOVE',
 		   AfterDisplay = case when l.PktNum is null then 'N' else 'Y' end,
 		   'EVENT1_ST', er.PktNum, '', '', ''
-	  from RTSS.dbo.EVENT2_ST as er WITH (NOLOCK)
+	  from RTSS.dbo.EVENT4_ST as er WITH (NOLOCK)
 	 inner join (select RejPktNum = cast(left(right(rtrim([DESC]), LEN([DESC])-18), len(RIGHT(rtrim([DESC]),LEN([DESC])-18))-1) as int),
 	                    PktNum, Asset, Location, EventDisplay, CustTierLevel, Zone
-	 		       from RTSS.dbo.EVENT2_ST WITH (NOLOCK)
+	 		       from RTSS.dbo.EVENT4_ST WITH (NOLOCK)
 			      where [DESC] like '~r:AssignedRemove%'
 				    and PktNum in (select PktNum from SQLA_New_Events)) as ev
 	    on ev.RejPktNum = er.PktNum
