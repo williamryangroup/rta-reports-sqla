@@ -93,12 +93,13 @@ BEGIN
 		                                                                                    from SQLA_Employees as emp
 		                                                                                   where emp.CardNum = er.EmpNum)
 		                   else er.EmpNum end,
-		   Reason = [Description],
+		   Reason = case when [Description] is null or [Description] = '' then State else [Description] end,
 		   AfterDisplay = er.RejAfterDisp								 
 	  from SQLA_FloorActivity as er
 	 where er.tOut >= @StartDt and er.tout < @EndDt
 	   and er.ActivityTypeID = 5
 	   and er.State like '%Reject%'
+	   and Source <> 'RTSSPPE'
 	   and (er.Activity in (select EventType from #RTA_Compliance_EventTypes) or @EventType is null or @EventType = '')
 	   and (er.Zone in (select ZoneArea from #RTA_Compliance_ZoneAreas) or @ZoneArea is null or @ZoneArea = '')
 	   and (    (er.Tier in (select CustTier from #RTA_Compliance_CustTiers))
