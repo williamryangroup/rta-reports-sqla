@@ -7,11 +7,16 @@
       <rd:SecurityType>Integrated</rd:SecurityType>
       <rd:DataSourceID>7ab97094-ada1-4b42-9b45-c3c5d0ac8eee</rd:DataSourceID>
     </DataSource>
+    <DataSource Name="RTA_SQLA">
+      <DataSourceReference>/ANI/Data Sources/RTA_SQLA</DataSourceReference>
+      <rd:SecurityType>None</rd:SecurityType>
+      <rd:DataSourceID>b6c5ae18-c0cf-4d62-861f-41c2ab750583</rd:DataSourceID>
+    </DataSource>
   </DataSources>
   <DataSets>
     <DataSet Name="RTA_EventDetails_ExecSum_Rsp">
       <Query>
-        <DataSourceName>RTSS</DataSourceName>
+        <DataSourceName>RTA_SQLA</DataSourceName>
         <QueryParameters>
           <QueryParameter Name="@StartDt">
             <Value>=Parameters!StartDt.Value</Value>
@@ -50,8 +55,7 @@
         </QueryParameters>
         <CommandType>StoredProcedure</CommandType>
         <CommandText>sp_SSRS_Rpt_RTA_EventDetails_ExecSum_Rsp</CommandText>
-        <rd:DesignerState>
-          <QueryDefinition xmlns="http://schemas.microsoft.com/ReportingServices/QueryDefinition/Relational">
+        <rd:DesignerState><QueryDefinition xmlns="http://schemas.microsoft.com/ReportingServices/QueryDefinition/Relational">
             <Functions>
               <SProc ColumnOwner="sp_SSRS_Rpt_RTA_EventDetails">
                 <Parameter Name="@StartDt">
@@ -107,8 +111,7 @@
               <ColumnExpression ColumnOwner="sp_SSRS_Rpt_RTA_EventDetails" ColumnName="EmpComplete" />
               <ColumnExpression ColumnOwner="sp_SSRS_Rpt_RTA_EventDetails" ColumnName="ResolutionDesc" />
             </SelectedColumns>
-          </QueryDefinition>
-        </rd:DesignerState>
+          </QueryDefinition></rd:DesignerState>
       </Query>
       <Fields>
         <Field Name="CustTierLevel">
@@ -151,7 +154,7 @@
     </DataSet>
     <DataSet Name="RTA_EventTypes">
       <Query>
-        <DataSourceName>RTSS</DataSourceName>
+        <DataSourceName>RTA_SQLA</DataSourceName>
         <CommandType>StoredProcedure</CommandType>
         <CommandText>sp_SSRS_Rpt_RTA_EventTypes</CommandText>
       </Query>
@@ -164,7 +167,7 @@
     </DataSet>
     <DataSet Name="RTA_ZoneArea">
       <Query>
-        <DataSourceName>RTSS</DataSourceName>
+        <DataSourceName>RTA_SQLA</DataSourceName>
         <CommandType>StoredProcedure</CommandType>
         <CommandText>sp_SSRS_Rpt_RTA_ZoneArea</CommandText>
       </Query>
@@ -177,7 +180,7 @@
     </DataSet>
     <DataSet Name="RTA_CustTiers">
       <Query>
-        <DataSourceName>RTSS</DataSourceName>
+        <DataSourceName>RTA_SQLA</DataSourceName>
         <CommandType>StoredProcedure</CommandType>
         <CommandText>sp_SSRS_Rpt_RTA_CustTiers</CommandText>
       </Query>
@@ -190,7 +193,7 @@
     </DataSet>
     <DataSet Name="RTA_EmpJobTypes">
       <Query>
-        <DataSourceName>RTSS</DataSourceName>
+        <DataSourceName>RTA_SQLA</DataSourceName>
         <QueryParameters>
           <QueryParameter Name="@IncludeAll">
             <Value>1</Value>

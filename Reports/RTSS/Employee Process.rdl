@@ -16,7 +16,7 @@
   <DataSets>
     <DataSet Name="RTA_Compliance_Employee">
       <Query>
-        <DataSourceName>RTSS</DataSourceName>
+        <DataSourceName>RTA_SQLA</DataSourceName>
         <QueryParameters>
           <QueryParameter Name="@StartDt">
             <Value>=Parameters!StartDt.Value</Value>
@@ -201,7 +201,7 @@
     </DataSet>
     <DataSet Name="RTA_EmpJobTypes">
       <Query>
-        <DataSourceName>RTSS</DataSourceName>
+        <DataSourceName>RTA_SQLA</DataSourceName>
         <QueryParameters>
           <QueryParameter Name="@IncludeAll">
             <Value>0</Value>
@@ -220,7 +220,7 @@
     </DataSet>
     <DataSet Name="RTA_EventTypes">
       <Query>
-        <DataSourceName>RTSS</DataSourceName>
+        <DataSourceName>RTA_SQLA</DataSourceName>
         <CommandType>StoredProcedure</CommandType>
         <CommandText>sp_SSRS_Rpt_RTA_EventTypes</CommandText>
       </Query>
@@ -233,7 +233,7 @@
     </DataSet>
     <DataSet Name="RTA_CustTiers">
       <Query>
-        <DataSourceName>RTSS</DataSourceName>
+        <DataSourceName>RTA_SQLA</DataSourceName>
         <CommandType>StoredProcedure</CommandType>
         <CommandText>sp_SSRS_Rpt_RTA_CustTiers</CommandText>
       </Query>
@@ -2672,7 +2672,6 @@
                               <PaddingBottom>2pt</PaddingBottom>
                             </Style>
                           </Textbox>
-                          <rd:Selected>true</rd:Selected>
                         </CellContents>
                       </TablixHeader>
                       <TablixMembers>

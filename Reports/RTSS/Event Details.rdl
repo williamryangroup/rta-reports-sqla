@@ -3,15 +3,20 @@
   <AutoRefresh>0</AutoRefresh>
   <DataSources>
     <DataSource Name="RTSS">
-      <DataSourceReference>/ANI/Data Sources/RTA_SQLA</DataSourceReference>
+      <DataSourceReference>/ANI/Data Sources/RTSS</DataSourceReference>
       <rd:SecurityType>Integrated</rd:SecurityType>
       <rd:DataSourceID>c9279d99-387f-4a42-a5a5-e0145fa6f788</rd:DataSourceID>
+    </DataSource>
+    <DataSource Name="RTA_SQLA">
+      <DataSourceReference>/ANI/Data Sources/RTA_SQLA</DataSourceReference>
+      <rd:SecurityType>None</rd:SecurityType>
+      <rd:DataSourceID>53fd9152-5b2f-4e5f-92e5-2cd3c862a6c2</rd:DataSourceID>
     </DataSource>
   </DataSources>
   <DataSets>
     <DataSet Name="RTA_EventDetails">
       <Query>
-        <DataSourceName>RTSS</DataSourceName>
+        <DataSourceName>RTA_SQLA</DataSourceName>
         <QueryParameters>
           <QueryParameter Name="@StartDt">
             <Value>=Parameters!StartDt.Value</Value>
@@ -334,7 +339,7 @@
     </DataSet>
     <DataSet Name="RTA_CustTiers">
       <Query>
-        <DataSourceName>RTSS</DataSourceName>
+        <DataSourceName>RTA_SQLA</DataSourceName>
         <CommandType>StoredProcedure</CommandType>
         <CommandText>sp_SSRS_Rpt_RTA_CustTiers</CommandText>
       </Query>
@@ -347,7 +352,7 @@
     </DataSet>
     <DataSet Name="RTA_EventTypes">
       <Query>
-        <DataSourceName>RTSS</DataSourceName>
+        <DataSourceName>RTA_SQLA</DataSourceName>
         <CommandType>StoredProcedure</CommandType>
         <CommandText>sp_SSRS_Rpt_RTA_EventTypes</CommandText>
       </Query>
@@ -360,7 +365,7 @@
     </DataSet>
     <DataSet Name="RTA_ZoneArea">
       <Query>
-        <DataSourceName>RTSS</DataSourceName>
+        <DataSourceName>RTA_SQLA</DataSourceName>
         <CommandType>StoredProcedure</CommandType>
         <CommandText>sp_SSRS_Rpt_RTA_ZoneArea</CommandText>
       </Query>
@@ -373,7 +378,7 @@
     </DataSet>
     <DataSet Name="EmpJobTypes">
       <Query>
-        <DataSourceName>RTSS</DataSourceName>
+        <DataSourceName>RTA_SQLA</DataSourceName>
         <CommandType>StoredProcedure</CommandType>
         <CommandText>sp_SSRS_Rpt_RTA_EmpJobTypes</CommandText>
       </Query>
@@ -1280,7 +1285,6 @@
                             <PaddingBottom>2pt</PaddingBottom>
                           </Style>
                         </Textbox>
-                        <rd:Selected>true</rd:Selected>
                       </CellContents>
                     </TablixCell>
                     <TablixCell>

@@ -3,15 +3,20 @@
   <AutoRefresh>0</AutoRefresh>
   <DataSources>
     <DataSource Name="RTSS">
-      <DataSourceReference>/ANI/Data Sources/RTA_SQLA</DataSourceReference>
+      <DataSourceReference>/ANI/Data Sources/RTSS</DataSourceReference>
       <rd:SecurityType>Integrated</rd:SecurityType>
       <rd:DataSourceID>5474876b-29be-4830-9588-64d97ec9a9e7</rd:DataSourceID>
+    </DataSource>
+    <DataSource Name="RTA_SQLA">
+      <DataSourceReference>/ANI/Data Sources/RTA_SQLA</DataSourceReference>
+      <rd:SecurityType>None</rd:SecurityType>
+      <rd:DataSourceID>48501da3-dca5-4aad-97cb-831d45242104</rd:DataSourceID>
     </DataSource>
   </DataSources>
   <DataSets>
     <DataSet Name="FloorActivity">
       <Query>
-        <DataSourceName>RTSS</DataSourceName>
+        <DataSourceName>RTA_SQLA</DataSourceName>
         <QueryParameters>
           <QueryParameter Name="@StartDt">
             <Value>=Parameters!StartDt.Value</Value>
@@ -180,7 +185,7 @@
     </DataSet>
     <DataSet Name="Locations">
       <Query>
-        <DataSourceName>RTSS</DataSourceName>
+        <DataSourceName>RTA_SQLA</DataSourceName>
         <CommandType>StoredProcedure</CommandType>
         <CommandText>sp_SSRS_Rpt_RTA_Locations</CommandText>
       </Query>
@@ -213,7 +218,7 @@
     </DataSet>
     <DataSet Name="Employees">
       <Query>
-        <DataSourceName>RTSS</DataSourceName>
+        <DataSourceName>RTA_SQLA</DataSourceName>
         <CommandType>StoredProcedure</CommandType>
         <CommandText>sp_SSRS_Rpt_RTA_Employees</CommandText>
       </Query>
@@ -242,7 +247,7 @@
     </DataSet>
     <DataSet Name="RTA_ZoneArea">
       <Query>
-        <DataSourceName>RTSS</DataSourceName>
+        <DataSourceName>RTA_SQLA</DataSourceName>
         <CommandType>StoredProcedure</CommandType>
         <CommandText>sp_SSRS_Rpt_RTA_ZoneArea</CommandText>
       </Query>
@@ -912,7 +917,6 @@
                             <PaddingBottom>2pt</PaddingBottom>
                           </Style>
                         </Textbox>
-                        <rd:Selected>true</rd:Selected>
                       </CellContents>
                     </TablixCell>
                     <TablixCell>

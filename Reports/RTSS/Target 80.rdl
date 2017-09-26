@@ -7,11 +7,16 @@
       <rd:SecurityType>Integrated</rd:SecurityType>
       <rd:DataSourceID>e464ef42-9194-49dc-8871-c60d485dffe1</rd:DataSourceID>
     </DataSource>
+    <DataSource Name="RTA_SQLA">
+      <DataSourceReference>/ANI/Data Sources/RTA_SQLA</DataSourceReference>
+      <rd:SecurityType>None</rd:SecurityType>
+      <rd:DataSourceID>39bf85bc-8208-4147-8a71-33ad0db48492</rd:DataSourceID>
+    </DataSource>
   </DataSources>
   <DataSets>
     <DataSet Name="RTA_Target80">
       <Query>
-        <DataSourceName>RTSS</DataSourceName>
+        <DataSourceName>RTA_SQLA</DataSourceName>
         <QueryParameters>
           <QueryParameter Name="@StartDt">
             <Value>=Parameters!StartDt.Value</Value>
@@ -53,8 +58,7 @@
         </QueryParameters>
         <CommandType>StoredProcedure</CommandType>
         <CommandText>sp_SSRS_Rpt_RTA_Target80</CommandText>
-        <rd:DesignerState>
-          <QueryDefinition xmlns="http://schemas.microsoft.com/ReportingServices/QueryDefinition/Relational">
+        <rd:DesignerState><QueryDefinition xmlns="http://schemas.microsoft.com/ReportingServices/QueryDefinition/Relational">
             <Functions>
               <SProc ColumnOwner="sp_SSRS_Rpt_RTA_Target80">
                 <Parameter Name="@StartDt">
@@ -107,8 +111,7 @@
               <ColumnExpression ColumnOwner="sp_SSRS_Rpt_RTA_Target80" ColumnName="RspTotal" />
               <ColumnExpression ColumnOwner="sp_SSRS_Rpt_RTA_Target80" ColumnName="RspPct" />
             </SelectedColumns>
-          </QueryDefinition>
-        </rd:DesignerState>
+          </QueryDefinition></rd:DesignerState>
       </Query>
       <Fields>
         <Field Name="ShiftName">
@@ -215,7 +218,7 @@
     </DataSet>
     <DataSet Name="RTA_EventTypes">
       <Query>
-        <DataSourceName>RTSS</DataSourceName>
+        <DataSourceName>RTA_SQLA</DataSourceName>
         <CommandType>StoredProcedure</CommandType>
         <CommandText>sp_SSRS_Rpt_RTA_EventTypes</CommandText>
       </Query>
@@ -228,7 +231,7 @@
     </DataSet>
     <DataSet Name="RTA_ZoneArea">
       <Query>
-        <DataSourceName>RTSS</DataSourceName>
+        <DataSourceName>RTA_SQLA</DataSourceName>
         <CommandType>StoredProcedure</CommandType>
         <CommandText>sp_SSRS_Rpt_RTA_ZoneArea</CommandText>
       </Query>
@@ -241,7 +244,7 @@
     </DataSet>
     <DataSet Name="RTA_CustTiers">
       <Query>
-        <DataSourceName>RTSS</DataSourceName>
+        <DataSourceName>RTA_SQLA</DataSourceName>
         <CommandType>StoredProcedure</CommandType>
         <CommandText>sp_SSRS_Rpt_RTA_CustTiers</CommandText>
       </Query>
@@ -255,7 +258,7 @@
     <DataSet Name="Target80NumMinutes">
       <Query>
         <DataSourceName>RTSS</DataSourceName>
-        <CommandText>select Target80NumMinutes= Setting from RTSS.dbo.SYSTEMSETTINGS where ConfigSection = 'REPORTS' and ConfigParam = 'Target80NumMinutes'</CommandText>
+        <CommandText>select Target80NumMinutes= Setting from SYSTEMSETTINGS where ConfigSection = 'REPORTS' and ConfigParam = 'Target80NumMinutes'</CommandText>
       </Query>
       <Fields>
         <Field Name="Target80NumMinutes">
@@ -266,7 +269,7 @@
     </DataSet>
     <DataSet Name="RTA_Employees">
       <Query>
-        <DataSourceName>RTSS</DataSourceName>
+        <DataSourceName>RTA_SQLA</DataSourceName>
         <CommandType>StoredProcedure</CommandType>
         <CommandText>sp_SSRS_Rpt_RTA_Employees</CommandText>
       </Query>
@@ -295,7 +298,7 @@
     </DataSet>
     <DataSet Name="RTA_EmpJobTypes">
       <Query>
-        <DataSourceName>RTSS</DataSourceName>
+        <DataSourceName>RTA_SQLA</DataSourceName>
         <QueryParameters>
           <QueryParameter Name="@IncludeAll">
             <Value>1</Value>
