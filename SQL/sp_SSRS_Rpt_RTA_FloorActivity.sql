@@ -63,6 +63,13 @@ BEGIN
 	DECLARE @ServerIP varchar(15) = isnull((select ltrim(rtrim(Setting)) from RTSS.dbo.SYSTEMSETTINGS WITH (NOLOCK) where ConfigSection = 'RTSSHH' and ConfigParam = 'WSSIP'),'0.0.0.0')
 	DECLARE @UseAssetField char(1) = isnull((select case when Setting = 'Asset' then '1' else '0' end from RTSS.dbo.SYSTEMSETTINGS WITH (NOLOCK) where ConfigSection = 'RTSSHH' and ConfigParam = 'EventLocationOrAssetFieldName'),'0')
 	
+	IF @UseAssetField  = '1' 
+	BEGIN
+		SET @Location1 = isnull((select Asset from SQLA_Locations where Location = @Location1),@Location1)
+	END 
+	
+	
+	
 	
 	-- CREATE TABLE OF ZoneAreas
 	IF (EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES 
@@ -182,7 +189,11 @@ BEGIN
 								          when f.Description = '-3' then 'Not assigned, higher priority event open'
 								          else f.Description end)
 		                       else f.Activity end,
-			   Location = ltrim(rtrim(f.Location)), f.PktNum, f.Tier, f.EmpNum, f.EmpName, e.JobType,
+			   Location = ltrim(rtrim(f.Location)), f.PktNum, f.Tier,
+			   f.EmpNum, 
+			   EmpName = case when e.CardNum is null then f.EmpName
+			                  else ltrim(rtrim(e.NameFirst)) + ' ' + left(e.NameFirst,1) + '.' end,
+			   e.JobType,
 		       [Source] = case when f.Source in ('RTSSPPE','RTSS.exe') then 'Server'
 							   when f.Source like '%.%.%.%' and f.Source = @ServerIP then 'Server'
 							   when f.Source like '%.%.%.%' and f.Source <> @ServerIP and f.EmpName = 'RTSSGUI' then 'Workstation'
@@ -258,8 +269,9 @@ BEGIN
 				  and le2.tOut < f.tOut
 		          and le2.tOut > DATEADD(hour,-8,f.tOut)
 				  and le2.tOut > le.tOut )
-		 group by f.tOut, f.State, f.Source, f.Description, f.Activity, f.Location, f.PktNum, f.Tier, f.EmpNum, f.EmpName, e.JobType, f.[Zone], le.[Zone], zc.Activity, f.ActivityTypeID, le.Location
-
+		 group by f.tOut, f.State, f.Source, f.Description, f.Activity, f.Location, f.PktNum, f.Tier,
+		       f.EmpNum, e.CardNum, f.EmpName, e.NameFirst, e.NameFirst, e.JobType, f.[Zone], le.[Zone], zc.Activity, f.ActivityTypeID, le.Location
+		 
 		IF (@ViewMode = 0)  -- Consolidated mode
 		BEGIN
 			-- Add single instances of Beep/Vibrate
