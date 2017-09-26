@@ -1,4 +1,4 @@
-USE [RTSS]
+USE [RTA_SQLA]
 GO
 
 /****** Object:  StoredProcedure [dbo].[sp_SSRS_Rpt_RTA_EventReject]    Script Date: 02/17/2016 21:00:42 ******/
@@ -33,7 +33,7 @@ BEGIN
 	-- interfering with SELECT statements.
 	SET NOCOUNT ON;
 
-	DECLARE @UseEmpName char(255) = (select isnull(Setting,'0') from SYSTEMSETTINGS where ConfigSection = 'REPORTS' and ConfigParam = 'UseEmpNamesInReports')
+	DECLARE @UseEmpName char(255) = (select isnull(Setting,'0') from RTSS.dbo.SYSTEMSETTINGS where ConfigSection = 'REPORTS' and ConfigParam = 'UseEmpNamesInReports')
 	
 	-- CREATE TABLE OF EventTypes
 	IF (EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES 
@@ -90,7 +90,7 @@ BEGIN
 		   tReject = er.tOut,
 		   Employee = case when @UseEmpName = '1' and EmpName <> '' then EmpName
 		                   when @UseEmpName = '1' and EmpName = '' and EmpNum <> '' then (select ltrim(rtrim(emp.NameFirst)) + ' ' + LEFT(ltrim(rtrim(emp.NameLast)),1)
-		                                                                                    from dbo.EMPLOYEE as emp
+		                                                                                    from SQLA_Employees as emp
 		                                                                                   where emp.CardNum = er.EmpNum)
 		                   else er.EmpNum end,
 		   Reason = [Description],
