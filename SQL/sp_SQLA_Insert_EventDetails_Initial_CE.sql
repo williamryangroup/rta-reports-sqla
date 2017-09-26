@@ -132,6 +132,7 @@ BEGIN
 	 where (@StartDt = null or e.tOut >= @StartDt)
 	   and (e.tOut is not NULL and isdate(e.tOut) = 1 and e.tOut > '1/2/1980')
 	   and (e.tComplete is not NULL and isdate(e.tComplete)=1 and e.tComplete >= e.tOut)
+	   and (datediff(hour,e.tOut,e.tComplete) < 8)
 	   and ((e.tAuthorize is not null and isdate(e.tAuthorize)=1 and e.tAuthorize > '1/2/1980') or (e.tAuthorize is null))
 	   and not exists
 	     ( select null from SQLA_FloorActivity as l2 WITH (NOLOCK)
