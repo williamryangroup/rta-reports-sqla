@@ -334,7 +334,7 @@ BEGIN
 	   and e2.ActivityStart < e1.ActivityEnd
 	   and e2.ActivityStart > e1.ActivityStart
 	   and e2.PktNum <> 3
-	 where e1.PktNum <> 3
+	 where e1.PktNum <> 3 and e1.ActivityStart >= @MinBreakOOSLoginDttm
 	   and not exists
 	     ( select null from SQLA_EmployeeEventTimes as e3
 		    where e3.EmpNum = e1.EmpNum
