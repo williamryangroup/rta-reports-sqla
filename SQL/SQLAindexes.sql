@@ -1,4 +1,4 @@
-use RTA_SQLA
+USE [RTA_SQLA]
 GO
 
 DROP INDEX [xn_SQLA_FloorActivity_PktNumState] ON [dbo].[SQLA_FloorActivity]
@@ -22,6 +22,9 @@ GO
 DROP INDEX [xn_SQLA_EmployeeEventTimes_EmpStartEnd] ON [dbo].[SQLA_EmployeeEventTimes]
 GO
 
+DROP INDEX [xn_SQLA_EmployeeEventTimes_ActEnd] ON [dbo].[SQLA_EmployeeEventTimes]
+GO
+
 CREATE NONCLUSTERED INDEX [xn_SQLA_FloorActivity_PktNumState] ON [dbo].[SQLA_FloorActivity]([PktNum],[ActivityTypeID],[State]) ON [PRIMARY]
 GO
 
@@ -41,4 +44,7 @@ CREATE NONCLUSTERED INDEX [xn_SQLA_EmployeeEventTimes_PktNum] ON [dbo].[SQLA_Emp
 GO
 
 CREATE NONCLUSTERED INDEX [xn_SQLA_EmployeeEventTimes_EmpStartEnd] ON [dbo].[SQLA_EmployeeEventTimes]([EmpNum],[ActivityStart],[ActivityEnd]) ON [PRIMARY]
+GO
+
+CREATE NONCLUSTERED INDEX [xn_SQLA_EmployeeEventTimes_ActEnd] ON [dbo].[SQLA_EmployeeEventTimes]([ActivityEnd]) ON [PRIMARY]
 GO
