@@ -48,3 +48,11 @@ GO
 
 CREATE NONCLUSTERED INDEX [xn_SQLA_EmployeeEventTimes_ActEnd] ON [dbo].[SQLA_EmployeeEventTimes]([ActivityEnd]) ON [PRIMARY]
 GO
+
+
+
+USE [RTSS]
+GO
+
+CREATE NONCLUSTERED INDEX [xn_SYSTEMLOG_EvtType] ON [dbo].[SYSTEMLOG1]([EvtType]) ON [PRIMARY]
+GO
