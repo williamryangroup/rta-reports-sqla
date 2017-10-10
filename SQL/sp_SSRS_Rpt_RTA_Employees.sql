@@ -39,7 +39,7 @@ BEGIN
 			   NameDisplay = 'All',
 			   DisplayOrd = 0
 		 union all
-		select CardNum = LTRIM(rtrim(CardNum)), isnull(NameFirst,''), isnull(NameLast,''), isnull(JobType,''),
+		select CardNum = LTRIM(rtrim(CardNum)), NameFirst = isnull(NameFirst,''), NameLast = isnull(NameLast,''), JobType = isnull(JobType,''),
 			   NameDisplay = '(' + left(isnull(JobType,''),1) + ') ' + isnull(NameFirst,'') + ' ' + isnull(NameLast,''),
 			   ROW_NUMBER() OVER(ORDER BY JobType, NameFirst, NameLast, CardNum ASC) AS DisplayOrd
 		  from SQLA_Employees
@@ -50,7 +50,7 @@ BEGIN
 	
 	ELSE
 	BEGIN
-		select CardNum = LTRIM(rtrim(CardNum)), isnull(NameFirst,''), isnull(NameLast,''), isnull(JobType,''),
+		select CardNum = LTRIM(rtrim(CardNum)), NameFirst = isnull(NameFirst,''), NameLast = isnull(NameLast,''), JobType = isnull(JobType,''),
 			   NameDisplay = '(' + left(isnull(JobType,''),1) + ') ' + isnull(NameFirst,'') + ' ' + isnull(NameLast,'')
 		  from SQLA_Employees
 		 where (    (@HostOnly = 0)
