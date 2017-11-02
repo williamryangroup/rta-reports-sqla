@@ -231,7 +231,7 @@ BEGIN
 		              and ((@MaxCmpSecs = 0) or (CmpSecs < @MaxCmpSecs))
 		              and ((@MinOverallMins1 = 0) or (TotSecs >= @MinOverallMins1 * 60))
 		              and ((@ResDesc1 = 0) or (@ResDesc1 = ResolutionDescID))
-		              and ((@Location = '') or (@Location = Location))
+		              and ((@Location = '') or (@Location = Location) or (@Location = 'All') or (@Location = ' All'))
 		              and ((@Hour is null) or (@Hour = tOutHour))
 		              and ((@Shift is null) or (@Shift = ShiftColumn))
 		              and ((@EmpCmpAsnTaken = 0) or (@EmpCmpAsnTaken = AsnTakeID))
