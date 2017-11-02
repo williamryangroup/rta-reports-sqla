@@ -44,6 +44,10 @@
             <Value>=Parameters!EventSum.Value</Value>
             <rd:UserDefined>true</rd:UserDefined>
           </QueryParameter>
+          <QueryParameter Name="@SeriesGrp">
+            <Value>=Parameters!SeriesGroup.Value</Value>
+            <rd:UserDefined>true</rd:UserDefined>
+          </QueryParameter>
         </QueryParameters>
         <CommandType>StoredProcedure</CommandType>
         <CommandText>sp_SSRS_Rpt_RTA_EventDetails_ExecSum_Emp2</CommandText>
@@ -381,7 +385,7 @@
             </ChartLegends>
             <ChartTitles>
               <ChartTitle Name="Default">
-                <Caption>=iif(Parameters!UtilType.Value=1,"Event","Employee") &amp; " Activity" &amp; Constants.vbCrLf &amp; Parameters!StartDt.Value &amp; " - " &amp; Parameters!EndDt.Value</Caption>
+                <Caption>=iif(Parameters!SeriesGroup.Value=0,"Event","Employee") &amp; " " &amp; iif(Parameters!UtilType.Value=0,"Activity","Breakdown") &amp; Constants.vbCrLf &amp; Parameters!StartDt.Value &amp; " - " &amp; Parameters!EndDt.Value</Caption>
                 <Style>
                   <BackgroundGradientType>None</BackgroundGradientType>
                   <FontWeight>Bold</FontWeight>
@@ -541,9 +545,9 @@
                       <FontSize>8pt</FontSize>
                     </Style>
                     <ChartAxisTitle>
-                      <Caption />
+                      <Caption>=iif(Parameters!UtilType.Value=1,"Event Type","Employee")</Caption>
                       <Style>
-                        <FontSize>8pt</FontSize>
+                        <FontWeight>Bold</FontWeight>
                       </Style>
                     </ChartAxisTitle>
                     <Interval>1</Interval>
@@ -617,9 +621,9 @@
                       <FontSize>8pt</FontSize>
                     </Style>
                     <ChartAxisTitle>
-                      <Caption>% TOTAL</Caption>
+                      <Caption>=iif(Parameters!SeriesGroup.Value=1,"% Total Time Logged  In","% Total Event Time")</Caption>
                       <Style>
-                        <FontSize>8pt</FontSize>
+                        <FontWeight>Bold</FontWeight>
                       </Style>
                     </ChartAxisTitle>
                     <ChartMajorGridLines>
@@ -696,11 +700,11 @@
                   <FontSize>8pt</FontSize>
                 </Style>
                 <ChartLegendTitle>
-                  <Caption />
+                  <Caption>=iif(Parameters!SeriesGroup.Value=1,"Event Type","Event State")</Caption>
                   <Style>
                     <FontSize>8pt</FontSize>
                     <FontWeight>Bold</FontWeight>
-                    <TextAlign>Center</TextAlign>
+                    <TextAlign>Left</TextAlign>
                   </Style>
                 </ChartLegendTitle>
                 <HeaderSeparatorColor>Black</HeaderSeparatorColor>
@@ -709,7 +713,7 @@
             </ChartLegends>
             <ChartTitles>
               <ChartTitle Name="Default">
-                <Caption>=iif(Parameters!UtilType.Value=1,"Event","Employee") &amp; " Activity" &amp; Constants.vbCrLf &amp; Parameters!StartDt.Value &amp; " - " &amp; Parameters!EndDt.Value</Caption>
+                <Caption>=iif(Parameters!SeriesGroup.Value=0,"Event","Employee") &amp; " " &amp; iif(Parameters!UtilType.Value=0,"Activity","Breakdown") &amp; Constants.vbCrLf &amp; Parameters!StartDt.Value &amp; " - " &amp; Parameters!EndDt.Value</Caption>
                 <Style>
                   <BackgroundGradientType>None</BackgroundGradientType>
                   <FontWeight>Bold</FontWeight>
@@ -755,7 +759,7 @@
               <Paragraph>
                 <TextRuns>
                   <TextRun>
-                    <Value>Employee Activity</Value>
+                    <Value>=iif(Parameters!SeriesGroup.Value=0,"Event","Employee") &amp; " " &amp; iif(Parameters!UtilType.Value=0,"Activity","Breakdown")</Value>
                     <Style>
                       <FontFamily>Verdana</FontFamily>
                       <FontSize>20pt</FontSize>
