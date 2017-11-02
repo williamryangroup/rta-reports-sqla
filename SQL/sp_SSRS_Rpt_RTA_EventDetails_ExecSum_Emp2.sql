@@ -30,7 +30,8 @@ CREATE PROCEDURE [dbo].[sp_SSRS_Rpt_RTA_EventDetails_ExecSum_Emp2]
 	@IncludeOOS int = 1,
 	@IncludeEMPCARD int = 1,
 	@UseQuartile int = 0,
-	@RspAnalysis int = 0
+	@RspAnalysis int = 0,
+	@SeriesGrp int = 0
 
 WITH RECOMPILE
 AS
@@ -247,21 +248,24 @@ BEGIN
 	   
 	   
 	-- OOS / BREAK
-	insert into #RTA_EventDetails_ExecSum_Emp2_Tmp2 (EmpNum,EmpName,EmpJobType,PktNum,EventDisplay,StatOrd,Stat,StatStart,StatEnd)
-	select et.EmpNum, EmpName = EmpNameFirst + ' ' + left(EmpNameLast,1), EmpJobType, PktNum, EventDisplay,
-		   StatOrd = case when PktNum = 1 then 1 -- Break
-						  when PktNum = 2 then 2 -- OOS
-						  end,
-		   Stat = EventDisplay, StatStart = ActivityStart, StatEnd = ActivityEnd
-	  from SQLA_EmployeeEventTimes as et
-	 inner join #RTA_EventDetails_ExecSum_Emp2_Avl_Tmp2 as a
-	    on a.EmpNum = et.EmpNum
-	 where ActivityStart < @EndDt and ActivityEnd > @StartDt
-	   and PktNum in (1,2) and ActivityStart >= @StartDt and ActivityStart < @EndDt
-	   and (et.EmpJobType in (select JobType from #RTA_EventDetails_ExecSum_Emp2_JobTypes) or @EmpJobType is null or @EmpJobType = '' or @EmpJobType = 'All')
-	   and ActivityStart >= MinActivityStart and ActivityEnd <= MaxActivityEnd
-	   and @UtilType = 0 and ((@IncludeOOS = 0 and PktNum not in (2)) or (@IncludeOOS = 1))
-		
+	IF (@UtilType = 0 and @SeriesGrp <> 0)
+	BEGIN
+		insert into #RTA_EventDetails_ExecSum_Emp2_Tmp2 (EmpNum,EmpName,EmpJobType,PktNum,EventDisplay,StatOrd,Stat,StatStart,StatEnd)
+		select et.EmpNum, EmpName = EmpNameFirst + ' ' + left(EmpNameLast,1), EmpJobType, PktNum, EventDisplay,
+			   StatOrd = case when PktNum = 1 then 1 -- Break
+							  when PktNum = 2 then 2 -- OOS
+							  end,
+			   Stat = EventDisplay, StatStart = ActivityStart, StatEnd = ActivityEnd
+		  from SQLA_EmployeeEventTimes as et
+		 inner join #RTA_EventDetails_ExecSum_Emp2_Avl_Tmp2 as a
+			on a.EmpNum = et.EmpNum
+		 where ActivityStart < @EndDt and ActivityEnd > @StartDt
+		   and PktNum in (1,2) and ActivityStart >= @StartDt and ActivityStart < @EndDt
+		   and (et.EmpJobType in (select JobType from #RTA_EventDetails_ExecSum_Emp2_JobTypes) or @EmpJobType is null or @EmpJobType = '' or @EmpJobType = 'All')
+		   and ActivityStart >= MinActivityStart and ActivityEnd <= MaxActivityEnd
+		   and ((@IncludeOOS = 0 and PktNum not in (2)) or (@IncludeOOS = 1))
+	END
+	
 	
 	-- UPDATE StatSecs
 	delete from #RTA_EventDetails_ExecSum_Emp2_Tmp2
@@ -277,27 +281,27 @@ BEGIN
 	   
 	update #RTA_EventDetails_ExecSum_Emp2_Tmp2
 	   set StatSecs = datediff(second,StatStart,StatEnd)
+
 	
 	
-	-- TOTAL OTHER
-	insert into #RTA_EventDetails_ExecSum_Emp2_Oth_Tmp2 (EmpNum,StatSecs)
-	select EmpNum, StatSecs = sum(isnull(StatSecs,0))
-	  from #RTA_EventDetails_ExecSum_Emp2_Tmp2
-	 where @UtilType = 0
-	 group by EmpNum
+	IF (@UtilType = 0 and @SeriesGrp <> 0)
+	BEGIN
+		-- TOTAL OTHER
+		insert into #RTA_EventDetails_ExecSum_Emp2_Oth_Tmp2 (EmpNum,StatSecs)
+		select EmpNum, StatSecs = sum(isnull(StatSecs,0))
+		  from #RTA_EventDetails_ExecSum_Emp2_Tmp2
+		 group by EmpNum
 	
-	
-	-- INSERT AVAILABLE
-	insert into #RTA_EventDetails_ExecSum_Emp2_Tmp2 (EmpNum,EmpName,EmpJobType,PktNum,EventDisplay,StatOrd,Stat,StatSecs,StatStart,StatEnd)
-	select a.EmpNum, EmpName = '', EmpJobType = '', PktNum = 3, EventDisplay = 'Available', StatOrd = 3, Stat = 'Available', 
-	       StatSecs = a.StatSecs - isnull(o.StatSecs,0), 
-		   MinActivityStart = case when MinActivityStart < @StartDt then @StartDt else MinActivityStart end, 
-		   MaxActivityEnd = case when MaxActivityEnd > @EndDt then @EndDt else MaxActivityEnd end
-	  from #RTA_EventDetails_ExecSum_Emp2_Avl_Tmp2 as a
-	  left join #RTA_EventDetails_ExecSum_Emp2_Oth_Tmp2 as o
-	    on a.EmpNum = o.EmpNum
-	 where @UtilType = 0
-		
+		-- INSERT AVAILABLE
+		insert into #RTA_EventDetails_ExecSum_Emp2_Tmp2 (EmpNum,EmpName,EmpJobType,PktNum,EventDisplay,StatOrd,Stat,StatSecs,StatStart,StatEnd)
+		select a.EmpNum, EmpName = '', EmpJobType = '', PktNum = 3, EventDisplay = 'Available', StatOrd = 3, Stat = 'Available', 
+			   StatSecs = a.StatSecs - isnull(o.StatSecs,0), 
+			   MinActivityStart = case when MinActivityStart < @StartDt then @StartDt else MinActivityStart end, 
+			   MaxActivityEnd = case when MaxActivityEnd > @EndDt then @EndDt else MaxActivityEnd end
+		  from #RTA_EventDetails_ExecSum_Emp2_Avl_Tmp2 as a
+		  left join #RTA_EventDetails_ExecSum_Emp2_Oth_Tmp2 as o
+			on a.EmpNum = o.EmpNum
+	END
 	
 	
 	-- RETURN table
@@ -332,7 +336,7 @@ BEGIN
 							   when u.EventDisplay like 'REEL%' then 'REEL'
 							   when u.EventDisplay like 'OOS%' then 'OOS'
 							   else u.EventDisplay end,
-	       u.StatOrd,
+	       StatOrd = case when u.StatOrd = 61 then 6 else u.StatOrd end,
 		   Stat = case when @EventSum = 1 and u.StatOrd not in (3,4,1,2) then 'EVENT'
                        when @EventSum = 2 then case when u.StatOrd = 4 then 'Asn'  --OpnToAsn
 					                                when u.StatOrd = 5 then 'Acp'  --AsnToAcp/Rej
