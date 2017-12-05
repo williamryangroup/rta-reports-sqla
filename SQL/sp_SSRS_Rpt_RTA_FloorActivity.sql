@@ -355,7 +355,9 @@ BEGIN
 			   AsnArea = case when len(ltrim(rtrim(zc.Activity))) < 14 then ''
 		                      else right(ltrim(rtrim(zc.Activity)),len(ltrim(rtrim(zc.Activity)))-14) end,
 		       f.ActivityTypeID,
-			   LastLocation = le.Location
+			   LastLocation = le.Location,
+			   EmpStatusM = sum(case when es.StatusCode = 'M' then 1 else 0 end),
+			   EmpStatusJ = sum(case when es.StatusCode = 'J' then 1 else 0 end)
 		  from SQLA_FloorActivity as f
 	     inner join SQLA_EmployeeCompliance as c
 	        on c.PktNum = f.PktNum
@@ -376,6 +378,10 @@ BEGIN
 		   and le.EmpNum <> ''
 		   and le.tOut < f.tOut
 		   and le.tOut > DATEADD(hour,-8,f.tOut)
+		  left join SQLA_EmployeeStatus as es
+		    on es.EmpNum = f.EmpNum
+		   and es.tStart <= f.tOut
+		   and es.tEnd > f.tOut
 		 where f.tOut >= @StartDt1 and f.tOut < @EndDt1
 		   and (@Location1 = '' or @Location1 = f.Location)
 		   and (@EmpNum1 = '' or @EmpNum1 = f.EmpNum)
@@ -424,6 +430,8 @@ BEGIN
 	       and (c.RejAuto = @RejAuto)
 	       and (c.RejMan = @RejMan)
 		   and (c.EventDisplay = @EventDisplay or @EventDisplay = '')
+		 group by f.tOut, f.State, f.Source, f.Description, f.Activity, f.Location, f.PktNum, f.Tier,
+		       f.EmpNum, e.CardNum, f.EmpName, e.NameFirst, e.NameLast, e.JobType, f.[Zone], le.[Zone], zc.Activity, f.ActivityTypeID, le.Location
 		   
 		IF (@ViewMode = 0)  -- Consolidated mode
 		BEGIN
@@ -435,8 +443,12 @@ BEGIN
 				   LastArea = '',
 				   AsnArea = '',
 				   f.ActivityTypeID,
-				   LastLocation = ''
-			  from SQLA_FloorActivity as f
+				   LastLocation = '',
+				   EmpStatusM = 0,
+				   EmpStatusJ = 0
+			  from #RTA_FloorActivity_Tmp as t
+			 inner join SQLA_FloorActivity as f
+			     on t.PktNum = f.PktNum
 			  left join SQLA_FloorActivity as na
 				on na.ActivityTypeID = 5 and na.State in ('Assign')
 			   and na.PktNum = f.PktNum
@@ -463,9 +475,13 @@ BEGIN
 			-- Add single instances of Display Alert Popup
 			insert into #RTA_FloorActivity_Tmp
 			select Time = min(f.tOut), f.State,	f.Activity, Location = ltrim(rtrim(f.Location)), f.PktNum, f.Tier, 
-			       EmpNum = cast(count(distinct [Source]) as varchar), EmpName = cast(count(distinct [Source]) as varchar),
-				   JobType = '', [Source] = 'Device', LastArea = '', AsnArea = '', f.ActivityTypeID, LastLocation = ''
-			  from SQLA_FloorActivity as f
+			       EmpNum = cast(count(distinct f.[Source]) as varchar), EmpName = cast(count(distinct f.[Source]) as varchar),
+				   JobType = '', [Source] = 'Device', LastArea = '', AsnArea = '', f.ActivityTypeID, LastLocation = '',
+				   EmpStatusM = 0,
+				   EmpStatusJ = 0
+			  from #RTA_FloorActivity_Tmp as t
+			 inner join SQLA_FloorActivity as f
+			     on t.PktNum = f.PktNum
 			 where f.tOut >= @StartDt1 and f.tOut < @EndDt1
 			   and (@Location1 = '' or @Location1 = f.Location)
 			   and (@EmpNum1 = '' or @EmpNum1 = f.EmpNum)
