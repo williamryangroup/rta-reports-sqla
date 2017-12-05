@@ -11,7 +11,7 @@ IF EXISTS (select * from dbo.sysobjects where id = object_id(N'[dbo].[sp_SSRS_Rp
 	DROP PROCEDURE [sp_SSRS_Rpt_RTA_ShowPaperOut]
 GO
 
-CREATE PROCEDURE sp_SSRS_Rpt_RTA_ShowPaperOut
+CREATE PROCEDURE [dbo].[sp_SSRS_Rpt_RTA_ShowPaperOut]
 
 AS
 BEGIN
