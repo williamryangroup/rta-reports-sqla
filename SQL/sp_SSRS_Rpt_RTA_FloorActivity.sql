@@ -192,7 +192,7 @@ BEGIN
 			   Location = ltrim(rtrim(f.Location)), f.PktNum, f.Tier,
 			   f.EmpNum, 
 			   EmpName = case when e.CardNum is null then f.EmpName
-			                  else ltrim(rtrim(e.NameFirst)) + ' ' + left(e.NameFirst,1) + '.' end,
+			                  else ltrim(rtrim(e.NameFirst)) + ' ' + left(e.NameLast,1) + '.' end,
 			   e.JobType,
 		       [Source] = case when f.Source in ('RTSSPPE','RTSS.exe') then 'Server'
 							   when f.Source like '%.%.%.%' and f.Source = @ServerIP then 'Server'
@@ -219,7 +219,7 @@ BEGIN
 		   and zc.tOut > DATEADD(hour,-8,f.tOut)
 		  left join SQLA_FloorActivity as le
 			on le.ActivityTypeID = 5
-		   and le.State like 'Complete%'
+		   and le.State like 'Complete%' and le.Source <> 'MGR CLEAR ALL'
 		   and le.EmpNum = f.EmpNum
 		   and le.EmpNum <> ''
 		   and le.tOut < f.tOut
@@ -264,13 +264,13 @@ BEGIN
 		   and not exists
 			 ( select * from SQLA_FloorActivity as le2
 				where le2.ActivityTypeID = 5
-				  and le2.State like 'Complete%'
+				  and le2.State like 'Complete%' and le2.Source <> 'MGR CLEAR ALL'
 				  and le2.EmpNum = f.EmpNum
 				  and le2.tOut < f.tOut
 		          and le2.tOut > DATEADD(hour,-8,f.tOut)
 				  and le2.tOut > le.tOut )
 		 group by f.tOut, f.State, f.Source, f.Description, f.Activity, f.Location, f.PktNum, f.Tier,
-		       f.EmpNum, e.CardNum, f.EmpName, e.NameFirst, e.NameFirst, e.JobType, f.[Zone], le.[Zone], zc.Activity, f.ActivityTypeID, le.Location
+		       f.EmpNum, e.CardNum, f.EmpName, e.NameFirst, e.NameLast, e.JobType, f.[Zone], le.[Zone], zc.Activity, f.ActivityTypeID, le.Location
 		 
 		IF (@ViewMode = 0)  -- Consolidated mode
 		BEGIN
@@ -371,7 +371,7 @@ BEGIN
 		   and zc.tOut > DATEADD(hour,-8,f.tOut)
 		  left join SQLA_FloorActivity as le
 			on le.ActivityTypeID = 5
-		   and le.State like 'Complete%'
+		   and le.State like 'Complete%' and le.Source <> 'MGR CLEAR ALL'
 		   and le.EmpNum = f.EmpNum
 		   and le.EmpNum <> ''
 		   and le.tOut < f.tOut
@@ -412,7 +412,7 @@ BEGIN
 		   and not exists
 			 ( select * from SQLA_FloorActivity as le2
 				where le2.ActivityTypeID = 5
-				  and le2.State like 'Complete%'
+				  and le2.State like 'Complete%' and le2.Source <> 'MGR CLEAR ALL'
 				  and le2.EmpNum = f.EmpNum
 				  and le2.tOut < f.tOut
 		          and le2.tOut > DATEADD(hour,-8,f.tOut)
@@ -424,7 +424,7 @@ BEGIN
 	       and (c.RejAuto = @RejAuto)
 	       and (c.RejMan = @RejMan)
 		   and (c.EventDisplay = @EventDisplay or @EventDisplay = '')
-
+		   
 		IF (@ViewMode = 0)  -- Consolidated mode
 		BEGIN
 			-- Add single instances of Beep/Vibrate

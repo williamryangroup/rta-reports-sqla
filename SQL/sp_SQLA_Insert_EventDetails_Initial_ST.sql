@@ -117,12 +117,14 @@ BEGIN
 		                           when EmpNumAssign in (select CardNum from RTSS.dbo.EMPLOYEE WITH (NOLOCK) where JobType = 'Supervisor') and tReassign is null and tReassignSupervisor is null then 2
 		                           when tReassign is not null and tReassign <> '' then 3
 		                           when tReassignSupervisor is not null and tReassignSupervisor <> '' then 4
+		                           when [Desc] = 'MGR CLEAR ALL' then 6
 		                           else null end,
 		   ResolutionDesc = case when EventDisplay = 'EMPCARD' and DeviceIDComplete is not null then ltrim(rtrim(isnull(ResolutionDesc,'')))
 		                         when ResolutionDesc = 'No Event' then ltrim(rtrim(ResolutionDesc))
 		                         when EmpNumAssign in (select CardNum from RTSS.dbo.EMPLOYEE WITH (NOLOCK) where JobType = 'Supervisor') and tReassign is null and tReassignSupervisor is null then 'SupervisorAssign'
 		                         when tReassign is not null and tReassign <> '' then 'Reassign'
 		                         when tReassignSupervisor is not null and tReassignSupervisor <> '' then 'ReassignSupervisor'
+		                         when [Desc] = 'MGR CLEAR ALL' then 'MGR CLEAR ALL'
 		                         else '' end,
 		   Reassign = case when tReassign is null or tReassign = '' then 0 else 1 end,
 		   ReassignSupervisor = case when tReassignSupervisor is null or tReassignSupervisor = '' then 0 else 1 end,

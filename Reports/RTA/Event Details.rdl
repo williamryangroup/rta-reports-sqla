@@ -2857,6 +2857,10 @@
             <Value>4</Value>
             <Label>ReassignSupervisor</Label>
           </ParameterValue>
+          <ParameterValue>
+            <Value>6</Value>
+            <Label>MGR CLEAR ALL</Label>
+          </ParameterValue>
         </ParameterValues>
       </ValidValues>
     </ReportParameter>
