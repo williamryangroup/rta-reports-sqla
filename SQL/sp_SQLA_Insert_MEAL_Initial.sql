@@ -36,8 +36,8 @@ BEGIN
 	
 	insert into SQLA_MEAL (PktNum, Location, Zone, EmpNum, EmpName, EmpLicNum, tOut, EntryReason, ParentEventID, PktNumWitness1, PktNumSourceWitness1, EmpNumWitness1, EmpNameWitness1, EmpLicNumWitness1, tWitness1, PktNumWitness2, PktNumSourceWitness2, EmpNumWitness2, EmpNameWitness2, EmpLicNumWitness2, tWitness2, PktNumWitness3, PktNumSourceWitness3, EmpNumWitness3, EmpNameWitness3, EmpLicNumWitness3, tWitness3, PktNumWitness4, PktNumSourceWitness4, EmpNumWitness4, EmpNameWitness4, EmpLicNumWitness4, tWitness4, EventComment, Asset, CardInEvtDisp, CardInEvtDesc, Source, tComplete)
 	select ml.PktNum, ml.Location, ml.Zone,
-	       EmpNum = case when ml.EmpNum is null or ml.EmpNum = '' then ISNULL(es.EmpNumComplete,et.EmpNumComplete) else ml.EmpNum end,
-		   EmpName = case when ml.EmpName is null or ml.EmpName = '' then ISNULL(es.EmpNameComplete,et.EmpNameComplete) else ml.EmpName end,
+	       EmpNum = case when ml.EmpNum is null or ml.EmpNum = '' then ISNULL(ISNULL(ISNULL(es.EmpNumComplete,et.EmpNumComplete),es.EmpNumComplete),et.EmpNumComplete) else ml.EmpNum end,
+		   EmpName = case when ml.EmpName is null or ml.EmpName = '' then ISNULL(ISNULL(ISNULL(es.EmpNameComplete,et.EmpNameComplete),es.EmpNameAuthorize),et.EmpNameAuthorize) else ml.EmpName end,
 		   ml.EmpLicNum,
 		   ml.tOut, 
 		   EntryReason = case when ml.EventDisplay1 = 'EMPCARD' then 'EMPCARD'
