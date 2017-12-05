@@ -628,6 +628,9 @@ order by Setting desc</CommandText>
                                     <Parameter Name="IncludeEMPCARD">
                                       <Value>=Parameters!IncludeEMPCARD.Value</Value>
                                     </Parameter>
+                                    <Parameter Name="MinRspSecs">
+                                      <Value>0</Value>
+                                    </Parameter>
                                   </Parameters>
                                 </Drillthrough>
                               </Action>
@@ -806,6 +809,9 @@ order by Setting desc</CommandText>
                                     <Parameter Name="IncludeEMPCARD">
                                       <Value>=Parameters!IncludeEMPCARD.Value</Value>
                                     </Parameter>
+                                    <Parameter Name="MinRspSecs">
+                                      <Value>0</Value>
+                                    </Parameter>
                                   </Parameters>
                                 </Drillthrough>
                               </Action>
@@ -878,6 +884,9 @@ order by Setting desc</CommandText>
                                     </Parameter>
                                     <Parameter Name="IncludeEMPCARD">
                                       <Value>=Parameters!IncludeEMPCARD.Value</Value>
+                                    </Parameter>
+                                    <Parameter Name="MinRspSecs">
+                                      <Value>0</Value>
                                     </Parameter>
                                   </Parameters>
                                 </Drillthrough>
@@ -952,6 +961,9 @@ order by Setting desc</CommandText>
                                     <Parameter Name="IncludeEMPCARD">
                                       <Value>=Parameters!IncludeEMPCARD.Value</Value>
                                     </Parameter>
+                                    <Parameter Name="MinRspSecs">
+                                      <Value>0</Value>
+                                    </Parameter>
                                   </Parameters>
                                 </Drillthrough>
                               </Action>
@@ -1025,6 +1037,9 @@ order by Setting desc</CommandText>
                                     <Parameter Name="IncludeEMPCARD">
                                       <Value>=Parameters!IncludeEMPCARD.Value</Value>
                                     </Parameter>
+                                    <Parameter Name="MinRspSecs">
+                                      <Value>0</Value>
+                                    </Parameter>
                                   </Parameters>
                                 </Drillthrough>
                               </Action>
@@ -1094,6 +1109,9 @@ order by Setting desc</CommandText>
                                     </Parameter>
                                     <Parameter Name="IncludeEMPCARD">
                                       <Value>=Parameters!IncludeEMPCARD.Value</Value>
+                                    </Parameter>
+                                    <Parameter Name="MinRspSecs">
+                                      <Value>0</Value>
                                     </Parameter>
                                   </Parameters>
                                 </Drillthrough>
@@ -1165,6 +1183,9 @@ order by Setting desc</CommandText>
                                     <Parameter Name="IncludeEMPCARD">
                                       <Value>=Parameters!IncludeEMPCARD.Value</Value>
                                     </Parameter>
+                                    <Parameter Name="MinRspSecs">
+                                      <Value>0</Value>
+                                    </Parameter>
                                   </Parameters>
                                 </Drillthrough>
                               </Action>
@@ -1181,6 +1202,7 @@ order by Setting desc</CommandText>
                             <PaddingBottom>2pt</PaddingBottom>
                           </Style>
                         </Textbox>
+                        <rd:Selected>true</rd:Selected>
                       </CellContents>
                     </TablixCell>
                   </TablixCells>
