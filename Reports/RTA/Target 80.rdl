@@ -372,7 +372,7 @@
                           <Paragraph>
                             <TextRuns>
                               <TextRun>
-                                <Value>=iif(Parameters!GroupBy.Value=1,"Shift","Tier")</Value>
+                                <Value>=iif(Parameters!GroupBy.Value=1,"Hour","Tier")</Value>
                                 <Style>
                                   <FontFamily>Tahoma</FontFamily>
                                   <FontSize>11pt</FontSize>
@@ -530,8 +530,11 @@
                                     <Parameter Name="MaxRspSecs">
                                       <Value>=Parameters!RspMins.Value*60</Value>
                                     </Parameter>
+                                    <Parameter Name="Shift">
+                                      <Value>=Fields!ShiftOrder.Value</Value>
+                                    </Parameter>
                                     <Parameter Name="Hour">
-                                      <Value>=Fields!ShiftHour.Value</Value>
+                                      <Value>=iif(Parameters!GroupBy.Value=1,Nothing,Fields!ShiftHour.Value)</Value>
                                     </Parameter>
                                     <Parameter Name="MinRspSecs">
                                       <Value>0</Value>
@@ -1448,8 +1451,11 @@
                                     <Parameter Name="MaxCmpMins">
                                       <Value>=Parameters!MaxCmpMins.Value</Value>
                                     </Parameter>
+                                    <Parameter Name="Shift">
+                                      <Value>=Fields!ShiftOrder.Value</Value>
+                                    </Parameter>
                                     <Parameter Name="Hour">
-                                      <Value>=Fields!ShiftHour.Value</Value>
+                                      <Value>=iif(Parameters!GroupBy.Value=1,Nothing,Fields!ShiftHour.Value)</Value>
                                     </Parameter>
                                     <Parameter Name="MinRspSecs">
                                       <Value>0</Value>
@@ -2829,8 +2835,11 @@
                                     <Parameter Name="MaxRspSecs">
                                       <Value>=Parameters!RspMins.Value * 60</Value>
                                     </Parameter>
+                                    <Parameter Name="Shift">
+                                      <Value>=Fields!ShiftOrder.Value</Value>
+                                    </Parameter>
                                     <Parameter Name="Hour">
-                                      <Value>=Fields!ShiftHour.Value</Value>
+                                      <Value>=iif(Parameters!GroupBy.Value=1,Nothing,Fields!ShiftHour.Value)</Value>
                                     </Parameter>
                                     <Parameter Name="MinRspSecs">
                                       <Value>0</Value>
@@ -3713,8 +3722,11 @@
                                     <Parameter Name="MaxCmpMins">
                                       <Value>=Parameters!MaxCmpMins.Value</Value>
                                     </Parameter>
+                                    <Parameter Name="Shift">
+                                      <Value>=Fields!ShiftOrder.Value</Value>
+                                    </Parameter>
                                     <Parameter Name="Hour">
-                                      <Value>=Fields!ShiftHour.Value</Value>
+                                      <Value>=iif(Parameters!GroupBy.Value=1,Nothing,Fields!ShiftHour.Value)</Value>
                                     </Parameter>
                                     <Parameter Name="MinRspSecs">
                                       <Value>0</Value>
@@ -6563,7 +6575,7 @@
                               <Paragraph>
                                 <TextRuns>
                                   <TextRun>
-                                    <Value>=iif(Parameters!GroupBy.Value=1,Fields!ShiftName.Value,Fields!CustTierLevel.Value)</Value>
+                                    <Value>=iif(Parameters!GroupBy.Value=1,"All",Fields!CustTierLevel.Value)</Value>
                                     <Style>
                                       <FontFamily>Tahoma</FontFamily>
                                       <FontWeight>Bold</FontWeight>
@@ -7142,7 +7154,7 @@
                           <Paragraph>
                             <TextRuns>
                               <TextRun>
-                                <Value>=iif(Parameters!GroupBy.Value=1,"Shift","Tier")</Value>
+                                <Value>=iif(Parameters!GroupBy.Value=1,"Hour","Tier")</Value>
                                 <Style>
                                   <FontFamily>Tahoma</FontFamily>
                                   <FontSize>11pt</FontSize>
@@ -7300,8 +7312,11 @@
                                     <Parameter Name="MaxRspSecs">
                                       <Value>=Parameters!RspMins.Value * 60</Value>
                                     </Parameter>
+                                    <Parameter Name="Shift">
+                                      <Value>=Fields!ShiftOrder.Value</Value>
+                                    </Parameter>
                                     <Parameter Name="Hour">
-                                      <Value>=Fields!ShiftHour.Value</Value>
+                                      <Value>=iif(Parameters!GroupBy.Value=1,Nothing,Fields!ShiftHour.Value)</Value>
                                     </Parameter>
                                     <Parameter Name="MinRspSecs">
                                       <Value>0</Value>
@@ -8218,8 +8233,11 @@
                                     <Parameter Name="MaxCmpMins">
                                       <Value>=Parameters!MaxCmpMins.Value</Value>
                                     </Parameter>
+                                    <Parameter Name="Shift">
+                                      <Value>=Fields!ShiftOrder.Value</Value>
+                                    </Parameter>
                                     <Parameter Name="Hour">
-                                      <Value>=Fields!ShiftHour.Value</Value>
+                                      <Value>=iif(Parameters!GroupBy.Value=1,Nothing,Fields!ShiftHour.Value)</Value>
                                     </Parameter>
                                     <Parameter Name="MinRspSecs">
                                       <Value>0</Value>
@@ -9599,8 +9617,11 @@
                                     <Parameter Name="MaxRspSecs">
                                       <Value>=Parameters!RspMins.Value * 60</Value>
                                     </Parameter>
+                                    <Parameter Name="Shift">
+                                      <Value>=Fields!ShiftOrder.Value</Value>
+                                    </Parameter>
                                     <Parameter Name="Hour">
-                                      <Value>=Fields!ShiftHour.Value</Value>
+                                      <Value>=iif(Parameters!GroupBy.Value=1,Nothing,Fields!ShiftHour.Value)</Value>
                                     </Parameter>
                                     <Parameter Name="MinRspSecs">
                                       <Value>0</Value>
@@ -10483,8 +10504,11 @@
                                     <Parameter Name="MaxCmpMins">
                                       <Value>=Parameters!MaxCmpMins.Value</Value>
                                     </Parameter>
+                                    <Parameter Name="Shift">
+                                      <Value>=Fields!ShiftOrder.Value</Value>
+                                    </Parameter>
                                     <Parameter Name="Hour">
-                                      <Value>=Fields!ShiftHour.Value</Value>
+                                      <Value>=iif(Parameters!GroupBy.Value=1,Nothing,Fields!ShiftHour.Value)</Value>
                                     </Parameter>
                                     <Parameter Name="MinRspSecs">
                                       <Value>0</Value>
@@ -13333,7 +13357,7 @@
                               <Paragraph>
                                 <TextRuns>
                                   <TextRun>
-                                    <Value>=iif(Parameters!GroupBy.Value = 1, Fields!ShiftName.Value, Fields!CustTierLevel.Value)</Value>
+                                    <Value>=iif(Parameters!GroupBy.Value = 1,"All",Fields!CustTierLevel.Value)</Value>
                                     <Style>
                                       <FontFamily>Tahoma</FontFamily>
                                       <FontWeight>Bold</FontWeight>
@@ -13649,7 +13673,7 @@
                           <Paragraph>
                             <TextRuns>
                               <TextRun>
-                                <Value>=iif(Parameters!GroupBy.Value=1,"Shift","Tier")</Value>
+                                <Value>=iif(Parameters!GroupBy.Value=1,"Hour","Tier")</Value>
                                 <Style>
                                   <FontFamily>Tahoma</FontFamily>
                                   <FontSize>11pt</FontSize>
@@ -13807,8 +13831,11 @@
                                     <Parameter Name="MaxRspSecs">
                                       <Value>=Parameters!RspMins.Value * 60</Value>
                                     </Parameter>
+                                    <Parameter Name="Shift">
+                                      <Value>=Fields!ShiftOrder.Value</Value>
+                                    </Parameter>
                                     <Parameter Name="Hour">
-                                      <Value>=Fields!ShiftHour.Value</Value>
+                                      <Value>=iif(Parameters!GroupBy.Value=1,Nothing,Fields!ShiftHour.Value)</Value>
                                     </Parameter>
                                     <Parameter Name="MinRspSecs">
                                       <Value>0</Value>
@@ -14725,8 +14752,11 @@
                                     <Parameter Name="MaxCmpMins">
                                       <Value>=Parameters!MaxCmpMins.Value</Value>
                                     </Parameter>
+                                    <Parameter Name="Shift">
+                                      <Value>=Fields!ShiftOrder.Value</Value>
+                                    </Parameter>
                                     <Parameter Name="Hour">
-                                      <Value>=Fields!ShiftHour.Value</Value>
+                                      <Value>=iif(Parameters!GroupBy.Value=1,Nothing,Fields!ShiftHour.Value)</Value>
                                     </Parameter>
                                     <Parameter Name="MinRspSecs">
                                       <Value>0</Value>
@@ -16106,8 +16136,11 @@
                                     <Parameter Name="MaxRspSecs">
                                       <Value>=Parameters!RspMins.Value * 60</Value>
                                     </Parameter>
+                                    <Parameter Name="Shift">
+                                      <Value>=Fields!ShiftOrder.Value</Value>
+                                    </Parameter>
                                     <Parameter Name="Hour">
-                                      <Value>=Fields!ShiftHour.Value</Value>
+                                      <Value>=iif(Parameters!GroupBy.Value=1,Nothing,Fields!ShiftHour.Value)</Value>
                                     </Parameter>
                                     <Parameter Name="MinRspSecs">
                                       <Value>0</Value>
@@ -16990,8 +17023,11 @@
                                     <Parameter Name="MaxCmpMins">
                                       <Value>=Parameters!MaxCmpMins.Value</Value>
                                     </Parameter>
+                                    <Parameter Name="Shift">
+                                      <Value>=Fields!ShiftOrder.Value</Value>
+                                    </Parameter>
                                     <Parameter Name="Hour">
-                                      <Value>=Fields!ShiftHour.Value</Value>
+                                      <Value>=iif(Parameters!GroupBy.Value=1,Nothing,Fields!ShiftHour.Value)</Value>
                                     </Parameter>
                                     <Parameter Name="MinRspSecs">
                                       <Value>0</Value>
@@ -19840,7 +19876,7 @@
                               <Paragraph>
                                 <TextRuns>
                                   <TextRun>
-                                    <Value>=iif(Parameters!GroupBy.Value = 1, Fields!ShiftName.Value, Fields!CustTierLevel.Value)</Value>
+                                    <Value>=iif(Parameters!GroupBy.Value = 1,"All",Fields!CustTierLevel.Value)</Value>
                                     <Style>
                                       <FontFamily>Tahoma</FontFamily>
                                       <FontWeight>Bold</FontWeight>
@@ -20314,9 +20350,6 @@
                                     <Parameter Name="MaxRspSecs">
                                       <Value>=Parameters!RspMins.Value * 60</Value>
                                     </Parameter>
-                                    <Parameter Name="Hour">
-                                      <Value>=Fields!ShiftHour.Value</Value>
-                                    </Parameter>
                                     <Parameter Name="MinRspSecs">
                                       <Value>0</Value>
                                     </Parameter>
@@ -20398,9 +20431,6 @@
                                     <Parameter Name="MaxRspSecs">
                                       <Value>=Parameters!RspMins.Value * 60</Value>
                                     </Parameter>
-                                    <Parameter Name="Shift">
-                                      <Value>=Fields!ShiftOrder.Value</Value>
-                                    </Parameter>
                                     <Parameter Name="MinRspSecs">
                                       <Value>0</Value>
                                     </Parameter>
@@ -20478,9 +20508,6 @@
                                     </Parameter>
                                     <Parameter Name="MaxRspSecs">
                                       <Value>=Parameters!RspMins.Value * 60</Value>
-                                    </Parameter>
-                                    <Parameter Name="Shift">
-                                      <Value>=Fields!ShiftOrder.Value</Value>
                                     </Parameter>
                                     <Parameter Name="CustTier">
                                       <Value>=Fields!CustTierLevel.Value</Value>
@@ -20568,9 +20595,6 @@
                                     </Parameter>
                                     <Parameter Name="MaxRspSecs">
                                       <Value>=Parameters!RspMins.Value * 60</Value>
-                                    </Parameter>
-                                    <Parameter Name="Shift">
-                                      <Value>=Fields!ShiftOrder.Value</Value>
                                     </Parameter>
                                     <Parameter Name="CustTier">
                                       <Value>=Fields!CustTierLevel.Value</Value>
@@ -21232,9 +21256,6 @@
                                     <Parameter Name="MaxCmpMins">
                                       <Value>=Parameters!MaxCmpMins.Value</Value>
                                     </Parameter>
-                                    <Parameter Name="Hour">
-                                      <Value>=Fields!ShiftHour.Value</Value>
-                                    </Parameter>
                                     <Parameter Name="MinRspSecs">
                                       <Value>0</Value>
                                     </Parameter>
@@ -21313,9 +21334,6 @@
                                     <Parameter Name="MaxCmpMins">
                                       <Value>=Parameters!MaxCmpMins.Value</Value>
                                     </Parameter>
-                                    <Parameter Name="Shift">
-                                      <Value>=Fields!ShiftOrder.Value</Value>
-                                    </Parameter>
                                     <Parameter Name="MinRspSecs">
                                       <Value>0</Value>
                                     </Parameter>
@@ -21390,9 +21408,6 @@
                                     </Parameter>
                                     <Parameter Name="ZoneArea">
                                       <Value>=Parameters!ZoneArea.Value</Value>
-                                    </Parameter>
-                                    <Parameter Name="Shift">
-                                      <Value>=Fields!ShiftOrder.Value</Value>
                                     </Parameter>
                                     <Parameter Name="CustTier">
                                       <Value>=Fields!CustTierLevel.Value</Value>
@@ -21477,9 +21492,6 @@
                                     </Parameter>
                                     <Parameter Name="ZoneArea">
                                       <Value>=Parameters!ZoneArea.Value</Value>
-                                    </Parameter>
-                                    <Parameter Name="Shift">
-                                      <Value>=Fields!ShiftOrder.Value</Value>
                                     </Parameter>
                                     <Parameter Name="CustTier">
                                       <Value>=Fields!CustTierLevel.Value</Value>
@@ -22613,9 +22625,6 @@
                                     <Parameter Name="MaxRspSecs">
                                       <Value>=Parameters!RspMins.Value * 60</Value>
                                     </Parameter>
-                                    <Parameter Name="Hour">
-                                      <Value>=Fields!ShiftHour.Value</Value>
-                                    </Parameter>
                                     <Parameter Name="MinRspSecs">
                                       <Value>0</Value>
                                     </Parameter>
@@ -22694,9 +22703,6 @@
                                     <Parameter Name="MaxRspSecs">
                                       <Value>=Parameters!RspMins.Value * 60</Value>
                                     </Parameter>
-                                    <Parameter Name="Shift">
-                                      <Value>=Fields!ShiftOrder.Value</Value>
-                                    </Parameter>
                                     <Parameter Name="MinRspSecs">
                                       <Value>0</Value>
                                     </Parameter>
@@ -22773,9 +22779,6 @@
                                     </Parameter>
                                     <Parameter Name="MaxRspSecs">
                                       <Value>=Parameters!RspMins.Value * 60</Value>
-                                    </Parameter>
-                                    <Parameter Name="Shift">
-                                      <Value>=Fields!ShiftOrder.Value</Value>
                                     </Parameter>
                                     <Parameter Name="AsnTake">
                                       <Value>1</Value>
@@ -22859,9 +22862,6 @@
                                     </Parameter>
                                     <Parameter Name="MaxRspSecs">
                                       <Value>=Parameters!RspMins.Value * 60</Value>
-                                    </Parameter>
-                                    <Parameter Name="Shift">
-                                      <Value>=Fields!ShiftOrder.Value</Value>
                                     </Parameter>
                                     <Parameter Name="AsnTake">
                                       <Value>2</Value>
@@ -23497,9 +23497,6 @@
                                     <Parameter Name="MaxCmpMins">
                                       <Value>=Parameters!MaxCmpMins.Value</Value>
                                     </Parameter>
-                                    <Parameter Name="Hour">
-                                      <Value>=Fields!ShiftHour.Value</Value>
-                                    </Parameter>
                                     <Parameter Name="MinRspSecs">
                                       <Value>0</Value>
                                     </Parameter>
@@ -23575,9 +23572,6 @@
                                     <Parameter Name="MaxCmpMins">
                                       <Value>=Parameters!MaxCmpMins.Value</Value>
                                     </Parameter>
-                                    <Parameter Name="Shift">
-                                      <Value>=Fields!ShiftOrder.Value</Value>
-                                    </Parameter>
                                     <Parameter Name="MinRspSecs">
                                       <Value>0</Value>
                                     </Parameter>
@@ -23651,9 +23645,6 @@
                                     </Parameter>
                                     <Parameter Name="ZoneArea">
                                       <Value>=Parameters!ZoneArea.Value</Value>
-                                    </Parameter>
-                                    <Parameter Name="Shift">
-                                      <Value>=Fields!ShiftOrder.Value</Value>
                                     </Parameter>
                                     <Parameter Name="AsnTake">
                                       <Value>1</Value>
@@ -23734,9 +23725,6 @@
                                     </Parameter>
                                     <Parameter Name="ZoneArea">
                                       <Value>=Parameters!ZoneArea.Value</Value>
-                                    </Parameter>
-                                    <Parameter Name="Shift">
-                                      <Value>=Fields!ShiftOrder.Value</Value>
                                     </Parameter>
                                     <Parameter Name="AsnTake">
                                       <Value>2</Value>
@@ -26285,7 +26273,7 @@
                           <Paragraph>
                             <TextRuns>
                               <TextRun>
-                                <Value>ALL</Value>
+                                <Value>All</Value>
                                 <Style>
                                   <FontFamily>Tahoma</FontFamily>
                                   <FontWeight>Bold</FontWeight>
@@ -26323,7 +26311,7 @@
                               <Paragraph>
                                 <TextRuns>
                                   <TextRun>
-                                    <Value>ALL</Value>
+                                    <Value>All</Value>
                                     <Style>
                                       <FontFamily>Tahoma</FontFamily>
                                       <FontWeight>Bold</FontWeight>
