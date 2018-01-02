@@ -138,7 +138,8 @@ BEGIN
 		   DayOfWeekOrd = DATEPART(weekday,tOut),
 		   MonthOrd = DATEPART(month,tOut),
 		   ShiftOrd = ShiftColumn,
-		   ZoneOrd = case when @ZonesAreNumeric = 1 then cast(Zone as int) else Zone end
+		   ZoneOrd = case when @ZonesAreNumeric=1 then cast((case when ISNUMERIC(Zone)=0 then 0 else Zone end) as int)
+		                  else Zone end
 	  from SQLA_EventDetails as d
 	  left join SQLA_ShiftHours as s
 	    on s.StartHour = tOutHour
