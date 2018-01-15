@@ -1,6 +1,37 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Report xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner" xmlns:cl="http://schemas.microsoft.com/sqlserver/reporting/2010/01/componentdefinition" xmlns="http://schemas.microsoft.com/sqlserver/reporting/2010/01/reportdefinition">
   <AutoRefresh>0</AutoRefresh>
+  <DataSources>
+    <DataSource Name="RTA_SQLA">
+      <DataSourceReference>/ANI/Data Sources/RTA_SQLA</DataSourceReference>
+      <rd:SecurityType>None</rd:SecurityType>
+      <rd:DataSourceID>6af271e5-321e-46c9-83a5-831b4c24a1d2</rd:DataSourceID>
+    </DataSource>
+    <DataSource Name="RTSS">
+      <DataSourceReference>/ANI/Data Sources/RTSS</DataSourceReference>
+      <rd:SecurityType>None</rd:SecurityType>
+      <rd:DataSourceID>824fc78b-dbb2-4830-ab65-e753ba0be46f</rd:DataSourceID>
+    </DataSource>
+  </DataSources>
+  <DataSets>
+    <DataSet Name="RTA_RptStartEndDttm">
+      <Query>
+        <DataSourceName>RTA_SQLA</DataSourceName>
+        <CommandType>StoredProcedure</CommandType>
+        <CommandText>sp_SSRS_Rpt_RTA_RptStartEndDttm</CommandText>
+      </Query>
+      <Fields>
+        <Field Name="StartDttm">
+          <DataField>StartDttm</DataField>
+          <rd:TypeName>System.DateTime</rd:TypeName>
+        </Field>
+        <Field Name="EndDttm">
+          <DataField>EndDttm</DataField>
+          <rd:TypeName>System.DateTime</rd:TypeName>
+        </Field>
+      </Fields>
+    </DataSet>
+  </DataSets>
   <ReportSections>
     <ReportSection>
       <Body>
@@ -235,18 +266,20 @@
     <ReportParameter Name="StartDt">
       <DataType>DateTime</DataType>
       <DefaultValue>
-        <Values>
-          <Value>=dateadd("d",-2,Today())</Value>
-        </Values>
+        <DataSetReference>
+          <DataSetName>RTA_RptStartEndDttm</DataSetName>
+          <ValueField>StartDttm</ValueField>
+        </DataSetReference>
       </DefaultValue>
       <Prompt>Start Date</Prompt>
     </ReportParameter>
     <ReportParameter Name="EndDt">
       <DataType>String</DataType>
       <DefaultValue>
-        <Values>
-          <Value>=dateadd("s",-1,dateadd("d",1,today()))</Value>
-        </Values>
+        <DataSetReference>
+          <DataSetName>RTA_RptStartEndDttm</DataSetName>
+          <ValueField>EndDttm</ValueField>
+        </DataSetReference>
       </DefaultValue>
       <Prompt>End Date</Prompt>
     </ReportParameter>

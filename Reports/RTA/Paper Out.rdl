@@ -124,6 +124,23 @@
         </Field>
       </Fields>
     </DataSet>
+    <DataSet Name="RTA_RptStartEndDttm">
+      <Query>
+        <DataSourceName>RTA_SQLA</DataSourceName>
+        <CommandType>StoredProcedure</CommandType>
+        <CommandText>sp_SSRS_Rpt_RTA_RptStartEndDttm</CommandText>
+      </Query>
+      <Fields>
+        <Field Name="StartDttm">
+          <DataField>StartDttm</DataField>
+          <rd:TypeName>System.DateTime</rd:TypeName>
+        </Field>
+        <Field Name="EndDttm">
+          <DataField>EndDttm</DataField>
+          <rd:TypeName>System.DateTime</rd:TypeName>
+        </Field>
+      </Fields>
+    </DataSet>
   </DataSets>
   <ReportSections>
     <ReportSection>
@@ -720,18 +737,20 @@
     <ReportParameter Name="StartDt">
       <DataType>DateTime</DataType>
       <DefaultValue>
-        <Values>
-          <Value>=dateadd("h",6,today())</Value>
-        </Values>
+        <DataSetReference>
+          <DataSetName>RTA_RptStartEndDttm</DataSetName>
+          <ValueField>StartDttm</ValueField>
+        </DataSetReference>
       </DefaultValue>
       <Prompt>Start Dt</Prompt>
     </ReportParameter>
     <ReportParameter Name="EndDt">
       <DataType>DateTime</DataType>
       <DefaultValue>
-        <Values>
-          <Value>=dateadd("h",10,today())</Value>
-        </Values>
+        <DataSetReference>
+          <DataSetName>RTA_RptStartEndDttm</DataSetName>
+          <ValueField>EndDttm</ValueField>
+        </DataSetReference>
       </DefaultValue>
       <Prompt>End Dt</Prompt>
     </ReportParameter>
