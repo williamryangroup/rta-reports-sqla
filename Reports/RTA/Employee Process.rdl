@@ -48,6 +48,10 @@
             <Value>=Parameters!ZoneArea.Value</Value>
             <rd:UserDefined>true</rd:UserDefined>
           </QueryParameter>
+          <QueryParameter Name="@EmpNum">
+            <Value>=Parameters!EmpNum.Value</Value>
+            <rd:UserDefined>true</rd:UserDefined>
+          </QueryParameter>
         </QueryParameters>
         <CommandType>StoredProcedure</CommandType>
         <CommandText>sp_SSRS_Rpt_RTA_Compliance_Employee</CommandText>
@@ -225,6 +229,18 @@
           <DataField>MEALbkSignatures</DataField>
           <rd:UserDefined>true</rd:UserDefined>
         </Field>
+        <Field Name="BreakCount">
+          <DataField>BreakCount</DataField>
+          <rd:UserDefined>true</rd:UserDefined>
+        </Field>
+        <Field Name="BreakSecs">
+          <DataField>BreakSecs</DataField>
+          <rd:UserDefined>true</rd:UserDefined>
+        </Field>
+        <Field Name="RtaCardTmSec">
+          <DataField>RtaCardTmSec</DataField>
+          <rd:UserDefined>true</rd:UserDefined>
+        </Field>
       </Fields>
     </DataSet>
     <DataSet Name="RTA_EmpJobTypes">
@@ -318,6 +334,39 @@ order by Setting desc</CommandText>
         </Field>
       </Fields>
     </DataSet>
+    <DataSet Name="RTA_Employees">
+      <Query>
+        <DataSourceName>RTA_SQLA</DataSourceName>
+        <CommandType>StoredProcedure</CommandType>
+        <CommandText>sp_SSRS_Rpt_RTA_Employees</CommandText>
+      </Query>
+      <Fields>
+        <Field Name="CardNum">
+          <DataField>CardNum</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="NameFirst">
+          <DataField>NameFirst</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="NameLast">
+          <DataField>NameLast</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="JobType">
+          <DataField>JobType</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="NameDisplay">
+          <DataField>NameDisplay</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="DisplayOrd">
+          <DataField>DisplayOrd</DataField>
+          <rd:TypeName>System.Int64</rd:TypeName>
+        </Field>
+      </Fields>
+    </DataSet>
   </DataSets>
   <ReportSections>
     <ReportSection>
@@ -360,6 +409,9 @@ order by Setting desc</CommandText>
                   <Width>1in</Width>
                 </TablixColumn>
                 <TablixColumn>
+                  <Width>1in</Width>
+                </TablixColumn>
+                <TablixColumn>
                   <Width>0.6in</Width>
                 </TablixColumn>
                 <TablixColumn>
@@ -385,6 +437,12 @@ order by Setting desc</CommandText>
                 </TablixColumn>
                 <TablixColumn>
                   <Width>0.5in</Width>
+                </TablixColumn>
+                <TablixColumn>
+                  <Width>0.5in</Width>
+                </TablixColumn>
+                <TablixColumn>
+                  <Width>0.9in</Width>
                 </TablixColumn>
                 <TablixColumn>
                   <Width>0.7in</Width>
@@ -865,6 +923,50 @@ order by Setting desc</CommandText>
                     </TablixCell>
                     <TablixCell>
                       <CellContents>
+                        <Textbox Name="Textbox66">
+                          <CanGrow>true</CanGrow>
+                          <UserSort>
+                            <SortExpression>=Avg(Fields!RtaCardTmSec.Value)</SortExpression>
+                            <SortExpressionScope>Employee</SortExpressionScope>
+                          </UserSort>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value>RspBothAvg</Value>
+                                  <Style>
+                                    <FontFamily>Tahoma</FontFamily>
+                                    <FontSize>11pt</FontSize>
+                                    <FontWeight>Bold</FontWeight>
+                                    <Color>White</Color>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style>
+                                <TextAlign>Center</TextAlign>
+                              </Style>
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>Textbox66</rd:DefaultName>
+                          <ToolTip>Average seconds between respond on device and respond by card in when both are received</ToolTip>
+                          <Style>
+                            <Border>
+                              <Color>#7292cc</Color>
+                              <Style>Solid</Style>
+                            </Border>
+                            <BackgroundColor>#4c68a2</BackgroundColor>
+                            <PaddingLeft>2pt</PaddingLeft>
+                            <PaddingRight>2pt</PaddingRight>
+                            <PaddingTop>2pt</PaddingTop>
+                            <PaddingBottom>2pt</PaddingBottom>
+                          </Style>
+                        </Textbox>
+                        <rd:Selected>true</rd:Selected>
+                      </CellContents>
+                    </TablixCell>
+                    <TablixCell>
+                      <CellContents>
                         <Textbox Name="Textbox15">
                           <CanGrow>true</CanGrow>
                           <UserSort>
@@ -977,6 +1079,7 @@ order by Setting desc</CommandText>
                             </Paragraph>
                           </Paragraphs>
                           <rd:DefaultName>Textbox183</rd:DefaultName>
+                          <ToolTip>% of total assigned and taken events employee accepted and responded</ToolTip>
                           <Style>
                             <Border>
                               <Color>#7292cc</Color>
@@ -1105,6 +1208,7 @@ order by Setting desc</CommandText>
                             </Paragraph>
                           </Paragraphs>
                           <rd:DefaultName>Textbox96</rd:DefaultName>
+                          <ToolTip># of jackpot verifications employee completed</ToolTip>
                           <Style>
                             <Border>
                               <Color>#7292cc</Color>
@@ -1147,6 +1251,7 @@ order by Setting desc</CommandText>
                             </Paragraph>
                           </Paragraphs>
                           <rd:DefaultName>Textbox46</rd:DefaultName>
+                          <ToolTip># of EmpCard events created by employee</ToolTip>
                           <Style>
                             <Border>
                               <Color>#7292cc</Color>
@@ -1189,6 +1294,7 @@ order by Setting desc</CommandText>
                             </Paragraph>
                           </Paragraphs>
                           <rd:DefaultName>Textbox46</rd:DefaultName>
+                          <ToolTip># of times employee went out-of-service </ToolTip>
                           <Style>
                             <Border>
                               <Color>#7292cc</Color>
@@ -1231,6 +1337,7 @@ order by Setting desc</CommandText>
                             </Paragraph>
                           </Paragraphs>
                           <rd:DefaultName>Textbox51</rd:DefaultName>
+                          <ToolTip>total time employee spent out-of-service</ToolTip>
                           <Style>
                             <Border>
                               <Color>#7292cc</Color>
@@ -1290,6 +1397,84 @@ order by Setting desc</CommandText>
                     </TablixCell>
                     <TablixCell>
                       <CellContents>
+                        <Textbox Name="Textbox60">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value>Brk</Value>
+                                  <Style>
+                                    <FontFamily>Tahoma</FontFamily>
+                                    <FontSize>11pt</FontSize>
+                                    <FontWeight>Bold</FontWeight>
+                                    <Color>White</Color>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style>
+                                <TextAlign>Center</TextAlign>
+                              </Style>
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>Textbox60</rd:DefaultName>
+                          <ToolTip># of breaks taken by employee</ToolTip>
+                          <Style>
+                            <Border>
+                              <Color>#7292cc</Color>
+                              <Style>Solid</Style>
+                            </Border>
+                            <BackgroundColor>#4c68a2</BackgroundColor>
+                            <PaddingLeft>2pt</PaddingLeft>
+                            <PaddingRight>2pt</PaddingRight>
+                            <PaddingTop>2pt</PaddingTop>
+                            <PaddingBottom>2pt</PaddingBottom>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                    <TablixCell>
+                      <CellContents>
+                        <Textbox Name="Textbox48">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value>Brk Tm</Value>
+                                  <Style>
+                                    <FontFamily>Tahoma</FontFamily>
+                                    <FontSize>11pt</FontSize>
+                                    <FontWeight>Bold</FontWeight>
+                                    <Color>White</Color>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style>
+                                <TextAlign>Center</TextAlign>
+                              </Style>
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>Textbox48</rd:DefaultName>
+                          <ToolTip>total time employee spent on break</ToolTip>
+                          <Style>
+                            <Border>
+                              <Color>#7292cc</Color>
+                              <Style>Solid</Style>
+                            </Border>
+                            <BackgroundColor>#4c68a2</BackgroundColor>
+                            <PaddingLeft>2pt</PaddingLeft>
+                            <PaddingRight>2pt</PaddingRight>
+                            <PaddingTop>2pt</PaddingTop>
+                            <PaddingBottom>2pt</PaddingBottom>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                    <TablixCell>
+                      <CellContents>
                         <Textbox Name="Textbox57">
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
@@ -1312,6 +1497,7 @@ order by Setting desc</CommandText>
                             </Paragraph>
                           </Paragraphs>
                           <rd:DefaultName>Textbox57</rd:DefaultName>
+                          <ToolTip># of meal book door entries bby employee</ToolTip>
                           <Style>
                             <Border>
                               <Color>#7292cc</Color>
@@ -1350,6 +1536,7 @@ order by Setting desc</CommandText>
                             </Paragraph>
                           </Paragraphs>
                           <rd:DefaultName>Textbox47</rd:DefaultName>
+                          <ToolTip># of meal book events signed by employee</ToolTip>
                           <Style>
                             <Border>
                               <Color>#7292cc</Color>
@@ -2217,6 +2404,42 @@ order by Setting desc</CommandText>
                     </TablixCell>
                     <TablixCell>
                       <CellContents>
+                        <Textbox Name="RtaCardTmSec">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value>=Avg(Fields!RtaCardTmSec.Value)</Value>
+                                  <Style>
+                                    <FontFamily>Tahoma</FontFamily>
+                                    <Format>0.0;(0.0)</Format>
+                                    <Color>#4d4d4d</Color>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style>
+                                <TextAlign>Center</TextAlign>
+                              </Style>
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>RtaCardTmSec</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Color>#e5e5e5</Color>
+                              <Style>Solid</Style>
+                            </Border>
+                            <PaddingLeft>2pt</PaddingLeft>
+                            <PaddingRight>2pt</PaddingRight>
+                            <PaddingTop>2pt</PaddingTop>
+                            <PaddingBottom>2pt</PaddingBottom>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                    <TablixCell>
+                      <CellContents>
                         <Textbox Name="AsnRsp">
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
@@ -2561,6 +2784,76 @@ order by Setting desc</CommandText>
                             </Paragraph>
                           </Paragraphs>
                           <rd:DefaultName>Cmp</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Color>#e5e5e5</Color>
+                              <Style>Solid</Style>
+                            </Border>
+                            <PaddingLeft>2pt</PaddingLeft>
+                            <PaddingRight>2pt</PaddingRight>
+                            <PaddingTop>2pt</PaddingTop>
+                            <PaddingBottom>2pt</PaddingBottom>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                    <TablixCell>
+                      <CellContents>
+                        <Textbox Name="Textbox61">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value>=sum(Fields!BreakCount.Value)</Value>
+                                  <Style>
+                                    <FontFamily>Tahoma</FontFamily>
+                                    <Color>#4d4d4d</Color>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style>
+                                <TextAlign>Center</TextAlign>
+                              </Style>
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>Textbox61</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Color>#e5e5e5</Color>
+                              <Style>Solid</Style>
+                            </Border>
+                            <PaddingLeft>2pt</PaddingLeft>
+                            <PaddingRight>2pt</PaddingRight>
+                            <PaddingTop>2pt</PaddingTop>
+                            <PaddingBottom>2pt</PaddingBottom>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                    <TablixCell>
+                      <CellContents>
+                        <Textbox Name="Textbox49">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value>=iif(Sum(iif(Fields!BreakSecs.Value&gt;0,1,0))=0, "00:00:00", right("00" &amp; int(Sum(Fields!BreakSecs.Value) / 3600), 2) &amp; ":" &amp; right("00" &amp; int(((Sum(Fields!BreakSecs.Value) Mod 3600)) / 60), 2) &amp; ":" &amp; right("00" &amp; int(Sum(Fields!BreakSecs.Value) Mod 60), 2))</Value>
+                                  <Style>
+                                    <FontFamily>Tahoma</FontFamily>
+                                    <Color>#4d4d4d</Color>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style>
+                                <TextAlign>Center</TextAlign>
+                              </Style>
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>Textbox49</rd:DefaultName>
                           <Style>
                             <Border>
                               <Color>#e5e5e5</Color>
@@ -3444,6 +3737,43 @@ order by Setting desc</CommandText>
                     </TablixCell>
                     <TablixCell>
                       <CellContents>
+                        <Textbox Name="Textbox98">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value>=Avg(Fields!RtaCardTmSec.Value)</Value>
+                                  <Style>
+                                    <FontFamily>Tahoma</FontFamily>
+                                    <Format>0.0;(0.0)</Format>
+                                    <Color>#4d4d4d</Color>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style>
+                                <TextAlign>Center</TextAlign>
+                              </Style>
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>Textbox98</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Color>#c6daf8</Color>
+                              <Style>Solid</Style>
+                            </Border>
+                            <BackgroundColor>#9eb6e4</BackgroundColor>
+                            <PaddingLeft>2pt</PaddingLeft>
+                            <PaddingRight>2pt</PaddingRight>
+                            <PaddingTop>2pt</PaddingTop>
+                            <PaddingBottom>2pt</PaddingBottom>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                    <TablixCell>
+                      <CellContents>
                         <Textbox Name="Textbox79">
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
@@ -3736,7 +4066,6 @@ order by Setting desc</CommandText>
                             <PaddingBottom>2pt</PaddingBottom>
                           </Style>
                         </Textbox>
-                        <rd:Selected>true</rd:Selected>
                       </CellContents>
                     </TablixCell>
                     <TablixCell>
@@ -3798,6 +4127,78 @@ order by Setting desc</CommandText>
                             </Paragraph>
                           </Paragraphs>
                           <rd:DefaultName>Textbox67</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Color>#c6daf8</Color>
+                              <Style>Solid</Style>
+                            </Border>
+                            <BackgroundColor>#9eb6e4</BackgroundColor>
+                            <PaddingLeft>2pt</PaddingLeft>
+                            <PaddingRight>2pt</PaddingRight>
+                            <PaddingTop>2pt</PaddingTop>
+                            <PaddingBottom>2pt</PaddingBottom>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                    <TablixCell>
+                      <CellContents>
+                        <Textbox Name="Textbox64">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value>=sum(Fields!BreakCount.Value)</Value>
+                                  <Style>
+                                    <FontFamily>Tahoma</FontFamily>
+                                    <Color>#4d4d4d</Color>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style>
+                                <TextAlign>Center</TextAlign>
+                              </Style>
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>Textbox64</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Color>#c6daf8</Color>
+                              <Style>Solid</Style>
+                            </Border>
+                            <BackgroundColor>#9eb6e4</BackgroundColor>
+                            <PaddingLeft>2pt</PaddingLeft>
+                            <PaddingRight>2pt</PaddingRight>
+                            <PaddingTop>2pt</PaddingTop>
+                            <PaddingBottom>2pt</PaddingBottom>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                    <TablixCell>
+                      <CellContents>
+                        <Textbox Name="Textbox59">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value>=iif(Sum(iif(Fields!BreakSecs.Value&gt;0,1,0))=0, "00:00:00", right("00" &amp; int(Sum(Fields!BreakSecs.Value) / 3600), 2) &amp; ":" &amp; right("00" &amp; int(((Sum(Fields!BreakSecs.Value) Mod 3600)) / 60), 2) &amp; ":" &amp; right("00" &amp; int(Sum(Fields!BreakSecs.Value) Mod 60), 2))</Value>
+                                  <Style>
+                                    <FontFamily>Tahoma</FontFamily>
+                                    <Color>#4d4d4d</Color>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style>
+                                <TextAlign>Center</TextAlign>
+                              </Style>
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>Textbox59</rd:DefaultName>
                           <Style>
                             <Border>
                               <Color>#c6daf8</Color>
@@ -4343,6 +4744,9 @@ order by Setting desc</CommandText>
                 <TablixMember />
                 <TablixMember />
                 <TablixMember />
+                <TablixMember />
+                <TablixMember />
+                <TablixMember />
                 <TablixMember>
                   <Visibility>
                     <Hidden>=iif(Parameters!MealBookMode.Value=1,false,true)</Hidden>
@@ -4432,7 +4836,7 @@ order by Setting desc</CommandText>
                           <Paragraph>
                             <TextRuns>
                               <TextRun>
-                                <Value>Emp Name</Value>
+                                <Value>=iif(Parameters!GroupBy.Value=1,"Event Type","Emp Name")</Value>
                                 <Style>
                                   <FontFamily>Tahoma</FontFamily>
                                   <FontSize>11pt</FontSize>
@@ -4466,12 +4870,12 @@ order by Setting desc</CommandText>
                 <TablixMember>
                   <Group Name="Employee">
                     <GroupExpressions>
-                      <GroupExpression>=Fields!EmpNum.Value</GroupExpression>
+                      <GroupExpression>=iif(Parameters!GroupBy.Value=1,Fields!EventDisplay.Value,Fields!EmpNum.Value)</GroupExpression>
                     </GroupExpressions>
                   </Group>
                   <SortExpressions>
                     <SortExpression>
-                      <Value>=Fields!EmpJobType.Value</Value>
+                      <Value>=iif(Parameters!GroupBy.Value=1,Fields!EventDisplay.Value,Fields!EmpJobType.Value)</Value>
                     </SortExpression>
                     <SortExpression>
                       <Value>=Fields!EmpNameFirst.Value</Value>
@@ -4492,7 +4896,7 @@ order by Setting desc</CommandText>
                               <Paragraph>
                                 <TextRuns>
                                   <TextRun>
-                                    <Value>="(" &amp; left(Fields!EmpJobType.Value,1) &amp; ") " &amp; Fields!EmpNameFirst.Value &amp; " " &amp; Fields!EmpNameLast.Value</Value>
+                                    <Value>=iif(Parameters!GroupBy.Value=1,Fields!EventDisplay.Value,"(" &amp; left(Fields!EmpJobType.Value,1) &amp; ") " &amp; Fields!EmpNameFirst.Value &amp; " " &amp; left(Fields!EmpNameLast.Value,1) &amp; ".")</Value>
                                     <Style>
                                       <FontFamily>Tahoma</FontFamily>
                                       <FontWeight>Bold</FontWeight>
@@ -4509,7 +4913,7 @@ order by Setting desc</CommandText>
                               <Actions>
                                 <Action>
                                   <Drillthrough>
-                                    <ReportName>/ANI/Reports/RTA/Floor Activity</ReportName>
+                                    <ReportName>=iif(Parameters!GroupBy.Value=1,"/ANI/Reports/RTA/Event Details","/ANI/Reports/RTA/Employee Process")</ReportName>
                                     <Parameters>
                                       <Parameter Name="StartDt">
                                         <Value>=Parameters!StartDt.Value</Value>
@@ -4519,9 +4923,30 @@ order by Setting desc</CommandText>
                                       </Parameter>
                                       <Parameter Name="EmpNum">
                                         <Value>=Fields!EmpNum.Value</Value>
+                                        <Omit>=iif(Parameters!GroupBy.Value=1,True,False)</Omit>
                                       </Parameter>
-                                      <Parameter Name="ActivityType">
-                                        <Value>0</Value>
+                                      <Parameter Name="EventType">
+                                        <Value>=iif(Parameters!GroupBy.Value=1,Fields!EventDisplay.Value,Parameters!EventType.Value)</Value>
+                                      </Parameter>
+                                      <Parameter Name="GroupBy">
+                                        <Value>=iif(Parameters!GroupBy.Value=0,1,0)</Value>
+                                        <Omit>=iif(Parameters!GroupBy.Value=1,True,False)</Omit>
+                                      </Parameter>
+                                      <Parameter Name="EmpActEmpNum">
+                                        <Value>=Parameters!EmpNum.Value</Value>
+                                        <Omit>=iif(Parameters!GroupBy.Value=0,True,False)</Omit>
+                                      </Parameter>
+                                      <Parameter Name="EmpActEvtDisplay">
+                                        <Value>=Fields!EventDisplay.Value</Value>
+                                        <Omit>=iif(Parameters!GroupBy.Value=0,True,False)</Omit>
+                                      </Parameter>
+                                      <Parameter Name="FromReport">
+                                        <Value>=Globals!ReportName</Value>
+                                        <Omit>=iif(Parameters!GroupBy.Value=0,True,False)</Omit>
+                                      </Parameter>
+                                      <Parameter Name="EmpActJobType">
+                                        <Value>=Fields!EmpJobType.Value</Value>
+                                        <Omit>=iif(Parameters!GroupBy.Value=0,True,False)</Omit>
                                       </Parameter>
                                     </Parameters>
                                   </Drillthrough>
@@ -4593,7 +5018,7 @@ order by Setting desc</CommandText>
             <DataSetName>RTA_Compliance_Employee</DataSetName>
             <Top>1.35833in</Top>
             <Height>0.75in</Height>
-            <Width>28.3in</Width>
+            <Width>30.7in</Width>
             <Style>
               <Border>
                 <Style>None</Style>
@@ -4607,7 +5032,7 @@ order by Setting desc</CommandText>
               <Paragraph>
                 <TextRuns>
                   <TextRun>
-                    <Value>RTA Employee Process</Value>
+                    <Value>="RTA Employee Process" &amp; iif(Parameters!GroupBy.Value=1," [" &amp; Parameters!EmpNum.Label &amp; "]","")</Value>
                     <Style>
                       <FontFamily>Verdana</FontFamily>
                       <FontSize>20pt</FontSize>
@@ -4620,7 +5045,7 @@ order by Setting desc</CommandText>
             <rd:WatermarkTextbox>Title</rd:WatermarkTextbox>
             <rd:DefaultName>ReportTitle</rd:DefaultName>
             <Height>0.4in</Height>
-            <Width>5in</Width>
+            <Width>8.85626in</Width>
             <ZIndex>1</ZIndex>
             <Style>
               <Border>
@@ -4635,7 +5060,7 @@ order by Setting desc</CommandText>
           <Line Name="Line3">
             <Top>0.45in</Top>
             <Height>0in</Height>
-            <Width>17.01in</Width>
+            <Width>19.5in</Width>
             <ZIndex>2</ZIndex>
             <Style>
               <Border>
@@ -4710,7 +5135,7 @@ order by Setting desc</CommandText>
             <Top>0.5in</Top>
             <Left>2.8in</Left>
             <Height>0.25in</Height>
-            <Width>3.09584in</Width>
+            <Width>3.68611in</Width>
             <ZIndex>4</ZIndex>
             <Style>
               <Border>
@@ -4743,10 +5168,10 @@ order by Setting desc</CommandText>
               </Paragraph>
             </Paragraphs>
             <rd:DefaultName>Textbox7</rd:DefaultName>
-            <Top>0.5in</Top>
-            <Left>5.89584in</Left>
+            <Top>0.5111in</Top>
+            <Left>6.5in</Left>
             <Height>0.25in</Height>
-            <Width>11.11416in</Width>
+            <Width>13in</Width>
             <ZIndex>5</ZIndex>
             <Style>
               <Border>
@@ -4779,9 +5204,9 @@ order by Setting desc</CommandText>
               </Paragraph>
             </Paragraphs>
             <rd:DefaultName>Textbox8</rd:DefaultName>
-            <Top>0.78888in</Top>
+            <Top>0.80277in</Top>
             <Height>0.25in</Height>
-            <Width>17.01in</Width>
+            <Width>19.5in</Width>
             <ZIndex>6</ZIndex>
             <Style>
               <Border>
@@ -4930,10 +5355,10 @@ order by Setting desc</CommandText>
               </Paragraph>
             </Paragraphs>
             <rd:DefaultName>Textbox3</rd:DefaultName>
-            <Top>1.06666in</Top>
+            <Top>1.08055in</Top>
             <Left>2.8in</Left>
             <Height>0.25in</Height>
-            <Width>3.09584in</Width>
+            <Width>3.7in</Width>
             <ZIndex>9</ZIndex>
             <Style>
               <Border>
@@ -4953,7 +5378,7 @@ order by Setting desc</CommandText>
           </Border>
         </Style>
       </Body>
-      <Width>28.33646in</Width>
+      <Width>30.7in</Width>
       <Page>
         <PageFooter>
           <Height>0.45in</Height>
@@ -5216,6 +5641,45 @@ order by Setting desc</CommandText>
           <DataSetName>RTA_MealBookMode</DataSetName>
           <ValueField>Setting</ValueField>
           <LabelField>Setting</LabelField>
+        </DataSetReference>
+      </ValidValues>
+    </ReportParameter>
+    <ReportParameter Name="GroupBy">
+      <DataType>Integer</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>0</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>Group By</Prompt>
+      <ValidValues>
+        <ParameterValues>
+          <ParameterValue>
+            <Value>0</Value>
+            <Label>Employee</Label>
+          </ParameterValue>
+          <ParameterValue>
+            <Value>1</Value>
+            <Label>Event Type</Label>
+          </ParameterValue>
+        </ParameterValues>
+      </ValidValues>
+    </ReportParameter>
+    <ReportParameter Name="EmpNum">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <DataSetReference>
+          <DataSetName>RTA_Employees</DataSetName>
+          <ValueField>CardNum</ValueField>
+        </DataSetReference>
+      </DefaultValue>
+      <AllowBlank>true</AllowBlank>
+      <Prompt>Employee</Prompt>
+      <ValidValues>
+        <DataSetReference>
+          <DataSetName>RTA_Employees</DataSetName>
+          <ValueField>CardNum</ValueField>
+          <LabelField>NameDisplay</LabelField>
         </DataSetReference>
       </ValidValues>
     </ReportParameter>
