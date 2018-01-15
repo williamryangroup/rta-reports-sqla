@@ -19,6 +19,7 @@ type sp_SSRS_Rpt_RTA_FloorActivity.sql >> sp_SSRS_Rpt_RTA_ALL.sql
 type sp_SSRS_Rpt_RTA_Locations.sql >> sp_SSRS_Rpt_RTA_ALL.sql
 type sp_SSRS_Rpt_RTA_MEAL.sql >> sp_SSRS_Rpt_RTA_ALL.sql
 type sp_SSRS_Rpt_RTA_PaperOut.sql >> sp_SSRS_Rpt_RTA_ALL.sql
+type sp_SSRS_Rpt_RTA_RptStartEndDttm.sql >> sp_SSRS_Rpt_RTA_ALL.sql
 type sp_SSRS_Rpt_RTA_ShowPaperOut.sql >> sp_SSRS_Rpt_RTA_ALL.sql
 type sp_SSRS_Rpt_RTA_SupReview.sql >> sp_SSRS_Rpt_RTA_ALL.sql
 type sp_SSRS_Rpt_RTA_Target80.sql >> sp_SSRS_Rpt_RTA_ALL.sql
