@@ -80,7 +80,10 @@ BEGIN
 		tOutHour int,
 		EvtDay date,
 		MEALbkEntries int,
-		MEALbkSignatures int
+		MEALbkSignatures int,
+		BreakCount int,
+		BreakSecs int,
+		RtaCardTmSec int
     )
 	
 	INSERT INTO dbo.#RTA_Compliance_Employee_Tmp EXEC dbo.sp_SSRS_Rpt_RTA_Compliance_Employee @StartDt=@StartDt1, @EndDt=@EndDt1, @EmpJobType=@EmpJobType1, @EventType=@EventType1, @AsnRspOnly=@AsnRspOnly1, @IncludeOOS=@IncludeOOS1, @IncludeEMPCARD=@IncludeEMPCARD1
