@@ -52,8 +52,8 @@ GO
 -- 9/29/2016
 ALTER TABLE [dbo].[SQLA_EmployeeCompliance] ADD [SourceTable] [nvarchar](255) NULL
 GO
-
+ALTER TABLE [dbo].[SQLA_EmployeeCompliance] ADD [RtaCardTmSec] [nvarchar](255) NULL
+GO
 
 SET ANSI_PADDING OFF
 GO
-

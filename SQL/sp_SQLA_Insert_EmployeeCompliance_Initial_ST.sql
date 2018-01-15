@@ -52,7 +52,8 @@ BEGIN
 		   [CustTier] = CustTier,
 		   [Rea] = case when tReassign is not null then 1 else 0 end,
 		   [ReaRej] = case when tReassignRej is not null then 1 else 0 end,
-		   [SourceTable] = 'EVENT1_ST'
+		   [SourceTable] = 'EVENT1_ST',
+		   [RtaCardTmSec] = case when tRespondCard > tRespondMobile then datediff(ss,tRespondMobile,tRespondCard) else 0 end
 	  from (
 	select EmpNum, PktNum, EventDisplay, tOut = min(tOut), CustTier,
 		   tAssign = min(tAssign),
@@ -66,7 +67,8 @@ BEGIN
 		   RejMan = count(tRejectManual),
 		   RejAuto = count(tRejectAuto),
 		   tReassign = min(tReassign),
-		   tReassignRej = min(tReassignRej)
+		   tReassignRej = min(tReassignRej),
+		   tRespondCard = min(case when AuthPktNum is not null and AuthPktNum <> '' then tAuthorize else null end)
 	  from (
 	  
 	-- EVENT_STATE_LOG1
