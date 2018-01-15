@@ -88,14 +88,14 @@ BEGIN
 		   EventDisplay = Activity, 
 		   CustTierLevel = Tier,
 		   tReject = er.tOut,
-		   Employee = case when @UseEmpName = '1' and EmpName <> '' then EmpName
-		                   when @UseEmpName = '1' and EmpName = '' and EmpNum <> '' then (select ltrim(rtrim(emp.NameFirst)) + ' ' + LEFT(ltrim(rtrim(emp.NameLast)),1)
-		                                                                                    from SQLA_Employees as emp
-		                                                                                   where emp.CardNum = er.EmpNum)
+		   Employee = case when @UseEmpName = '1' and emp.CardNum is not null then '(' + left(emp.JobType,1) + ') ' + rtrim(emp.NameFirst) + ' ' + LEFT(emp.NameLast,1) + '.'
+		                   when @UseEmpName = '1' and emp.CardNum is null then EmpName
 		                   else er.EmpNum end,
 		   Reason = case when [Description] is null or [Description] = '' then State else [Description] end,
 		   AfterDisplay = er.RejAfterDisp								 
 	  from SQLA_FloorActivity as er
+	  left join SQLA_Employees as emp
+	    on emp.CardNum = er.EmpNum
 	 where er.tOut >= @StartDt and er.tout < @EndDt
 	   and er.ActivityTypeID = 5
 	   and er.State like '%Reject%'
