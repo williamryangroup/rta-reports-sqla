@@ -199,15 +199,15 @@
                 <ChartMember>
                   <Group Name="Chart7_CategoryGroup">
                     <GroupExpressions>
-                      <GroupExpression>=iif(Parameters!AsnRspOnly.Value=0,iif(Fields!Asn.Value="Y","Assigned","Taken"),Fields!EmpNameFirst.Value + " " + left(Fields!EmpNameLast.Value,1) + ".")</GroupExpression>
+                      <GroupExpression>=iif(Parameters!AsnRspOnly.Value=0,iif(Fields!Asn.Value="Y","Assigned","Taken"),"(" + left(Fields!EmpJobType.Value,1) + ") " + Fields!EmpNameFirst.Value + " " + left(Fields!EmpNameLast.Value,1) + ".")</GroupExpression>
                     </GroupExpressions>
                   </Group>
                   <SortExpressions>
                     <SortExpression>
-                      <Value>=iif(Parameters!AsnRspOnly.Value=0,iif(Fields!Asn.Value="Y","Assigned","Taken"),Fields!EmpNameFirst.Value + " " + left(Fields!EmpNameLast.Value,1) + ".")</Value>
+                      <Value>=iif(Parameters!AsnRspOnly.Value=0,iif(Fields!Asn.Value="Y","Assigned","Taken"),"(" + left(Fields!EmpJobType.Value,1) + ") " + Fields!EmpNameFirst.Value + " " + left(Fields!EmpNameLast.Value,1) + ".")</Value>
                     </SortExpression>
                   </SortExpressions>
-                  <Label>=iif(Parameters!AsnRspOnly.Value=0,iif(Fields!Asn.Value="Y","Assigned","Carded/Not Assigned"),Fields!EmpNameFirst.Value + " " + left(Fields!EmpNameLast.Value,1) + ".")</Label>
+                  <Label>=iif(Parameters!AsnRspOnly.Value=0,iif(Fields!Asn.Value="Y","Assigned","Carded/Not Assigned"),"(" + left(Fields!EmpJobType.Value,1) + ") " + Fields!EmpNameFirst.Value + " " + left(Fields!EmpNameLast.Value,1) + ".")</Label>
                 </ChartMember>
               </ChartMembers>
             </ChartCategoryHierarchy>

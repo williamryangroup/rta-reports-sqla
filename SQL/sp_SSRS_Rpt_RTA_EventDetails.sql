@@ -157,7 +157,7 @@ BEGIN
 		StatEnd datetime
 	)
 	
-	IF (@FromReport='Executive Scorecard Employee Activity')
+	IF (@FromReport in ('Executive Scorecard Employee Activity','Employee Process'))
 	BEGIN
 		INSERT INTO #RTA_EventDetails_ExecSum_Emp2_Tmp EXEC [dbo].[sp_SSRS_Rpt_RTA_EventDetails_ExecSum_Emp2] @StartDt=@StartDt1, @EndDt=@EndDt1, @UtilType=@EmpActUtil, @EmpJobType=@EmpActJobType, @EventSum=@EmpActEvtSum
 	END
@@ -188,9 +188,15 @@ BEGIN
 			                   when CmpMobile = 1 then 'Mobile'
 			                   when CmpGame = 1 then 'Game'
 			                   else 'Other' end,
-			   EmpAssign = case when @UseEmpName = '1' and EmpNameAsn <> '' then EmpNameAsn else EmpNumAsn end,
-			   EmpRespond = case when @UseEmpName = '1' and EmpNameRsp <> '' then EmpNameRsp else EmpNumRsp end,
-			   EmpComplete = case when @UseEmpName = '1' and EmpNameCmp <> '' then EmpNameCmp else EmpNumCmp end,
+			   EmpAssign = case when @UseEmpName = '1' and EmpNameAsn <> '' and empasn.CardNum is not null then '(' + left(empasn.JobType,1) + ') ' + empasn.NameFirst + ' ' + left(empasn.NameLast,1) + '.'
+		                        when @UseEmpName = '1' and EmpNameAsn <> '' and empasn.CardNum is null then EmpNameAsn
+								else EmpNumAsn end,
+			   EmpRespond = case when @UseEmpName = '1' and EmpNameRsp <> '' and emprsp.CardNum is not null then '(' + left(emprsp.JobType,1) + ') ' + emprsp.NameFirst + ' ' + left(emprsp.NameLast,1) + '.'
+		                         when @UseEmpName = '1' and EmpNameRsp <> '' and emprsp.CardNum is null then EmpNameRsp
+								 else EmpNumRsp end,
+			   EmpComplete = case when @UseEmpName = '1' and EmpNameCmp <> '' and empcmp.CardNum is not null then '(' + left(empcmp.JobType,1) + ') ' + empcmp.NameFirst + ' ' + left(empcmp.NameLast,1) + '.'
+		                          when @UseEmpName = '1' and EmpNameCmp <> '' and empcmp.CardNum is null then EmpNameCmp
+								  else EmpNumCmp end,
 			   ResolutionDesc,
 			   Zone,
 			   CustNum,
@@ -214,7 +220,15 @@ BEGIN
 		  left join SQLA_AreaAssoc as a
 			on a.Area = e.FromZone
 		   and a.AssocArea = e.Zone
-		 where (    (     @FromReport not in ('Executive Scorecard Employee Activity','Supervisor Review')
+		  left join SQLA_Employees as empasn
+		    on empasn.CardNum = e.EmpNumAsn
+		  left join SQLA_Employees as emprsp
+		    on emprsp.CardNum = e.EmpNumRsp
+		  left join SQLA_Employees as empcmp
+		    on empcmp.CardNum = e.EmpNumCmp
+			
+		   
+		 where (    (     @FromReport not in ('Executive Scorecard Employee Activity','Supervisor Review','Employee Process')
 		              and tOut >= @StartDt1 and tOut < @EndDt1
 		              and (TotSecs*1.0/60.0) <= @MaxCmpMins1
 		              and (EventDisplay in (select EventType from #RTA_Compliance_EventTypes) or @EventType1 is null or @EventType1 = '')
@@ -267,18 +281,18 @@ BEGIN
 					        or (@CustTier <> 'NUL' and CustTierLevel in (select CustTier from #RTA_Compliance_CustTiers))
 				            or (@CustTier1 is null or @CustTier1 = '') )
 					  and ((@EmpCmpAsnTaken = 0) or (@EmpCmpAsnTaken = AsnTakeID)) )
-		         or (     @FromReport = 'Executive Scorecard Employee Activity'
+		         or (     @FromReport in ('Executive Scorecard Employee Activity','Employee Process')
 				      and (    (     @EmpActStat = 'OOS' and EventDisplay like 'OOS%'
 					             and tOut >= @StartDt1 and tOut < @EndDt1 and EmpNumAsn = @EmpActEmpNum
 					             and e.tOut in (select StatStart from #RTA_EventDetails_ExecSum_Emp2_Tmp
 					                             where EmpNum = @EmpActEmpNum
 										           and EventDisplay = @EmpActEvtDisplay
 										           and Stat = @EmpActStat))
-		                    or (     @EmpActStat <> 'OOS'
+		                    or (     (@EmpActStat <> 'OOS' or @EmpActStat = '')
 							     and e.PktNum in (select PktNum from #RTA_EventDetails_ExecSum_Emp2_Tmp
 					                               where (EmpNum = @EmpActEmpNum or @EmpActEmpNum='')
-										             and EventDisplay = @EmpActEvtDisplay
-										             and (Stat = @EmpActStat or @EmpActStat=''))) ) ) ) ) as d
+										             and (EventDisplay = @EmpActEvtDisplay)
+										             and (Stat = @EmpActStat or @EmpActStat='')) ) ) ) ) ) as d
 		 where ((@MinTrvSecs = -1) or (d.tAuthorize is not null and d.tAcpInit <= d.tAuthorize and DATEDIFF(second,d.tAcpInit,d.tAuthorize) >= @MinTrvSecs))
 		   and ((@MaxTrvSecs = 0) or (d.tAuthorize is not null and d.tAcpInit <= d.tAuthorize and DATEDIFF(second,d.tAcpInit,d.tAuthorize) < @MaxTrvSecs))
 	END
