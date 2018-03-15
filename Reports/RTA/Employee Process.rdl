@@ -962,7 +962,6 @@ order by Setting desc</CommandText>
                             <PaddingBottom>2pt</PaddingBottom>
                           </Style>
                         </Textbox>
-                        <rd:Selected>true</rd:Selected>
                       </CellContents>
                     </TablixCell>
                     <TablixCell>
@@ -1399,6 +1398,10 @@ order by Setting desc</CommandText>
                       <CellContents>
                         <Textbox Name="Textbox60">
                           <CanGrow>true</CanGrow>
+                          <UserSort>
+                            <SortExpression>=Sum(Fields!BreakCount.Value)</SortExpression>
+                            <SortExpressionScope>Employee</SortExpressionScope>
+                          </UserSort>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
@@ -1438,6 +1441,10 @@ order by Setting desc</CommandText>
                       <CellContents>
                         <Textbox Name="Textbox48">
                           <CanGrow>true</CanGrow>
+                          <UserSort>
+                            <SortExpression>=iif(Sum(iif(Fields!BreakSecs.Value&gt;0,1,0))=0, "00:00:00", right("00" &amp; int(Sum(Fields!BreakSecs.Value) / 3600), 2) &amp; ":" &amp; right("00" &amp; int(((Sum(Fields!BreakSecs.Value) Mod 3600)) / 60), 2) &amp; ":" &amp; right("00" &amp; int(Sum(Fields!BreakSecs.Value) Mod 60), 2))</SortExpression>
+                            <SortExpressionScope>Employee</SortExpressionScope>
+                          </UserSort>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
@@ -1477,6 +1484,10 @@ order by Setting desc</CommandText>
                       <CellContents>
                         <Textbox Name="Textbox57">
                           <CanGrow>true</CanGrow>
+                          <UserSort>
+                            <SortExpression>=Sum(Fields!MEALbkEntries.Value)</SortExpression>
+                            <SortExpressionScope>Employee</SortExpressionScope>
+                          </UserSort>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
@@ -1516,6 +1527,10 @@ order by Setting desc</CommandText>
                       <CellContents>
                         <Textbox Name="Textbox47">
                           <CanGrow>true</CanGrow>
+                          <UserSort>
+                            <SortExpression>=Sum(Fields!MEALbkSignatures.Value)</SortExpression>
+                            <SortExpressionScope>Employee</SortExpressionScope>
+                          </UserSort>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
@@ -1936,7 +1951,7 @@ order by Setting desc</CommandText>
                             </Paragraph>
                           </Paragraphs>
                           <rd:DefaultName>Textbox18</rd:DefaultName>
-                          <ToolTip>average response time</ToolTip>
+                          <ToolTip>average time between assign and response</ToolTip>
                           <Style>
                             <Border>
                               <Color>#7292cc</Color>
@@ -1949,6 +1964,7 @@ order by Setting desc</CommandText>
                             <PaddingBottom>2pt</PaddingBottom>
                           </Style>
                         </Textbox>
+                        <rd:Selected>true</rd:Selected>
                       </CellContents>
                     </TablixCell>
                     <TablixCell>
