@@ -14,9 +14,11 @@ type Create_SQLA_EventTypes.sql >> Create_SQLA_ALL.sql
 type Create_SQLA_FloorActivity.sql >> Create_SQLA_ALL.sql
 type Create_SQLA_Locations.sql >> Create_SQLA_ALL.sql
 type Create_SQLA_MEAL.sql >> Create_SQLA_ALL.sql
+type Create_SQLA_New_Alerts.sql >> Create_SQLA_ALL.sql
 type Create_SQLA_New_EmpAct.sql >> Create_SQLA_ALL.sql
 type Create_SQLA_New_Events.sql >> Create_SQLA_ALL.sql
 type Create_SQLA_New_SEQ.sql >> Create_SQLA_ALL.sql
+type Create_SQLA_New_SysLog.sql >> Create_SQLA_ALL.sql
 type Create_SQLA_ShiftHours.sql >> Create_SQLA_ALL.sql
 type Create_SQLA_ZoneArea.sql >> Create_SQLA_ALL.sql
 
