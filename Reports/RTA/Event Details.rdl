@@ -154,6 +154,14 @@
             <Value>=Parameters!HasNoBeepVib.Value</Value>
             <rd:UserDefined>true</rd:UserDefined>
           </QueryParameter>
+          <QueryParameter Name="@JpAmtMin">
+            <Value>=Parameters!JpAmtMin.Value</Value>
+            <rd:UserDefined>true</rd:UserDefined>
+          </QueryParameter>
+          <QueryParameter Name="@JpAmtMax">
+            <Value>=Parameters!JpAmtMax.Value</Value>
+            <rd:UserDefined>true</rd:UserDefined>
+          </QueryParameter>
         </QueryParameters>
         <CommandType>StoredProcedure</CommandType>
         <CommandText>sp_SSRS_Rpt_RTA_EventDetails</CommandText>
@@ -319,6 +327,10 @@
           <DataField>tRejInit</DataField>
           <rd:UserDefined>true</rd:UserDefined>
         </Field>
+        <Field Name="Asset">
+          <DataField>Asset</DataField>
+          <rd:UserDefined>true</rd:UserDefined>
+        </Field>
         <Field Name="AsnSecs">
           <DataField>AsnSecs</DataField>
           <rd:UserDefined>true</rd:UserDefined>
@@ -412,6 +424,18 @@
         </Field>
       </Fields>
     </DataSet>
+    <DataSet Name="RTA_ShowAssetField">
+      <Query>
+        <DataSourceName>RTSS</DataSourceName>
+        <CommandText>select Setting from SYSTEMSETTINGS where ConfigSection = 'REPORTS' and ConfigParam = 'EvtDetailShowAssetField'</CommandText>
+      </Query>
+      <Fields>
+        <Field Name="Setting">
+          <DataField>Setting</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+      </Fields>
+    </DataSet>
   </DataSets>
   <ReportSections>
     <ReportSection>
@@ -433,7 +457,10 @@
                   <Width>0.5in</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>0.8in</Width>
+                  <Width>1in</Width>
+                </TablixColumn>
+                <TablixColumn>
+                  <Width>1in</Width>
                 </TablixColumn>
                 <TablixColumn>
                   <Width>0.9in</Width>
@@ -657,6 +684,47 @@
                               <TextRuns>
                                 <TextRun>
                                   <Value>Location</Value>
+                                  <Style>
+                                    <FontFamily>Tahoma</FontFamily>
+                                    <FontSize>11pt</FontSize>
+                                    <FontWeight>Bold</FontWeight>
+                                    <Color>White</Color>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style>
+                                <TextAlign>Center</TextAlign>
+                              </Style>
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>Textbox7</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Color>#7292cc</Color>
+                              <Style>Solid</Style>
+                            </Border>
+                            <BackgroundColor>#4c68a2</BackgroundColor>
+                            <PaddingLeft>2pt</PaddingLeft>
+                            <PaddingRight>2pt</PaddingRight>
+                            <PaddingTop>2pt</PaddingTop>
+                            <PaddingBottom>2pt</PaddingBottom>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                    <TablixCell>
+                      <CellContents>
+                        <Textbox Name="Textbox40">
+                          <CanGrow>true</CanGrow>
+                          <UserSort>
+                            <SortExpression>=Fields!Location.Value</SortExpression>
+                          </UserSort>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value>Asset</Value>
                                   <Style>
                                     <FontFamily>Tahoma</FontFamily>
                                     <FontSize>11pt</FontSize>
@@ -1580,7 +1648,42 @@
                                 </TextRun>
                               </TextRuns>
                               <Style>
-                                <TextAlign>Left</TextAlign>
+                                <TextAlign>Center</TextAlign>
+                              </Style>
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>Location</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Color>#e5e5e5</Color>
+                              <Style>Solid</Style>
+                            </Border>
+                            <PaddingLeft>2pt</PaddingLeft>
+                            <PaddingRight>2pt</PaddingRight>
+                            <PaddingTop>2pt</PaddingTop>
+                            <PaddingBottom>2pt</PaddingBottom>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                    <TablixCell>
+                      <CellContents>
+                        <Textbox Name="Location2">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value>=Fields!Asset.Value</Value>
+                                  <Style>
+                                    <FontFamily>Tahoma</FontFamily>
+                                    <Color>#4d4d4d</Color>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style>
+                                <TextAlign>Center</TextAlign>
                               </Style>
                             </Paragraph>
                           </Paragraphs>
@@ -2167,6 +2270,11 @@
                 <TablixMember />
                 <TablixMember />
                 <TablixMember />
+                <TablixMember>
+                  <Visibility>
+                    <Hidden>=iif(Parameters!ShowAssetField.Value=0,True,False)</Hidden>
+                  </Visibility>
+                </TablixMember>
                 <TablixMember />
                 <TablixMember />
                 <TablixMember />
@@ -2205,7 +2313,7 @@
             <Top>1.85833in</Top>
             <Left>0.01389in</Left>
             <Height>0.5in</Height>
-            <Width>18.68125in</Width>
+            <Width>19.88125in</Width>
             <Style>
               <Border>
                 <Style>None</Style>
@@ -2672,7 +2780,7 @@
           </Border>
         </Style>
       </Body>
-      <Width>18.69514in</Width>
+      <Width>20.19514in</Width>
       <Page>
         <PageFooter>
           <Height>0.45in</Height>
@@ -3183,6 +3291,49 @@
         </Values>
       </DefaultValue>
       <Prompt>HasNoBeepVib</Prompt>
+      <ValidValues>
+        <ParameterValues>
+          <ParameterValue>
+            <Value>0</Value>
+            <Label>No</Label>
+          </ParameterValue>
+          <ParameterValue>
+            <Value>1</Value>
+            <Label>Yes</Label>
+          </ParameterValue>
+        </ParameterValues>
+      </ValidValues>
+    </ReportParameter>
+    <ReportParameter Name="JpAmtMin">
+      <DataType>Integer</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>0</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>JpAmtMin</Prompt>
+      <Hidden>true</Hidden>
+    </ReportParameter>
+    <ReportParameter Name="JpAmtMax">
+      <DataType>Integer</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>0</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>JpAmtMax</Prompt>
+      <Hidden>true</Hidden>
+    </ReportParameter>
+    <ReportParameter Name="ShowAssetField">
+      <DataType>Integer</DataType>
+      <DefaultValue>
+        <DataSetReference>
+          <DataSetName>RTA_ShowAssetField</DataSetName>
+          <ValueField>Setting</ValueField>
+        </DataSetReference>
+      </DefaultValue>
+      <Prompt>ShowAssetField</Prompt>
+      <Hidden>true</Hidden>
       <ValidValues>
         <ParameterValues>
           <ParameterValue>
