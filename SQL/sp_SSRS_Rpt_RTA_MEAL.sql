@@ -49,8 +49,13 @@ BEGIN
 		   PktNumWitness4, PktNumSourceWitness4, EmpNumWitness4,
 		   EmpNameWitness4 = case when empw4.CardNum is null then EmpNameWitness4 else '('+left(empw4.JobType,1)+') '+empw4.NameFirst+' '+left(empw4.NameLast,1)+'.' end,
 		   EmpLicNumWitness4, tWitness4,
+		   PktNumWitness5, PktNumSourceWitness5, EmpNumWitness5,
+		   EmpNameWitness5 = case when empw5.CardNum is null then EmpNameWitness5 else '('+left(empw5.JobType,1)+') '+empw5.NameFirst+' '+left(empw5.NameLast,1)+'.' end,
+		   EmpLicNumWitness5, tWitness5,
 		   EventComment, Asset, 
-		   EventDescription = case when m.EntryReason = 'DROP TEAM' then m.CardInEvtDisp else isnull(r.EventDescription,m.CardInEvtDesc) end
+		   EventDescription = case when r.EventDescription is null and (m.CardInEvtDesc like '3C%' or m.CardInEvtDesc like '5A%') then ''
+								   when m.EntryReason = 'DROP TEAM' then ''
+		                           else isnull(r.EventDescription,rtrim(m.CardInEvtDesc)) end
 	  FROM SQLA_MEAL as m
 	  left join SQLA_CardInReasons as r
 	    on r.Dept = m.Source
@@ -60,13 +65,15 @@ BEGIN
 	  left join SQLA_Employees as emp2
 	    on emp2.CardNum = ltrim(rtrim(m.CardInEvtDisp))
 	  left join SQLA_Employees as empw1
-	    on empw1.CardNum = m.EmpNum
+	    on empw1.CardNum = m.EmpNumWitness1
 	  left join SQLA_Employees as empw2
-	    on empw2.CardNum = m.EmpNum
+	    on empw2.CardNum = m.EmpNumWitness2
 	  left join SQLA_Employees as empw3
-	    on empw3.CardNum = m.EmpNum
+	    on empw3.CardNum = m.EmpNumWitness3
 	  left join SQLA_Employees as empw4
-	    on empw4.CardNum = m.EmpNum
+	    on empw4.CardNum = m.EmpNumWitness4
+	  left join SQLA_Employees as empw5
+	    on empw4.CardNum = m.EmpNumWitness5
 	 WHERE tOut >= @StartDt and tOut <= @EndDt
 	   and ((@Location = '') or (@Location = ' All') or (Location = @Location) or (Asset = @Location))
 END

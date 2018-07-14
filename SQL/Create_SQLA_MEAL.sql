@@ -70,8 +70,23 @@ GO
 --8/16/2017
 ALTER TABLE [dbo].[SQLA_MEAL] ADD [tComplete] [datetime] NULL
 GO
+--2/27/2018
+ALTER TABLE [dbo].[SQLA_MEAL] ADD [PktNumWitness5] [int] NULL
+GO
+ALTER TABLE [dbo].[SQLA_MEAL] ADD [PktNumSourceWitness5] [nvarchar](20) NULL
+GO
+ALTER TABLE [dbo].[SQLA_MEAL] ADD [EmpNumWitness5] [nvarchar](20) NULL
+GO
+ALTER TABLE [dbo].[SQLA_MEAL] ADD [EmpNameWitness5] [nvarchar](50) NULL
+GO
+ALTER TABLE [dbo].[SQLA_MEAL] ADD [EmpLicNumWitness5] [nvarchar](20) NULL
+GO
+ALTER TABLE [dbo].[SQLA_MEAL] ADD [tWitness5] [datetime] NULL
+GO
+-- 5/7/2018
+ALTER TABLE [dbo].[SQLA_MEAL] ALTER COLUMN [CardInEvtDesc] [nvarchar](255) NULL
+GO
 
 
 SET ANSI_PADDING OFF
 GO
-

@@ -34,7 +34,7 @@ BEGIN
 	
 	truncate table SQLA_MEAL
 	
-	insert into SQLA_MEAL (PktNum, Location, Zone, EmpNum, EmpName, EmpLicNum, tOut, EntryReason, ParentEventID, PktNumWitness1, PktNumSourceWitness1, EmpNumWitness1, EmpNameWitness1, EmpLicNumWitness1, tWitness1, PktNumWitness2, PktNumSourceWitness2, EmpNumWitness2, EmpNameWitness2, EmpLicNumWitness2, tWitness2, PktNumWitness3, PktNumSourceWitness3, EmpNumWitness3, EmpNameWitness3, EmpLicNumWitness3, tWitness3, PktNumWitness4, PktNumSourceWitness4, EmpNumWitness4, EmpNameWitness4, EmpLicNumWitness4, tWitness4, EventComment, Asset, CardInEvtDisp, CardInEvtDesc, Source, tComplete)
+	insert into SQLA_MEAL (PktNum, Location, Zone, EmpNum, EmpName, EmpLicNum, tOut, EntryReason, ParentEventID, PktNumWitness1, PktNumSourceWitness1, EmpNumWitness1, EmpNameWitness1, EmpLicNumWitness1, tWitness1, PktNumWitness2, PktNumSourceWitness2, EmpNumWitness2, EmpNameWitness2, EmpLicNumWitness2, tWitness2, PktNumWitness3, PktNumSourceWitness3, EmpNumWitness3, EmpNameWitness3, EmpLicNumWitness3, tWitness3, PktNumWitness4, PktNumSourceWitness4, EmpNumWitness4, EmpNameWitness4, EmpLicNumWitness4, tWitness4, PktNumWitness5, PktNumSourceWitness5, EmpNumWitness5, EmpNameWitness5, EmpLicNumWitness5, tWitness5, EventComment, Asset, CardInEvtDisp, CardInEvtDesc, Source, tComplete)
 	select ml.PktNum, ml.Location, ml.Zone,
 	       EmpNum = case when ml.EmpNum is null or ml.EmpNum = '' then ISNULL(ISNULL(ISNULL(es.EmpNumComplete,et.EmpNumComplete),es.EmpNumAuthorize),et.EmpNumAuthorize) else ml.EmpNum end,
 		   EmpName = case when ml.EmpName is null or ml.EmpName = '' then ISNULL(ISNULL(ISNULL(es.EmpNameComplete,et.EmpNameComplete),es.EmpNameAuthorize),et.EmpNameAuthorize) else ml.EmpName end,
@@ -49,6 +49,7 @@ BEGIN
 		   ml.PktNumWitness2, ml.PktNumSourceWitness2, ml.EmpNumWitness2, ml.EmpNameWitness2, ml.EmpLicNumWitness2, ml.tWitness2,
 		   ml.PktNumWitness3, ml.PktNumSourceWitness3, ml.EmpNumWitness3, ml.EmpNameWitness3, ml.EmpLicNumWitness3, ml.tWitness3,
 		   ml.PktNumWitness4, ml.PktNumSourceWitness4, ml.EmpNumWitness4, ml.EmpNameWitness4, ml.EmpLicNumWitness4, ml.tWitness4,
+		   ml.PktNumWitness5, ml.PktNumSourceWitness5, ml.EmpNumWitness5, ml.EmpNameWitness5, ml.EmpLicNumWitness5, ml.tWitness5,
 		   EventComment = isnull(es.EventComment,et.EventComment),
 		   ml.Asset,
 		   CardInEvtDisp = isnull(isnull(isnull(isnull(isnull(crs.EventDisplay,crt.EventDisplay),rds.CmpReasonNum),rdt.CmpReasonNum),es.ResolutionDesc),et.ResolutionDesc),
@@ -73,6 +74,9 @@ BEGIN
 	  left join (select CmpReasonNum = cast(row_number() over(order by ConfigSection, ConfigParam)-1 as nvarchar), CompleteReason = Setting from RTSS.dbo.SYSTEMSETTINGS with (nolock) where ConfigSection = 'CompleteReason_ST') as rdt
 	    on rdt.CmpReasonNum = et.ResolutionDesc
 	 where (@StartDt = null or ml.tOut >= @StartDt) and (ml.tOut is not NULL and isdate(ml.tOut) = 1 and ml.tOut > '1/2/1980')
+	   and (    (ml.ParentEventID is null) or (ml.PktCbMsg = 'RTA Offline')
+	         or (ml.ParentEventID is not null and ml.ParentEventID = 0 and ml.PktNumEvent is null)
+			 or (ml.ParentEventID is not null and (es.PktNum is not null or et.PktNum is not null)))
 
 END
 
