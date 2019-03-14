@@ -510,6 +510,9 @@ order by Setting desc</CommandText>
             <Left>1.23958in</Left>
             <Height>0.5in</Height>
             <Width>1in</Width>
+            <Visibility>
+              <Hidden>=iif(Parameters!StartDt.Value &gt; Parameters!EndDt.Value,TRUE,FALSE)</Hidden>
+            </Visibility>
             <Style>
               <Border>
                 <Style>None</Style>
@@ -937,6 +940,9 @@ order by Setting desc</CommandText>
             <Height>0.75in</Height>
             <Width>3.23958in</Width>
             <ZIndex>1</ZIndex>
+            <Visibility>
+              <Hidden>=iif(Parameters!StartDt.Value &gt; Parameters!EndDt.Value,TRUE,FALSE)</Hidden>
+            </Visibility>
             <Style>
               <Border>
                 <Style>None</Style>
@@ -1489,6 +1495,9 @@ order by Setting desc</CommandText>
             <Height>0.75in</Height>
             <Width>3.23958in</Width>
             <ZIndex>6</ZIndex>
+            <Visibility>
+              <Hidden>=iif(Parameters!StartDt.Value &gt; Parameters!EndDt.Value,TRUE,FALSE)</Hidden>
+            </Visibility>
             <Style>
               <Border>
                 <Style>None</Style>
@@ -1929,6 +1938,9 @@ order by Setting desc</CommandText>
             <Height>0.75in</Height>
             <Width>3.23958in</Width>
             <ZIndex>7</ZIndex>
+            <Visibility>
+              <Hidden>=iif(Parameters!StartDt.Value &gt; Parameters!EndDt.Value,TRUE,FALSE)</Hidden>
+            </Visibility>
             <Style>
               <Border>
                 <Style>None</Style>
@@ -1960,6 +1972,9 @@ order by Setting desc</CommandText>
             <Height>0.25541in</Height>
             <Width>3.23958in</Width>
             <ZIndex>8</ZIndex>
+            <Visibility>
+              <Hidden>=iif(Parameters!StartDt.Value &gt; Parameters!EndDt.Value,TRUE,FALSE)</Hidden>
+            </Visibility>
             <Style>
               <Border>
                 <Style>None</Style>
@@ -1997,6 +2012,9 @@ order by Setting desc</CommandText>
             <Height>0.25541in</Height>
             <Width>3.23958in</Width>
             <ZIndex>9</ZIndex>
+            <Visibility>
+              <Hidden>=iif(Parameters!StartDt.Value &gt; Parameters!EndDt.Value,TRUE,FALSE)</Hidden>
+            </Visibility>
             <Style>
               <Border>
                 <Style>None</Style>
@@ -2420,6 +2438,9 @@ order by Setting desc</CommandText>
             <Height>0.75in</Height>
             <Width>3.23958in</Width>
             <ZIndex>10</ZIndex>
+            <Visibility>
+              <Hidden>=iif(Parameters!StartDt.Value &gt; Parameters!EndDt.Value,TRUE,FALSE)</Hidden>
+            </Visibility>
             <Style>
               <Border>
                 <Style>None</Style>
@@ -2838,6 +2859,9 @@ order by Setting desc</CommandText>
             <Height>0.75in</Height>
             <Width>3.23958in</Width>
             <ZIndex>11</ZIndex>
+            <Visibility>
+              <Hidden>=iif(Parameters!StartDt.Value &gt; Parameters!EndDt.Value,TRUE,FALSE)</Hidden>
+            </Visibility>
             <Style>
               <Border>
                 <Style>None</Style>
@@ -3271,6 +3295,9 @@ order by Setting desc</CommandText>
             <Height>0.75in</Height>
             <Width>3.23958in</Width>
             <ZIndex>12</ZIndex>
+            <Visibility>
+              <Hidden>=iif(Parameters!StartDt.Value &gt; Parameters!EndDt.Value,TRUE,FALSE)</Hidden>
+            </Visibility>
             <Style>
               <Border>
                 <Style>None</Style>
@@ -3302,6 +3329,9 @@ order by Setting desc</CommandText>
             <Height>0.25541in</Height>
             <Width>3.23958in</Width>
             <ZIndex>13</ZIndex>
+            <Visibility>
+              <Hidden>=iif(Parameters!StartDt.Value &gt; Parameters!EndDt.Value,TRUE,FALSE)</Hidden>
+            </Visibility>
             <Style>
               <Border>
                 <Style>None</Style>
@@ -3726,6 +3756,9 @@ order by Setting desc</CommandText>
             <Height>0.75in</Height>
             <Width>3.23958in</Width>
             <ZIndex>14</ZIndex>
+            <Visibility>
+              <Hidden>=iif(Parameters!StartDt.Value &gt; Parameters!EndDt.Value,TRUE,FALSE)</Hidden>
+            </Visibility>
             <Style>
               <Border>
                 <Style>None</Style>
@@ -4144,6 +4177,9 @@ order by Setting desc</CommandText>
             <Height>0.75in</Height>
             <Width>3.23958in</Width>
             <ZIndex>15</ZIndex>
+            <Visibility>
+              <Hidden>=iif(Parameters!StartDt.Value &gt; Parameters!EndDt.Value,TRUE,FALSE)</Hidden>
+            </Visibility>
             <Style>
               <Border>
                 <Style>None</Style>
@@ -4577,6 +4613,9 @@ order by Setting desc</CommandText>
             <Height>0.75in</Height>
             <Width>3.23958in</Width>
             <ZIndex>16</ZIndex>
+            <Visibility>
+              <Hidden>=iif(Parameters!StartDt.Value &gt; Parameters!EndDt.Value,TRUE,FALSE)</Hidden>
+            </Visibility>
             <Style>
               <Border>
                 <Style>None</Style>
@@ -4693,6 +4732,9 @@ order by Setting desc</CommandText>
             <Height>0.5in</Height>
             <Width>1.00743in</Width>
             <ZIndex>17</ZIndex>
+            <Visibility>
+              <Hidden>=iif(Parameters!StartDt.Value &gt; Parameters!EndDt.Value,TRUE,FALSE)</Hidden>
+            </Visibility>
             <Style>
               <Border>
                 <Style>None</Style>
@@ -4723,6 +4765,9 @@ order by Setting desc</CommandText>
             <Height>0.25in</Height>
             <Width>1.23215in</Width>
             <ZIndex>18</ZIndex>
+            <Visibility>
+              <Hidden>=iif(Parameters!StartDt.Value &gt; Parameters!EndDt.Value,TRUE,FALSE)</Hidden>
+            </Visibility>
             <Style>
               <Border>
                 <Style>None</Style>
@@ -4734,8 +4779,44 @@ order by Setting desc</CommandText>
               <PaddingBottom>2pt</PaddingBottom>
             </Style>
           </Textbox>
+          <Textbox Name="Textbox1">
+            <CanGrow>true</CanGrow>
+            <KeepTogether>true</KeepTogether>
+            <Paragraphs>
+              <Paragraph>
+                <TextRuns>
+                  <TextRun>
+                    <Value>ERROR:  Invalid date parameters entered!</Value>
+                    <Style>
+                      <FontWeight>Bold</FontWeight>
+                      <Color>White</Color>
+                    </Style>
+                  </TextRun>
+                </TextRuns>
+                <Style />
+              </Paragraph>
+            </Paragraphs>
+            <rd:DefaultName>Textbox1</rd:DefaultName>
+            <Top>4.30277in</Top>
+            <Height>0.25in</Height>
+            <Width>3.11458in</Width>
+            <ZIndex>19</ZIndex>
+            <Visibility>
+              <Hidden>=iif(Parameters!StartDt.Value &gt; Parameters!EndDt.Value,FALSE,TRUE)</Hidden>
+            </Visibility>
+            <Style>
+              <Border>
+                <Style>None</Style>
+              </Border>
+              <BackgroundColor>Red</BackgroundColor>
+              <PaddingLeft>2pt</PaddingLeft>
+              <PaddingRight>2pt</PaddingRight>
+              <PaddingTop>2pt</PaddingTop>
+              <PaddingBottom>2pt</PaddingBottom>
+            </Style>
+          </Textbox>
         </ReportItems>
-        <Height>4.26805in</Height>
+        <Height>4.55277in</Height>
         <Style>
           <Border>
             <Style>None</Style>
