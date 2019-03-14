@@ -25,12 +25,18 @@ IF NOT EXISTS (select * from dbo.sysobjects where id = object_id(N'[dbo].[SQLA_E
 	) ON [PRIMARY]
 GO
 
--- TABLE UPDATES
 
+-- TABLE UPDATES
 -- 12/21/2016
 ALTER TABLE [dbo].[SQLA_Employees] ALTER COLUMN [CardNum] [nvarchar](40) NOT NULL
 GO
-
+-- 8/29/2018
+ALTER TABLE [dbo].[SQLA_Employees] ADD [ShiftStartTm] [nvarchar](5) NULL
+GO
+ALTER TABLE [dbo].[SQLA_Employees] ADD [IsDualRate] [int] NULL
+GO
+ALTER TABLE [dbo].[SQLA_Employees] ADD [IsPartTime] [int] NULL
+GO
 
 SET ANSI_PADDING OFF
 GO
