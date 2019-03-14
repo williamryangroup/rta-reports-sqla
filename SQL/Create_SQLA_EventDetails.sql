@@ -66,7 +66,7 @@ GO
 ALTER TABLE [dbo].[SQLA_EventDetails] ADD [AmtEvent] [nvarchar](12) NULL
 GO
 
---11/17
+--11/17/2017
 ALTER TABLE [dbo].[SQLA_EventDetails] ALTER COLUMN [EmpNumAsn] [nvarchar](40) NULL
 GO
 ALTER TABLE [dbo].[SQLA_EventDetails] ALTER COLUMN [EmpNumRsp] [nvarchar](40) NULL
@@ -74,8 +74,12 @@ GO
 ALTER TABLE [dbo].[SQLA_EventDetails] ALTER COLUMN [EmpNumCmp] [nvarchar](40) NULL
 GO
 
---1/5
+--1/5/2018
 ALTER TABLE [dbo].[SQLA_EventDetails] ALTER COLUMN [CustNum] [nvarchar](40) NULL
+GO
+
+--5/15/2018
+ALTER TABLE [dbo].[SQLA_EventDetails] ADD [CompVarianceReason] [nvarchar](50) NULL
 GO
 
 

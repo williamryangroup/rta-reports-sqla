@@ -5,6 +5,7 @@ type sp_SSRS_Rpt_RTA_Compliance_Employee.sql >> sp_SSRS_Rpt_RTA_ALL.sql
 type sp_SSRS_Rpt_RTA_Compliance_Supervisor.sql >> sp_SSRS_Rpt_RTA_ALL.sql
 type sp_SSRS_Rpt_RTA_CustTiers.sql >> sp_SSRS_Rpt_RTA_ALL.sql
 type sp_SSRS_Rpt_RTA_EmpJobTypes.sql >> sp_SSRS_Rpt_RTA_ALL.sql
+type sp_SSRS_Rpt_RTA_EmpLogins.sql >> sp_SSRS_Rpt_RTA_ALL.sql
 type sp_SSRS_Rpt_RTA_Employees.sql >> sp_SSRS_Rpt_RTA_ALL.sql
 type sp_SSRS_Rpt_RTA_EventDetails.sql >> sp_SSRS_Rpt_RTA_ALL.sql
 type sp_SSRS_Rpt_RTA_EventDetails_ExecSum_Cmp.sql >> sp_SSRS_Rpt_RTA_ALL.sql
@@ -16,10 +17,12 @@ type sp_SSRS_Rpt_RTA_EventDistanceDetail.sql >> sp_SSRS_Rpt_RTA_ALL.sql
 type sp_SSRS_Rpt_RTA_EventReject.sql >> sp_SSRS_Rpt_RTA_ALL.sql
 type sp_SSRS_Rpt_RTA_EventTypes.sql >> sp_SSRS_Rpt_RTA_ALL.sql
 type sp_SSRS_Rpt_RTA_FloorActivity.sql >> sp_SSRS_Rpt_RTA_ALL.sql
+type sp_SSRS_Rpt_RTA_KPI_Rsp.sql >> sp_SSRS_Rpt_RTA_ALL.sql
 type sp_SSRS_Rpt_RTA_Locations.sql >> sp_SSRS_Rpt_RTA_ALL.sql
-type sp_SSRS_Rpt_RTA_MEAL.sql >> sp_SSRS_Rpt_RTA_ALL.sql
 type sp_SSRS_Rpt_RTA_PaperOut.sql >> sp_SSRS_Rpt_RTA_ALL.sql
 type sp_SSRS_Rpt_RTA_RptStartEndDttm.sql >> sp_SSRS_Rpt_RTA_ALL.sql
+type sp_SSRS_Rpt_RTA_RulesOfEngagement.sql >> sp_SSRS_Rpt_RTA_ALL.sql
+type sp_SSRS_Rpt_RTA_Shifts.sql >> sp_SSRS_Rpt_RTA_ALL.sql
 type sp_SSRS_Rpt_RTA_ShowPaperOut.sql >> sp_SSRS_Rpt_RTA_ALL.sql
 type sp_SSRS_Rpt_RTA_SupReview.sql >> sp_SSRS_Rpt_RTA_ALL.sql
 type sp_SSRS_Rpt_RTA_Target80.sql >> sp_SSRS_Rpt_RTA_ALL.sql

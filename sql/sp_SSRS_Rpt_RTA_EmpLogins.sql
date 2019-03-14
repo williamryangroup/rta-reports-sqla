@@ -31,7 +31,8 @@ BEGIN
 		   BreakDuration = datediff(s,b.ActivityStart,b.ActivityEnd)/60.0
 	  from SQLA_EmployeeEventTimes as l
 	  left join SQLA_EmployeeEventTimes as b
-		on b.ActivityStart <= l.ActivityEnd
+		on b.EmpNum = l.EmpNum
+	   and b.ActivityStart <= l.ActivityEnd
 	   and b.ActivityEnd >= l.ActivityStart
 	   and b.PktNum = 1
 	 where (l.PktNum = 3)

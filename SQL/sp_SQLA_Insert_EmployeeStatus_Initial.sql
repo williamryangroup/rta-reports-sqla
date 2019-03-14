@@ -20,6 +20,7 @@ GO
 -- Description:	<Description,,>
 -- =============================================
 CREATE PROCEDURE [dbo].[sp_SQLA_Insert_EmployeeStatus_Initial]
+	@StartDt datetime = null
 
 WITH RECOMPILE
 AS
@@ -69,7 +70,8 @@ BEGIN
 	   and e.tOut > s.tOut
 	  left join SQLA_Employees as emp
 	    on emp.CardNum = s.EmpNum
-	 WHERE (s.tOut > '1/2/1980' and e.tOut > '1/2/1980')
+	 WHERE (@StartDt = null or s.tOut >= @StartDt)
+	   AND (s.tOut > '1/2/1980' and e.tOut > '1/2/1980')
 	   AND s.ActivityTypeID = 3 and s.State = 'Login'
 	   AND e.ActivityTypeID = 3 and e.State = 'Logout'
 	 GROUP BY s.EmpNum, emp.NameFirst, emp.NameLast, s.tOut, emp.JobType ) as a
@@ -86,7 +88,8 @@ BEGIN
 	   AND e.tOut > s.tOut
 	  LEFT JOIN SQLA_Employees as j WITH (NOLOCK)
 		ON j.CardNum = s.EmpNum
-	 WHERE (s.tOut > '1/2/1980' and e.tOut > '1/2/1980')
+	 WHERE (@StartDt = null or s.tOut >= @StartDt)
+	   AND (s.tOut > '1/2/1980' and e.tOut > '1/2/1980')
 	   AND (s.ActivityTypeID = 4 and s.Activity like 'Zones Served:%' and rtrim(s.Activity) <> 'Zones Served:')
 	   AND ((e.ActivityTypeID = 4 and e.Activity like 'Zones Served:%') or (e.ActivityTypeID = 3 and e.State = 'Logout'))
 	 GROUP BY s.EmpNum, j.NameFirst, j.NameLast, j.JobType, s.Activity, s.tOut ) as t

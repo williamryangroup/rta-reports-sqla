@@ -598,6 +598,9 @@
             <Left>0.01861in</Left>
             <Height>3.2in</Height>
             <Width>2.5in</Width>
+            <Visibility>
+              <Hidden>=iif(Parameters!StartDt.Value &gt; Parameters!EndDt.Value,TRUE,FALSE)</Hidden>
+            </Visibility>
             <Bookmark>bkmkCustRsp</Bookmark>
             <Style>
               <Border>
@@ -964,6 +967,9 @@
             <Height>3.2in</Height>
             <Width>6.6in</Width>
             <ZIndex>1</ZIndex>
+            <Visibility>
+              <Hidden>=iif(Parameters!StartDt.Value &gt; Parameters!EndDt.Value,TRUE,FALSE)</Hidden>
+            </Visibility>
             <Style>
               <Border>
                 <Style>None</Style>
@@ -1099,6 +1105,9 @@
             <Height>0.5in</Height>
             <Width>0.8in</Width>
             <ZIndex>2</ZIndex>
+            <Visibility>
+              <Hidden>=iif(Parameters!StartDt.Value &gt; Parameters!EndDt.Value,TRUE,FALSE)</Hidden>
+            </Visibility>
             <Style>
               <Border>
                 <Style>None</Style>
@@ -1171,6 +1180,9 @@
             <Height>0.25in</Height>
             <Width>1in</Width>
             <ZIndex>3</ZIndex>
+            <Visibility>
+              <Hidden>=iif(Parameters!StartDt.Value &gt; Parameters!EndDt.Value,TRUE,FALSE)</Hidden>
+            </Visibility>
             <Style>
               <Border>
                 <Style>Solid</Style>
@@ -1206,6 +1218,9 @@
             <Height>0.50542in</Height>
             <Width>0.99528in</Width>
             <ZIndex>4</ZIndex>
+            <Visibility>
+              <Hidden>=iif(Parameters!StartDt.Value &gt; Parameters!EndDt.Value,TRUE,FALSE)</Hidden>
+            </Visibility>
             <Style>
               <Border>
                 <Style>None</Style>
@@ -1276,6 +1291,9 @@
             <Height>0.25in</Height>
             <Width>1in</Width>
             <ZIndex>5</ZIndex>
+            <Visibility>
+              <Hidden>=iif(Parameters!StartDt.Value &gt; Parameters!EndDt.Value,TRUE,FALSE)</Hidden>
+            </Visibility>
             <Style>
               <Border>
                 <Style>Solid</Style>
@@ -1326,6 +1344,9 @@
             <Height>0.25in</Height>
             <Width>1in</Width>
             <ZIndex>6</ZIndex>
+            <Visibility>
+              <Hidden>=iif(Parameters!StartDt.Value &gt; Parameters!EndDt.Value,TRUE,FALSE)</Hidden>
+            </Visibility>
             <Style>
               <Border>
                 <Style>Solid</Style>
@@ -1388,6 +1409,9 @@
             <Height>0.25in</Height>
             <Width>1in</Width>
             <ZIndex>7</ZIndex>
+            <Visibility>
+              <Hidden>=iif(Parameters!StartDt.Value &gt; Parameters!EndDt.Value,TRUE,FALSE)</Hidden>
+            </Visibility>
             <Style>
               <Border>
                 <Style>Solid</Style>
@@ -1450,6 +1474,9 @@
             <Height>0.25in</Height>
             <Width>1in</Width>
             <ZIndex>8</ZIndex>
+            <Visibility>
+              <Hidden>=iif(Parameters!StartDt.Value &gt; Parameters!EndDt.Value,TRUE,FALSE)</Hidden>
+            </Visibility>
             <Style>
               <Border>
                 <Style>Solid</Style>
@@ -1515,6 +1542,9 @@
             <Height>0.25in</Height>
             <Width>1in</Width>
             <ZIndex>9</ZIndex>
+            <Visibility>
+              <Hidden>=iif(Parameters!StartDt.Value &gt; Parameters!EndDt.Value,TRUE,FALSE)</Hidden>
+            </Visibility>
             <Style>
               <Border>
                 <Style>Solid</Style>
@@ -1586,6 +1616,9 @@
             <Height>0.25in</Height>
             <Width>1in</Width>
             <ZIndex>10</ZIndex>
+            <Visibility>
+              <Hidden>=iif(Parameters!StartDt.Value &gt; Parameters!EndDt.Value,TRUE,FALSE)</Hidden>
+            </Visibility>
             <Style>
               <Border>
                 <Style>Solid</Style>
@@ -1721,6 +1754,9 @@
             <Height>0.5in</Height>
             <Width>0.8in</Width>
             <ZIndex>11</ZIndex>
+            <Visibility>
+              <Hidden>=iif(Parameters!StartDt.Value &gt; Parameters!EndDt.Value,TRUE,FALSE)</Hidden>
+            </Visibility>
             <Style>
               <Border>
                 <Style>None</Style>
@@ -2178,13 +2214,50 @@
             <Width>1in</Width>
             <ZIndex>14</ZIndex>
             <Visibility>
-              <Hidden>=iif(Parameters!ShowPaperOut.Value=1,False,True)</Hidden>
+              <Hidden>=iif((Parameters!ShowPaperOut.Value=1) or (Parameters!StartDt.Value &lt; Parameters!EndDt.Value),False,True)</Hidden>
             </Visibility>
             <Style>
               <Border>
                 <Style>Solid</Style>
               </Border>
               <BackgroundColor>LightSteelBlue</BackgroundColor>
+              <PaddingLeft>2pt</PaddingLeft>
+              <PaddingRight>2pt</PaddingRight>
+              <PaddingTop>2pt</PaddingTop>
+              <PaddingBottom>2pt</PaddingBottom>
+            </Style>
+          </Textbox>
+          <Textbox Name="Textbox1">
+            <CanGrow>true</CanGrow>
+            <KeepTogether>true</KeepTogether>
+            <Paragraphs>
+              <Paragraph>
+                <TextRuns>
+                  <TextRun>
+                    <Value>ERROR:  Invalid date parameters entered!</Value>
+                    <Style>
+                      <FontWeight>Bold</FontWeight>
+                      <Color>White</Color>
+                    </Style>
+                  </TextRun>
+                </TextRuns>
+                <Style />
+              </Paragraph>
+            </Paragraphs>
+            <rd:DefaultName>Textbox1</rd:DefaultName>
+            <Top>4.37548in</Top>
+            <Left>0.02778in</Left>
+            <Height>0.25in</Height>
+            <Width>3.11458in</Width>
+            <ZIndex>15</ZIndex>
+            <Visibility>
+              <Hidden>=iif(Parameters!StartDt.Value &gt; Parameters!EndDt.Value,FALSE,TRUE)</Hidden>
+            </Visibility>
+            <Style>
+              <Border>
+                <Style>None</Style>
+              </Border>
+              <BackgroundColor>Red</BackgroundColor>
               <PaddingLeft>2pt</PaddingLeft>
               <PaddingRight>2pt</PaddingRight>
               <PaddingTop>2pt</PaddingTop>

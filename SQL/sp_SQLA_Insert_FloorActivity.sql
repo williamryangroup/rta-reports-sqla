@@ -30,6 +30,10 @@ BEGIN
 	-- interfering with SELECT statements.
 	SET NOCOUNT ON;
 	
+	DECLARE @AllowSqlaLog int = 0     -- 0 = No / 1 = Yes
+	
+	IF(@AllowSqlaLog = 1) insert into SQLA_Log (RecordDttm, RecordDesc) values (getdate(),'Insert_FloorActivity: Start')
+	
 	
 	-- Capture new EVENT_STATES purged from RTSS since last SQLA insert
 	truncate table SQLA_New_SEQ
@@ -44,6 +48,8 @@ BEGIN
 		 ( select null from SQLA_FloorActivity as f WITH (NOLOCK)
 			where f.SourceTable = 'EVENT_STATE_LOG1' and f.SourceTableID = l.SEQ)
 	
+	IF(@AllowSqlaLog = 1) insert into SQLA_Log (RecordDttm, RecordDesc) values (getdate(),'Insert_FloorActivity: SQLA_New_SEQ')
+	
 	
 	-- Capture new EVENTS purged from RTSS since last SQLA insert
 	truncate table SQLA_New_Events
@@ -53,6 +59,8 @@ BEGIN
 	 where not exists 
 		 ( select null from SQLA_FloorActivity as f WITH (NOLOCK)
 			where f.SourceTable = 'EVENT1' and f.SourceTableID = e.PktNum)
+	
+	IF(@AllowSqlaLog = 1) insert into SQLA_Log (RecordDttm, RecordDesc) values (getdate(),'Insert_FloorActivity: SQLA_New_Events')
 	
 	/*
 	-- Capture new SYSTEMLOG entries purged from RTSS since last SQLA insert
@@ -65,6 +73,8 @@ BEGIN
 	 where e.EvtNum > @MinEvtNum and not exists 
 		 ( select null from SQLA_FloorActivity as f WITH (NOLOCK)
 			where f.SourceTable = 'SYSTEMLOG1' and f.SourceTableID = e.EvtNum)
+	
+	IF(@AllowSqlaLog = 1) insert into SQLA_Log (RecordDttm, RecordDesc) values (getdate(),'Insert_FloorActivity: SQLA_New_SysLog')
 	*/
 	
 	-- Capture new RTSS.dbo.EMPLOYEEACTIVITY purged from RTSS since last SQLA insert
@@ -82,6 +92,8 @@ BEGIN
 			  and f.SourceTableDttm1 = e.tOut
 			  and f.SourceTableDttm2 = e.tIn )
 	
+	IF(@AllowSqlaLog = 1) insert into SQLA_Log (RecordDttm, RecordDesc) values (getdate(),'Insert_FloorActivity: SQLA_New_EmpAct')
+	
 	insert into SQLA_New_EmpAct (CardNum, tOut, tIn)
 	select CardNum, tOut, tIn from RTSS.dbo.EMPLOYEEACTIVITY as e WITH (NOLOCK)
 	 where (    Activity like 'LOGIN%'
@@ -94,6 +106,8 @@ BEGIN
 			  and f.SourceTableID2 = e.CardNum
 			  and f.SourceTableDttm1 = e.tOut
 			  and f.SourceTableDttm2 = e.tIn )
+	
+	IF(@AllowSqlaLog = 1) insert into SQLA_Log (RecordDttm, RecordDesc) values (getdate(),'Insert_FloorActivity: SQLA_New_EmpAct')
 	
 	
 	DECLARE @MinAlert1ID int = (select isnull(MAX(SourceTableID),0) from SQLA_FloorActivity WITH (NOLOCK) where SourceTable = 'ALERT1')
@@ -116,9 +130,11 @@ BEGIN
 	DECLARE @CaptAllGetEvents int = isnull((select Setting from RTSS.dbo.SYSTEMSETTINGS WITH (NOLOCK) where ConfigSection = 'RTSSHH' and ConfigParam = 'CaptAllGetEvents'),0)
 	DECLARE @AutoDispatchLogging int = isnull((select Setting from RTSS.dbo.SYSTEMSETTINGS WITH (NOLOCK) where ConfigSection = 'SYSTEM' and ConfigParam = 'AutoDispatchLogging'),0)
 	
+	IF(@AllowSqlaLog = 1) insert into SQLA_Log (RecordDttm, RecordDesc) values (getdate(),'Insert_FloorActivity: Declare Variables')
 	
 	
-    -- RTSS.dbo.EMPLOYEE ACTIVITY - Login/Logout, Zone Change, Break Start
+	
+    -- RTSS.dbo.EMPLOYEE ACTIVITY1 - Login/Logout, Zone Change, Break Start
 	insert into SQLA_FloorActivity
 	select e.tOut, 
 	       ActivityTypeID = case when Activity like 'Break%' then 1
@@ -146,8 +162,10 @@ BEGIN
 	   and n.tIn = e.tIn
 	 where e.tOut > '1/2/1980' and Activity not in ('MANUAL REJECT','') and Activity not like 'REJECT%' and Activity not like 'OOS%' and Activity not like '10 6%'
 	
+	IF(@AllowSqlaLog = 1) insert into SQLA_Log (RecordDttm, RecordDesc) values (getdate(),'Insert_FloorActivity: EMPLOYEE ACTIVITY1 - Login/Logout, Zone Change, Break Start')
 	
-	-- RTSS.dbo.EMPLOYEE ACTIVITY - Break End
+	
+	-- RTSS.dbo.EMPLOYEE ACTIVITY1 - Break End
 	insert into SQLA_FloorActivity
 	select Time = e.tIn, 
 	       ActivityTypeID = case when Activity like 'Break%' then 1
@@ -162,6 +180,8 @@ BEGIN
 	   and n.tOut = e.tOut
 	   and n.tIn = e.tIn
 	 where e.tOut > '1/2/1980' and Activity like 'Break%'
+	
+	IF(@AllowSqlaLog = 1) insert into SQLA_Log (RecordDttm, RecordDesc) values (getdate(),'Insert_FloorActivity: EMPLOYEE ACTIVITY1 - Break End')
 	
 	
     -- RTSS.dbo.EMPLOYEE ACTIVITY - Login/Logout, Zone Change, Break Start
@@ -192,6 +212,8 @@ BEGIN
 	   and n.tIn = e.tIn
 	 where e.tOut > '1/2/1980' and Activity not in ('MANUAL REJECT','') and Activity not like 'REJECT%' and Activity not like 'OOS%' and Activity not like '10 6%'
 	
+	IF(@AllowSqlaLog = 1) insert into SQLA_Log (RecordDttm, RecordDesc) values (getdate(),'Insert_FloorActivity: EMPLOYEE ACTIVITY - Login/Logout, Zone Change, Break Start')
+	
 	
 	-- RTSS.dbo.EMPLOYEE ACTIVITY - Break End
 	insert into SQLA_FloorActivity
@@ -208,6 +230,8 @@ BEGIN
 	   and n.tOut = e.tOut
 	   and n.tIn = e.tIn
 	 where e.tOut > '1/2/1980' and Activity like 'Break%'
+	
+	IF(@AllowSqlaLog = 1) insert into SQLA_Log (RecordDttm, RecordDesc) values (getdate(),'Insert_FloorActivity: EMPLOYEE ACTIVITY - Break End')
 	
 	
 	
@@ -217,6 +241,8 @@ BEGIN
 	  from RTSS.dbo.EVENT4 as e WITH (NOLOCK)
 	 where tOut is not null and tOut > '1/2/1980' and EventDisplay in ('OOS','10 6')
 	   and PktNum in (select PktNum from SQLA_New_Events)
+	
+	IF(@AllowSqlaLog = 1) insert into SQLA_Log (RecordDttm, RecordDesc) values (getdate(),'Insert_FloorActivity: OOS/10 6 - Start')
 	   
 	-- EVENT - OOS/10 6 - End
 	insert into SQLA_FloorActivity
@@ -224,6 +250,8 @@ BEGIN
 	  from RTSS.dbo.EVENT4 as e WITH (NOLOCK)
 	 where tComplete is not null and tComplete > '1/2/1980' and EventDisplay in ('OOS','10 6')
 	   and PktNum in (select PktNum from SQLA_New_Events)
+	
+	IF(@AllowSqlaLog = 1) insert into SQLA_Log (RecordDttm, RecordDesc) values (getdate(),'Insert_FloorActivity: OOS/10 6 - End')
 
 	
 	
@@ -236,8 +264,10 @@ BEGIN
 	       case when @UseAssetAsLocation = 1 then Asset else Location end, Zone, PktNum, CustTierLevel, '', '', '', '', '','EVENT1',PktNum, '', '', ''
 	  from RTSS.dbo.EVENT4 as e WITH (NOLOCK)
 	 where tRecd is not null and tRecd > '1/2/1980' and EventDisplay not in ('OOS','10 6')
-	   and exists (select null from RTSS.dbo.EVENT_STATE_LOG1 as l2 where l2.PktNum = e.PktNum and l2.EventTable = 'EVENT')
+	   --and exists (select null from RTSS.dbo.EVENT_STATE_LOG1 as l2 where l2.PktNum = e.PktNum and l2.EventTable = 'EVENT')
 	   and PktNum in (select PktNum from SQLA_New_Events)
+	
+	IF(@AllowSqlaLog = 1) insert into SQLA_Log (RecordDttm, RecordDesc) values (getdate(),'Insert_FloorActivity: EVENT - Received')
 	
 	
 	-- EVENT - Open
@@ -251,6 +281,8 @@ BEGIN
 	 where tOut is not null and tOut > '1/2/1980' and EventDisplay not in ('OOS','10 6')
 	   and PktNum in (select PktNum from SQLA_New_Events)
 	
+	IF(@AllowSqlaLog = 1) insert into SQLA_Log (RecordDttm, RecordDesc) values (getdate(),'Insert_FloorActivity: EVENT - Open')
+	
 	
 	-- EVENT - Display Workstation
 	insert into SQLA_FloorActivity
@@ -262,6 +294,8 @@ BEGIN
 	  from RTSS.dbo.EVENT4 as e WITH (NOLOCK)
 	 where tDisplay is not null and tDisplay > '1/2/1980' and EventDisplay not in ('OOS','10 6')
 	   and PktNum in (select PktNum from SQLA_New_Events)
+	
+	IF(@AllowSqlaLog = 1) insert into SQLA_Log (RecordDttm, RecordDesc) values (getdate(),'Insert_FloorActivity: EVENT - Display Workstation')
 	
 	
 	-- EVENT - Reject
@@ -275,6 +309,8 @@ BEGIN
 	 where tReject is not null and tReject > '1/2/1980' and EventDisplay not in ('OOS','10 6')
 	   and PktNum in (select PktNum from SQLA_New_Events)
 	
+	IF(@AllowSqlaLog = 1) insert into SQLA_Log (RecordDttm, RecordDesc) values (getdate(),'Insert_FloorActivity: EVENT - Reject')
+	
 	
 	-- EVENT - Authorize - Initial
 	insert into SQLA_FloorActivity
@@ -286,6 +322,8 @@ BEGIN
 	  from RTSS.dbo.EVENT4 as e WITH (NOLOCK)
 	 where tInitialResponse is not null and tInitialResponse > '1/2/1980' and EventDisplay not in ('OOS','10 6')
 	   and PktNum in (select PktNum from SQLA_New_Events)
+	
+	IF(@AllowSqlaLog = 1) insert into SQLA_Log (RecordDttm, RecordDesc) values (getdate(),'Insert_FloorActivity: EVENT - Authorize - Initial')
 	
 	
 	-- EVENT - Authorize - no initial
@@ -300,6 +338,8 @@ BEGIN
 	 where (tInitialResponse is null or tInitialResponse <= '1/2/1980') and tAuthorize is not null and tAuthorize > '1/2/1980' and EventDisplay not in ('OOS','10 6')
 	   and PktNum in (select PktNum from SQLA_New_Events)
 	
+	IF(@AllowSqlaLog = 1) insert into SQLA_Log (RecordDttm, RecordDesc) values (getdate(),'Insert_FloorActivity: EVENT - Authorize - no initial')
+	
 	
 	-- EVENT - Authorize - EMPCARD 
 	insert into SQLA_FloorActivity
@@ -312,6 +352,8 @@ BEGIN
 	 where tAuthorize is not null and tAuthorize > '1/2/1980' and EventDisplay = 'EMPCARD'
 	   and PktNum in (select PktNum from SQLA_New_Events)
 	
+	IF(@AllowSqlaLog = 1) insert into SQLA_Log (RecordDttm, RecordDesc) values (getdate(),'Insert_FloorActivity: EVENT - Authorize - EMPCARD')
+	
 	
 	-- EVENT - Remove
 	insert into SQLA_FloorActivity
@@ -323,6 +365,8 @@ BEGIN
 	  from RTSS.dbo.EVENT4 as e WITH (NOLOCK)
 	 where tRemove is not null and tRemove > '1/2/1980' and EventDisplay not in ('OOS','10 6')
 	   and PktNum in (select PktNum from SQLA_New_Events)
+	
+	IF(@AllowSqlaLog = 1) insert into SQLA_Log (RecordDttm, RecordDesc) values (getdate(),'Insert_FloorActivity: EVENT - Remove')
 	
 	
 	-- EVENT - Complete
@@ -344,6 +388,8 @@ BEGIN
 	  from RTSS.dbo.EVENT4 as e WITH (NOLOCK)
 	 where tComplete is not null and tComplete > '1/2/1980' and EventDisplay not in ('OOS','10 6')
 	   and PktNum in (select PktNum from SQLA_New_Events)
+	
+	IF(@AllowSqlaLog = 1) insert into SQLA_Log (RecordDttm, RecordDesc) values (getdate(),'Insert_FloorActivity: EVENT - Complete')
 	   
 	
 	IF @CaptEvtStateTimes > 0
@@ -382,6 +428,7 @@ BEGIN
 					when l.EventState = 'EventAssignedRemove' then 'Event Assigned Remove'
 					when l.EventState = 'tReassignPrior' then 'Reassigned to Prior Event'
 					when l.EventState = 'tJackpotVerify' then 'Jackpot Verify'
+					when l.EventState = 'tRespondBy' then 'Respond Dashboard'
 					else l.EventState end,
 			   EventDisplay = EventDisplay + case when EventDisplay = 'EMPCARD' and DeviceIDComplete is not null then ' ' + ltrim(rtrim(isnull(ResolutionDesc,'')))
 												  when EventDisplay in ('JKPT','PJ','JP','PROG') then ' ' + isnull(AmtEvent,'')
@@ -406,6 +453,8 @@ BEGIN
 		 where l.tEventState is not null and e.EventDisplay not in ('OOS','10 6')
 		   and EventState not in ('tRecd','tOut','tDisplay','tInitialResponse','tRemove','tComplete','tRejectAuto')
 		   and l.SEQ in (select SEQ from SQLA_New_SEQ)
+	
+		IF(@AllowSqlaLog = 1) insert into SQLA_Log (RecordDttm, RecordDesc) values (getdate(),'Insert_FloorActivity: EVENT_STATE_LOG1')
 	END
 	
 	
@@ -421,6 +470,8 @@ BEGIN
 				on e.PktNum = n.PktNum
 			 where tNotifyPushed is not null and tNotifyPushed > '1/2/1980' and EventDisplay not in ('OOS','10 6')
 			   and e.PktNum in (select PktNum from SQLA_New_Events)
+	
+			IF(@AllowSqlaLog = 1) insert into SQLA_Log (RecordDttm, RecordDesc) values (getdate(),'Insert_FloorActivity: DEVICE_NOTIFICATION_TIMES - Pushed')
 		END
 		
 		-- RTSS.dbo.DEVICE_NOTIFICATION_TIMES - Respond
@@ -431,6 +482,8 @@ BEGIN
 			on e.PktNum = n.PktNum
 		 where tDeviceRespond is not null and tDeviceRespond > '1/2/1980' and EventDisplay not in ('OOS','10 6')
 		   and e.PktNum in (select PktNum from SQLA_New_Events)
+	
+			IF(@AllowSqlaLog = 1) insert into SQLA_Log (RecordDttm, RecordDesc) values (getdate(),'Insert_FloorActivity: DEVICE_NOTIFICATION_TIMES - Respond')
 		
 		IF @CaptAllGetEvents = 0
 		BEGIN
@@ -442,6 +495,8 @@ BEGIN
 				on e.PktNum = n.PktNum
 			 where tEventSent is not null and tEventSent > '1/2/1980' and EventDisplay not in ('OOS','10 6') and n.DeviceIDNotify is not null
 			   and e.PktNum in (select PktNum from SQLA_New_Events)
+	
+			IF(@AllowSqlaLog = 1) insert into SQLA_Log (RecordDttm, RecordDesc) values (getdate(),'Insert_FloorActivity: DEVICE_NOTIFICATION_TIMES - Pull')
 		END
 	END
 	
@@ -457,6 +512,8 @@ BEGIN
 		    on e.PktNum = cast(s.EvtDetail1 as int)
 		 where EvtType = 'GetEvents' and EvtDetail1 <> '-1'
 		   and not exists (select null from SQLA_FloorActivity WITH (NOLOCK) where SourceTable = 'SYSTEMLOG1' and SourceTableID = EvtNum)
+	
+		IF(@AllowSqlaLog = 1) insert into SQLA_Log (RecordDttm, RecordDesc) values (getdate(),'Insert_FloorActivity: SYSTEMLOG - GetEvent - EventDetail1')
 		
 		-- RTSS.dbo.SYSTEMLOG - GetEvent - EventDetail2 - non-Popup
 		insert into SQLA_FloorActivity
@@ -467,6 +524,8 @@ BEGIN
 		    on e.PktNum = cast(s.EvtDetail2 as int)
 		 where EvtType = 'GetEvents' and EvtDetail2 <> '-1' and (EvtDetail4 is null or EvtDetail4 = '')
 		   and not exists (select null from SQLA_FloorActivity WITH (NOLOCK) where SourceTable = 'SYSTEMLOG1' and SourceTableID = EvtNum)
+	
+		IF(@AllowSqlaLog = 1) insert into SQLA_Log (RecordDttm, RecordDesc) values (getdate(),'Insert_FloorActivity: SYSTEMLOG - GetEvent - EventDetail2 - non-Popup')
 		
 		-- RTSS.dbo.SYSTEMLOG - GetEvent - EventDetail2 - Popup
 		insert into SQLA_FloorActivity
@@ -477,6 +536,8 @@ BEGIN
 		    on e.PktNum = cast(s.EvtDetail2 as int)
 		 where EvtType = 'GetEvents' and EvtDetail2 <> '-1' and EvtDetail4 is not null and EvtDetail4 <> '' 
 		   and not exists (select null from SQLA_FloorActivity WITH (NOLOCK) where SourceTable = 'SYSTEMLOG1' and SourceTableID = EvtNum)
+	
+		IF(@AllowSqlaLog = 1) insert into SQLA_Log (RecordDttm, RecordDesc) values (getdate(),'Insert_FloorActivity: SYSTEMLOG - GetEvent - EventDetail2 - Popup')
 	END
 	
 	
@@ -491,6 +552,8 @@ BEGIN
 			on e.PktNum = cast(s.EvtDetail1 as int)
 		 where EvtType = 'AutoDispatch'
 		   and not exists (select null from SQLA_FloorActivity WITH (NOLOCK) where SourceTable = 'SYSTEMLOG1' and SourceTableID = EvtNum)
+	
+		IF(@AllowSqlaLog = 1) insert into SQLA_Log (RecordDttm, RecordDesc) values (getdate(),'Insert_FloorActivity: SYSTEMLOG - AutoDispatch')
 	END
 	
 	
@@ -501,6 +564,8 @@ BEGIN
 		select Time = EvtTime, 6, State = EvtType, Activity = ltrim(rtrim(EvtDescr)), Location = '', Zone = '', PktNum = null, Tier = '', EmpNum = ltrim(rtrim(UserName)), EmpName = (select ltrim(rtrim(NameFirst)) + ' ' + ltrim(rtrim(NameLast)) from RTSS.dbo.EMPLOYEE WITH (NOLOCK) where CardNum = s.UserName), [Source] = ltrim(rtrim(MachineName)), '', '', 'SYSTEMLOG1', EvtNum, '', '', ''
 		  from RTSS.dbo.SYSTEMLOG1 as s WITH (NOLOCK)
 		 where s.EvtNum > @MinSysLog1EvtNum and EvtType = 'SupervDashboard'
+	
+		IF(@AllowSqlaLog = 1) insert into SQLA_Log (RecordDttm, RecordDesc) values (getdate(),'Insert_FloorActivity: SYSTEMLOG - Scorecard')
 	END
 	
 	
@@ -511,12 +576,18 @@ BEGIN
 		select Time = EvtTime, 7, State = EvtType, Activity = ltrim(rtrim(EvtDescr)), Location = '', Zone = '', PktNum = case when ISNUMERIC(EvtDetail1)= 1 then cast(EvtDetail1 as int) else null end, Tier = '', EmpNum = ltrim(rtrim(UserName)), EmpName = (select ltrim(rtrim(NameFirst)) + ' ' + ltrim(rtrim(NameLast)) from RTSS.dbo.EMPLOYEE WITH (NOLOCK) where CardNum = s.UserName), [Source] = ltrim(rtrim(MachineName)), '', '', 'SYSTEMLOG1', EvtNum, '', '', ''
 		  from RTSS.dbo.SYSTEMLOG1 as s WITH (NOLOCK)
 		 where s.EvtNum > @MinSysLog1EvtNum and EvtType = 'SupervAdmEvt'
+	
+		IF(@AllowSqlaLog = 1) insert into SQLA_Log (RecordDttm, RecordDesc) values (getdate(),'Insert_FloorActivity: SYSTEMLOG - Supervisor Admin - Event')
+		
 		
 		-- RTSS.dbo.SYSTEMLOG - Supervisor Admin - Employee
 		insert into SQLA_FloorActivity
 		select Time = EvtTime, 8, State = EvtType, Activity = ltrim(rtrim(EvtDescr)), Location = '', Zone = '', PktNum = null, Tier = '', EmpNum = ltrim(rtrim(UserName)), EmpName = (select ltrim(rtrim(NameFirst)) + ' ' + ltrim(rtrim(NameLast)) from RTSS.dbo.EMPLOYEE WITH (NOLOCK) where CardNum = s.UserName), [Source] = ltrim(rtrim(MachineName)), '', '', 'SYSTEMLOG1', EvtNum, '', '', ''
 		  from RTSS.dbo.SYSTEMLOG1 as s WITH (NOLOCK)
 		 where s.EvtNum > @MinSysLog1EvtNum and EvtType = 'SupervAdmEmp'
+	
+		IF(@AllowSqlaLog = 1) insert into SQLA_Log (RecordDttm, RecordDesc) values (getdate(),'Insert_FloorActivity: SYSTEMLOG - Supervisor Admin - Employee')
+		
 		
 		-- RTSS.dbo.SYSTEMLOG - Supervisor Admin - Employee
 		insert into SQLA_FloorActivity
@@ -540,6 +611,8 @@ BEGIN
 			   'SYSTEMLOG1', EvtNum, '', '', ''
 		  from RTSS.dbo.SYSTEMLOG1 as s WITH (NOLOCK)
 		 where s.EvtNum > @MinSysLog1EvtNum and EvtType = 'SupervAdmEmp'
+	
+		IF(@AllowSqlaLog = 1) insert into SQLA_Log (RecordDttm, RecordDesc) values (getdate(),'Insert_FloorActivity: SYSTEMLOG - Supervisor Admin - Employee')
 	END
 	
 	
@@ -556,6 +629,8 @@ BEGIN
 		  left join RTSS.dbo.LOCZONE as l WITH (NOLOCK)
 			on l.Location = a.location
 		 where a.ID > @MinAlert1ID and alertType <> 'EVENT'
+	
+		IF(@AllowSqlaLog = 1) insert into SQLA_Log (RecordDttm, RecordDesc) values (getdate(),'Insert_FloorActivity: ALERT - Create - EMPLOYEE')
 		
 		-- RTSS.dbo.ALERT - Create - NON-Employee
 		insert into SQLA_FloorActivity
@@ -567,6 +642,8 @@ BEGIN
 			on l.Location = a.location
 		 where a.ID > @MinAlert1ID and alertType <> 'EVENT'
 		   and a.alertUser not in (select CardNum from RTSS.dbo.EMPLOYEE)
+	
+		IF(@AllowSqlaLog = 1) insert into SQLA_Log (RecordDttm, RecordDesc) values (getdate(),'Insert_FloorActivity: ALERT - Create - NON-Employee')
 		   
 		-- RTSS.dbo.SYSTEMLOG - Display Alert Popup
 		insert into SQLA_FloorActivity
@@ -577,6 +654,8 @@ BEGIN
 		  left join RTSS.dbo.LOCZONE as l WITH (NOLOCK)
 			on l.Location = a.location
 		 where s.EvtNum > @MinSysLog1EvtNum and EvtType = 'NEW ALERT'
+	
+		IF(@AllowSqlaLog = 1) insert into SQLA_Log (RecordDttm, RecordDesc) values (getdate(),'Insert_FloorActivity: SYSTEMLOG - Display Alert Popup')
 		   
 		-- RTSS.dbo.SYSTEMLOG - Alert Accept/Dismiss
 		insert into SQLA_FloorActivity
@@ -587,6 +666,8 @@ BEGIN
 		  left join RTSS.dbo.LOCZONE as l WITH (NOLOCK)
 			on l.Location = a.location
 		 where s.EvtNum > @MinSysLog1EvtNum and EvtType = 'SupervProcAlert'
+	
+		IF(@AllowSqlaLog = 1) insert into SQLA_Log (RecordDttm, RecordDesc) values (getdate(),'Insert_FloorActivity: SYSTEMLOG - Alert Accept/Dismiss')
 		 
 		-- RTSS.dbo.ALERT - Alert Resolved/Evt Cmp
 		insert into SQLA_FloorActivity
@@ -597,6 +678,8 @@ BEGIN
 		 where a.ID > @MinAlert1ID and a.alertType <> 'EVENT'
 		   and (    (a.tNotify is null and a.tDismiss is null) 
 		         or (a.tDismiss is not null and a.tDismiss >= a.tCreate and a.tDismiss >= e.tComplete))
+	
+		IF(@AllowSqlaLog = 1) insert into SQLA_Log (RecordDttm, RecordDesc) values (getdate(),'Insert_FloorActivity: ALERT - Alert Resolved/Evt Cmp')
 		 
 		-- RTSS.dbo.ALERT - Alert Resolved
 		insert into SQLA_FloorActivity
@@ -611,6 +694,8 @@ BEGIN
 		   and a.tDismiss >= e.tComplete
 		 where a.ID > @MinAlert1ID and a.alertType <> 'EVENT'
 		   and a.tDismiss is not null and s.EvtNum is null and e.PktNum is null
+	
+		IF(@AllowSqlaLog = 1) insert into SQLA_Log (RecordDttm, RecordDesc) values (getdate(),'Insert_FloorActivity: ALERT - Alert Resolved')
 	END
 		
 	
@@ -643,6 +728,8 @@ BEGIN
 	 group by er.tReject, ev.EventDisplay, case when @UseAssetAsLocation = 1 then ev.Asset else ev.Location end,
 	       Zone, er.PktNum, ev.CustTierLevel, er.EmpNumReject, er.EmpNameReject, er.DeviceIDReject, er.RejectReason, l.PktNum
 	
+	IF(@AllowSqlaLog = 1) insert into SQLA_Log (RecordDttm, RecordDesc) values (getdate(),'Insert_FloorActivity: EVENT - Auto Reject - EventReject1/Event1/EventStateLog1')
+	
 	
 	-- EVENT - Auto Reject - EventReject/Event1/EventStateLog1
 	insert into SQLA_FloorActivity
@@ -672,6 +759,8 @@ BEGIN
 	   and er.PktNum in (select PktNum from SQLA_New_Events)
 	 group by er.tReject, ev.EventDisplay, case when @UseAssetAsLocation = 1 then ev.Asset else ev.Location end,
 	       Zone, er.PktNum, ev.CustTierLevel, er.EmpNumReject, er.EmpNameReject, er.DeviceIDReject, er.RejectReason, l.PktNum
+	
+	IF(@AllowSqlaLog = 1) insert into SQLA_Log (RecordDttm, RecordDesc) values (getdate(),'Insert_FloorActivity: EVENT - Auto Reject - EventReject/Event1/EventStateLog1')
 	
 	
 	-- EVENT - Rejects due to assigned RTSS.dbo.EMPLOYEE carding another location
@@ -705,11 +794,9 @@ BEGIN
 	 where er.PktNum in (select PktNum from SQLA_New_Events)
 	 group by er.tOut, ev.EventDisplay, case when @UseAssetAsLocation = 1 then ev.Asset else ev.Location end,
 	       ev.Zone, ev.PktNum, ev.CustTierLevel, er.EmpNumAuthorize, er.EmpNameAuthorize, ev.RejPktNum, l.PktNum, er.PktNum
+	
+	IF(@AllowSqlaLog = 1) insert into SQLA_Log (RecordDttm, RecordDesc) values (getdate(),'Insert_FloorActivity: EVENT - Rejects due to assigned RTSS.dbo.EMPLOYEE carding another location')
 	       
 END
-
-
-
-
 
 GO

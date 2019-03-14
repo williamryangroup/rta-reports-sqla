@@ -29,7 +29,8 @@ BEGIN
 	-- interfering with SELECT statements.
 	SET NOCOUNT ON;
 	
-	truncate table SQLA_Employees
+	delete from SQLA_Employees
+	 where CardNum in (select CardNum from RTSS.dbo.EMPLOYEE WITH (NOLOCK))
 	
 	insert into SQLA_Employees (CardNum, NameFirst, NameLast, JobType)
 	select CardNum, 

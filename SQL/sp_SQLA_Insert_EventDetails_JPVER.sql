@@ -24,6 +24,8 @@ BEGIN
 	-- SET NOCOUNT ON added to prevent extra result sets from
 	-- interfering with SELECT statements.
 	SET NOCOUNT ON;
+	
+	DECLARE @MinBreakOOSLoginDttm datetime = dateadd(hour,-72,getdate())
 
 	-- *** JP VER - tJackpotVerify ***
 	insert into SQLA_EventDetails_JPVER (PktNum, EventDisplay, tOut, tComplete, Source, EmpNum, EmpName, EmpNameFirst, EmpNameLast, EmpJobType)
@@ -81,7 +83,7 @@ BEGIN
 		on o.EmpNumAsn = v.EmpNum
 	   and o.tOut >= j.tOut  -- JP start
 	   and o.tOut < v.tOut   -- JP VER start
-	   and o.PktNum in (select PktNum from SQLA_FloorActivity where Activity = 'OOS - 1. Jackpot Verify')
+	   and o.PktNum in (select PktNum from SQLA_FloorActivity where Activity = 'OOS - 1. Jackpot Verify'  and tOut >= @MinBreakOOSLoginDttm)
 	  left join SQLA_EventDetails_JPVER as v2
 	    on v2.PktNum = v.PktNum
 	   and v2.Source = v.Source

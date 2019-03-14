@@ -277,7 +277,9 @@ BEGIN
 			-- Add single instances of Beep/Vibrate
 			insert into #RTA_FloorActivity_Tmp
 			select Time = min(f.tOut), State = 'Beep/Vibrate',
-				   f.Activity, Location = ltrim(rtrim(f.Location)), f.PktNum, f.Tier, f.EmpNum, f.EmpName, JobType = '',
+				   f.Activity, Location = ltrim(rtrim(f.Location)), f.PktNum, f.Tier, f.EmpNum, 
+				   EmpName = case when e.CardNum is null then f.EmpName else rtrim(e.NameFirst) + ' ' + left(e.NameLast,1) end,
+				   JobType = e.JobType,
 				   [Source] = 'Device',
 				   LastArea = '',
 				   AsnArea = '',
@@ -286,6 +288,8 @@ BEGIN
 				   EmpStatusM = 0,
 				   EmpStatusJ = 0
 			  from SQLA_FloorActivity as f
+			  left join SQLA_Employees as e
+				on e.CardNum = f.EmpNum
 			  left join SQLA_FloorActivity as na
 				on na.ActivityTypeID = 5 and na.State in ('Assign')
 			   and na.PktNum = f.PktNum
@@ -307,17 +311,19 @@ BEGIN
 					  and na2.PktNum = na.PktNum
 					  and na2.tOut > f.tOut
 					  and na2.tOut < na.tOut )
-			 group by na.tOut, f.Activity, ltrim(rtrim(f.Location)), f.PktNum, f.Tier, f.EmpNum, f.EmpName, f.ActivityTypeID
+			 group by na.tOut, f.Activity, ltrim(rtrim(f.Location)), f.PktNum, f.Tier, f.EmpNum, e.CardNum, f.EmpName, e.NameFirst, e.NameLast, e.JobType, f.ActivityTypeID
 			
 			
 			-- Add single instances of Display Alert Popup
 			insert into #RTA_FloorActivity_Tmp
 			select Time = min(f.tOut), f.State,	f.Activity, Location = ltrim(rtrim(f.Location)), f.PktNum, f.Tier, 
 			       EmpNum = cast(count(distinct [Source]) as varchar), EmpName = cast(count(distinct [Source]) as varchar),
-				   JobType = '', [Source] = 'Device', LastArea = '', AsnArea = '', f.ActivityTypeID, LastLocation = '',
+				   JobType = e.JobType, [Source] = 'Device', LastArea = '', AsnArea = '', f.ActivityTypeID, LastLocation = '',
 				   EmpStatusM = 0,
 				   EmpStatusJ = 0
 			  from SQLA_FloorActivity as f
+			  left join SQLA_Employees as e
+				on e.CardNum = f.EmpNum
 			 where f.tOut >= @StartDt1 and f.tOut < @EndDt1
 			   and (@Location1 = '' or @Location1 = f.Location)
 			   and (@EmpNum1 = '' or @EmpNum1 = f.EmpNum)
@@ -328,7 +334,7 @@ BEGIN
 					 or (@CustTier is null or @CustTier = '' or @Custtier = 'All'))
 			   and f.ActivityTypeID = 9 and f.State = 'Display Alert Popup'
 			   and (f.Zone in (select ZoneArea from #RTA_Compliance_ZoneAreas) or @ZoneArea is null or @ZoneArea = '' or @ZoneArea like '00%')
-			 group by f.State, f.Activity, ltrim(rtrim(f.Location)), f.PktNum, f.Tier, f.ActivityTypeID, f.Description
+			 group by f.State, f.Activity, ltrim(rtrim(f.Location)), f.PktNum, f.Tier, f.ActivityTypeID, f.Description, e.JobType
 		END
 	END
 	
@@ -344,7 +350,9 @@ BEGIN
 										          when ISNUMERIC(f.Source) = 1 then ' Game'
 										          else '' end)
 							           else '' end),
-		       f.Activity, Location = ltrim(rtrim(f.Location)), f.PktNum, f.Tier, f.EmpNum, f.EmpName, e.JobType,
+		       f.Activity, Location = ltrim(rtrim(f.Location)), f.PktNum, f.Tier, f.EmpNum, 
+			   EmpName = case when e.CardNum is null then f.EmpName else rtrim(e.NameFirst) + ' ' + left(e.NameLast,1) end,
+			   e.JobType,
 		       [Source] = case when f.Source in ('RTSSPPE','RTSS.exe') then 'Server'
 							   when f.Source like '%.%.%.%' and f.Source = @ServerIP then 'Server'
 							   when f.Source like '%.%.%.%' and f.Source <> @ServerIP and f.EmpName = 'RTSSGUI' then 'Workstation'
@@ -438,7 +446,9 @@ BEGIN
 			-- Add single instances of Beep/Vibrate
 			insert into #RTA_FloorActivity_Tmp
 			select Time = min(f.tOut), State = 'Beep/Vibrate',
-				   f.Activity, Location = ltrim(rtrim(f.Location)), f.PktNum, f.Tier, f.EmpNum, f.EmpName, JobType = '',
+				   f.Activity, Location = ltrim(rtrim(f.Location)), f.PktNum, f.Tier, f.EmpNum, 
+				   EmpName = case when e.CardNum is null then f.EmpName else rtrim(e.NameFirst) + ' ' + left(e.NameLast,1) end,
+				   JobType = e.JobType,
 				   [Source] = 'Device',
 				   LastArea = '',
 				   AsnArea = '',
@@ -448,7 +458,9 @@ BEGIN
 				   EmpStatusJ = 0
 			  from #RTA_FloorActivity_Tmp as t
 			 inner join SQLA_FloorActivity as f
-			     on t.PktNum = f.PktNum
+			    on t.PktNum = f.PktNum
+			  left join SQLA_Employees as e
+				on e.CardNum = f.EmpNum
 			  left join SQLA_FloorActivity as na
 				on na.ActivityTypeID = 5 and na.State in ('Assign')
 			   and na.PktNum = f.PktNum
@@ -469,19 +481,21 @@ BEGIN
 					  and na2.PktNum = na.PktNum
 					  and na2.tOut > f.tOut
 					  and na2.tOut < na.tOut )
-			 group by na.tOut, f.Activity, ltrim(rtrim(f.Location)), f.PktNum, f.Tier, f.EmpNum, f.EmpName, f.ActivityTypeID
+			 group by na.tOut, f.Activity, ltrim(rtrim(f.Location)), f.PktNum, f.Tier, f.EmpNum, f.EmpName, e.CardNum, e.NameFirst, e.NameLast, e.JobType, f.ActivityTypeID
 			
 			
 			-- Add single instances of Display Alert Popup
 			insert into #RTA_FloorActivity_Tmp
 			select Time = min(f.tOut), f.State,	f.Activity, Location = ltrim(rtrim(f.Location)), f.PktNum, f.Tier, 
 			       EmpNum = cast(count(distinct f.[Source]) as varchar), EmpName = cast(count(distinct f.[Source]) as varchar),
-				   JobType = '', [Source] = 'Device', LastArea = '', AsnArea = '', f.ActivityTypeID, LastLocation = '',
+				   JobType = e.JobType, [Source] = 'Device', LastArea = '', AsnArea = '', f.ActivityTypeID, LastLocation = '',
 				   EmpStatusM = 0,
 				   EmpStatusJ = 0
 			  from #RTA_FloorActivity_Tmp as t
 			 inner join SQLA_FloorActivity as f
-			     on t.PktNum = f.PktNum
+			    on t.PktNum = f.PktNum
+			  left join SQLA_Employees as e
+				on e.CardNum = f.EmpNum
 			 where f.tOut >= @StartDt1 and f.tOut < @EndDt1
 			   and (@Location1 = '' or @Location1 = f.Location)
 			   and (@EmpNum1 = '' or @EmpNum1 = f.EmpNum)
@@ -492,7 +506,7 @@ BEGIN
 					 or (@CustTier is null or @CustTier = '' or @Custtier = 'All'))
 			   and f.ActivityTypeID = 9 and f.State = 'Display Alert Popup'
 			   and (f.Zone in (select ZoneArea from #RTA_Compliance_ZoneAreas) or @ZoneArea is null or @ZoneArea = '' or @ZoneArea like '00%')
-			 group by f.State, f.Activity, ltrim(rtrim(f.Location)), f.PktNum, f.Tier, f.ActivityTypeID, f.Description
+			 group by f.State, f.Activity, ltrim(rtrim(f.Location)), f.PktNum, f.Tier, f.ActivityTypeID, f.Description, e.JobType
 		END
 	END	
 	
@@ -510,7 +524,7 @@ BEGIN
 			   PktNum = m.ParentEventID,
 			   Tier = isnull(e.CustTierLevel,'NUL'),
 			   EmpNum = m.EmpNum,
-			   EmpName = m.EmpName,
+			   EmpName = case when p.CardNum is null then EmpName else rtrim(p.NameFirst) + ' ' + left(p.NameLast,1) end,
 			   JobType = p.JobType,
 			   Source = m.Source,
 			   LastArea = '',
@@ -544,7 +558,7 @@ BEGIN
 			   PktNum = m.ParentEventID,
 			   Tier = isnull(e.CustTierLevel,'NUL'),
 			   EmpNum = m.EmpNum,
-			   EmpName = m.EmpName,
+			   EmpName = case when p.CardNum is null then EmpName else rtrim(p.NameFirst) + ' ' + left(p.NameLast,1) end,
 			   JobType = p.JobType,
 			   Source = m.Source,
 			   LastArea = '',
@@ -578,7 +592,7 @@ BEGIN
 			   PktNum = m.ParentEventID,
 			   Tier = isnull(e.CustTierLevel,'NUL'),
 			   EmpNum = m.EmpNumWitness1,
-			   EmpName = m.EmpNameWitness1,
+			   EmpName = case when p.CardNum is null then EmpNameWitness1 else rtrim(p.NameFirst) + ' ' + left(p.NameLast,1) end,
 			   JobType = p.JobType,
 			   Source = m.Source,
 			   LastArea = '',
@@ -612,7 +626,7 @@ BEGIN
 			   PktNum = m.ParentEventID,
 			   Tier = isnull(e.CustTierLevel,'NUL'),
 			   EmpNum = m.EmpNumWitness2,
-			   EmpName = m.EmpNameWitness2,
+			   EmpName = case when p.CardNum is null then EmpNameWitness2 else rtrim(p.NameFirst) + ' ' + left(p.NameLast,1) end,
 			   JobType = p.JobType,
 			   Source = m.Source,
 			   LastArea = '',
@@ -646,7 +660,7 @@ BEGIN
 			   PktNum = m.ParentEventID,
 			   Tier = isnull(e.CustTierLevel,'NUL'),
 			   EmpNum = m.EmpNumWitness3,
-			   EmpName = m.EmpNameWitness3,
+			   EmpName = case when p.CardNum is null then EmpNameWitness3 else rtrim(p.NameFirst) + ' ' + left(p.NameLast,1) end,
 			   JobType = p.JobType,
 			   Source = m.Source,
 			   LastArea = '',
@@ -680,7 +694,7 @@ BEGIN
 			   PktNum = m.ParentEventID,
 			   Tier = isnull(e.CustTierLevel,'NUL'),
 			   EmpNum = m.EmpNumWitness4,
-			   EmpName = m.EmpNameWitness4,
+			   EmpName = case when p.CardNum is null then EmpNameWitness4 else rtrim(p.NameFirst) + ' ' + left(p.NameLast,1) end,
 			   JobType = p.JobType,
 			   Source = m.Source,
 			   LastArea = '',
@@ -741,6 +755,9 @@ BEGIN
 			tReaInit datetime,
 			tAcpInit datetime,
 			tRejInit datetime,
+			Asset varchar(255),
+			CustPriorityLevel varchar(255),
+			CompVarianceReason varchar(50),
 			AsnSecs int,
 			ReaSecs int,
 			AcpSecs int,
@@ -750,16 +767,21 @@ BEGIN
 		
 		INSERT INTO dbo.#RTA_EventDetails_Tmp EXEC dbo.sp_SSRS_Rpt_RTA_EventDetails @StartDt = @StartDt1, @EndDt = @EndDt1, @MinRspSecs = @RspVarMin, @MaxRspSecs = @RspVarMax
 		
-		select * from #RTA_FloorActivity_Tmp 
-		 where PktNum in (select PktNum from #RTA_EventDetails_Tmp)
+		select f.*, Asset = ltrim(rtrim(e.Asset))
+		  from #RTA_FloorActivity_Tmp as f
+		 inner join #RTA_EventDetails_Tmp as e
+		   on f.PktNum = e.PktNum
 	
 	END
 	
 	
 	-- Return results
 	ELSE
-		select * from #RTA_FloorActivity_Tmp
-
+		select f.*, Asset = case when @UseAssetField = 1 then ltrim(rtrim(loc.Location)) else ltrim(rtrim(loc.Asset)) end
+		  from #RTA_FloorActivity_Tmp as f
+		  left join SQLA_Locations as loc
+		    on (    (@UseAssetField = 0 and loc.Location = f.Location)
+			     or (@UseAssetField = 1 and loc.Asset = f.Location) )
 	
 END
 

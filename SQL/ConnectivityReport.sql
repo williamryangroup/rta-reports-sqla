@@ -1,3 +1,8 @@
+declare @StartDttm datetime = '7/27/2018 08:00'
+declare @EndDttm datetime = '7/29/2018 17:00'
+
+declare @ServerIP nvarchar(20) = (select ltrim(rtrim(Setting)) from RTSS.dbo.SYSTEMSETTINGS WITH (NOLOCK) where ConfigSection = 'RTSSHH' and ConfigParam = 'WSSIP')
+
 
 select q.EmpNum, q.DeviceID, EmpName = '(' + left(emp.JobType,1) + ') ' + RTRIM(emp.NameFirst) + ' ' + LEFT(emp.NameLast,1) + '.',
        AsnCount = sum(q.AsnCount),
@@ -26,11 +31,11 @@ select a.EmpNum, a.DeviceID,
 	   MinsLoggedIn = 0,
 	   FirstLogin = null,
 	   LastLogout = null
-  from EVENT1 as e WITH (NOLOCK)
+  from EVENT4 as e WITH (NOLOCK)
  inner join EVENT_STATE_LOG1 as a WITH (NOLOCK)
     on a.PktNum = e.PktNum
  where a.EventState in ('tAssign','tAssignSupervisor','tReassign','ReassignAttendant','tReassignSupervisor')
-   and e.tOut >= '1/23/2017' and e.tOut < '1/24/2017'
+   and e.tOut >= @StartDttm and e.tOut < @EndDttm
  group by a.EmpNum, a.DeviceID
  union all
  
@@ -45,7 +50,7 @@ select a.EmpNum, a.DeviceID,
 	   MinsLoggedIn = 0,
 	   FirstLogin = null,
 	   LastLogout = null
-  from EVENT1 as e WITH (NOLOCK)
+  from EVENT4 as e WITH (NOLOCK)
  inner join EVENT_STATE_LOG1 as a WITH (NOLOCK)
     on a.PktNum = e.PktNum
  inner join EVENT_STATE_LOG1 as r WITH (NOLOCK)
@@ -61,10 +66,8 @@ select a.EmpNum, a.DeviceID,
  where (a.EventState in ('tAssign','tAssignSupervisor','tReassign','ReassignAttendant','tReassignSupervisor'))
    and (    (r.EventState in ('tRejectAutoServer'))
          or (     r.EventState = 'tReject'
-              and r.EmpName = (select ltrim(rtrim(Setting))  -- Server IP
-                                 from RTSS.dbo.SYSTEMSETTINGS WITH (NOLOCK)
-                                where ConfigSection = 'RTSSHH' and ConfigParam = 'WSSIP') ) )
-   and e.tOut >= '1/23/2017' and e.tOut < '1/24/2017'
+              and r.EmpName = @ServerIP ) )
+   and e.tOut >= @StartDttm and e.tOut < @EndDttm
    and (v.PktNum is null)
  group by a.EmpNum, a.DeviceID
  union all
@@ -86,14 +89,14 @@ select ea.CardNum, ea.DeviceID,
        LogoutCount = case when ea.Activity like 'Logout%' then 1 else 0 end
   from EMPLOYEEACTIVITY as ea WITH (NOLOCK)
  where (ea.Activity like 'Login%' or ea.Activity like 'Logout%')
-   and ea.tOut >= '1/23/2017' and ea.tOut < '1/24/2017'
+   and ea.tOut >= @StartDttm and ea.tOut < @EndDttm
  union all
 select ea.CardNum, ea.DeviceID,
        LoginCount = case when ea.Activity like 'Login%' then 1 else 0 end,
        LogoutCount = case when ea.Activity like 'Logout%' then 1 else 0 end
   from EMPLOYEEACTIVITY1 as ea WITH (NOLOCK)
  where (ea.Activity like 'Login%' or ea.Activity like 'Logout%')
-   and ea.tOut >= '1/23/2017' and ea.tOut < '1/24/2017'
+   and ea.tOut >= @StartDttm and ea.tOut < @EndDttm
        ) as t
  group by CardNum, DeviceID 
  union all
@@ -109,15 +112,13 @@ select r.EmpNum, r.DeviceID,
 	   MinsLoggedIn = 0,
 	   FirstLogin = null,
 	   LastLogout = null
-  from EVENT1 as e WITH (NOLOCK)
+  from EVENT4 as e WITH (NOLOCK)
  inner join EVENT_STATE_LOG1 as r WITH (NOLOCK)
     on r.PktNum = e.PktNum
  where (    (r.EventState in ('tRejectAutoServer'))
          or (     r.EventState = 'tReject'
-              and r.EmpName = (select ltrim(rtrim(Setting))  -- Server IP
-                                 from RTSS.dbo.SYSTEMSETTINGS WITH (NOLOCK)
-                                where ConfigSection = 'RTSSHH' and ConfigParam = 'WSSIP') ) )
-   and e.tOut >= '1/23/2017' and e.tOut < '1/24/2017'
+              and r.EmpName = @ServerIP ) )
+   and e.tOut >= @StartDttm and e.tOut < @EndDttm
  group by r.EmpNum, r.DeviceID
  union all
  
@@ -134,7 +135,7 @@ select r.EmpNum, r.DeviceID,
 	   LastLogout = null
   from SYSTEMLOG1 WITH (NOLOCK)
  where EvtType = 'GetEvents'
-   and EvtTime >= '1/23/2017' and EvtTime < '1/24/2017'
+   and EvtTime >= @StartDttm and EvtTime < @EndDttm
  group by UserName, MachineName
  union all
  
@@ -153,8 +154,8 @@ select EmpNum, DeviceID,
 select EmpNum = a.CardNum, a.DeviceID, tStart = min(a.tStart), a.tEnd
   from (
 select s.CardNum, s.DeviceID,
-       tStart = case when s.tOut < '1/23/2017' then '1/23/2017' else s.tOut end,
-       tEnd = min(case when e.tOut > '1/24/2017' then '1/24/2017' else e.tOut end)
+       tStart = case when s.tOut < @StartDttm then @StartDttm else s.tOut end,
+       tEnd = min(case when e.tOut > @EndDttm then @EndDttm else e.tOut end)
   from RTSS.dbo.EMPLOYEEACTIVITY1 as s WITH (NOLOCK)
  inner join RTSS.dbo.EMPLOYEEACTIVITY1 as e WITH (NOLOCK)
 	on e.CardNum = s.CardNum
@@ -162,7 +163,7 @@ select s.CardNum, s.DeviceID,
    and e.tOut > s.tOut
  where (s.Activity like 'Login%' or s.Activity like 'Start Shift%')
    and (e.Activity like 'Logout%' or e.Activity like 'End Shift%')
-   and e.tOut >= '1/23/2017' and s.tOut < '1/24/2017'
+   and e.tOut >= @StartDttm and s.tOut < @EndDttm
  group by s.CardNum, s.DeviceID, s.tOut ) as a
  group by a.CardNum, a.DeviceID, a.tEnd ) as l
  group by l.EmpNum, l.DeviceID

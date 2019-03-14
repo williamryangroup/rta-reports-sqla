@@ -38,7 +38,9 @@ BEGIN
 	IF (@FeedType <> 'SYNKROS')
 	BEGIN
 		insert into SQLA_Locations (Location, Asset, Zone, Area, IsActive, DisplayLocation, ZoneArea)
-		select Location, Asset, Zone, Area, IsActive,
+		select Location = case when @UseAssetField = 1 then Asset else Location end, 
+		       Asset = case when @UseAssetField = 1 then Location else Asset end,
+			   Zone, Area, IsActive,
 			   DisplayLocation = case when @UseAssetField = 1 then Asset else Location end,
 			   ZoneArea = case when @UseArea = 1 then Area else Zone end
 		  from RTSS.dbo.LOCZONE WITH (NOLOCK)

@@ -637,12 +637,12 @@
                 <TablixMember>
                   <Group Name="EventDisplay">
                     <GroupExpressions>
-                      <GroupExpression>=iif(Fields!EventDisplay.Value like "JKPT*","JKPT",Fields!EventDisplay.Value)</GroupExpression>
+                      <GroupExpression>=iif(Fields!EventDisplay.Value like "JKPT*","JKPT",iif(Fields!EventDisplay.Value like "JP*","JP",iif(Fields!EventDisplay.Value like "PJ*","PJ",Fields!EventDisplay.Value)))</GroupExpression>
                     </GroupExpressions>
                   </Group>
                   <SortExpressions>
                     <SortExpression>
-                      <Value>=iif(Fields!EventDisplay.Value like "JKPT*","JKPT",Fields!EventDisplay.Value)</Value>
+                      <Value>=iif(Fields!EventDisplay.Value like "JKPT*","JKPT",iif(Fields!EventDisplay.Value like "JP*","JP",iif(Fields!EventDisplay.Value like "PJ*","PJ",Fields!EventDisplay.Value)))</Value>
                     </SortExpression>
                   </SortExpressions>
                   <TablixHeader>
@@ -655,7 +655,7 @@
                           <Paragraph>
                             <TextRuns>
                               <TextRun>
-                                <Value>=iif(Fields!EventDisplay.Value like "JKPT*","JKPT",Fields!EventDisplay.Value)</Value>
+                                <Value>=iif(Fields!EventDisplay.Value like "JKPT*","JKPT",iif(Fields!EventDisplay.Value like "JP*","JP",iif(Fields!EventDisplay.Value like "PJ*","PJ",Fields!EventDisplay.Value)))</Value>
                                 <Style>
                                   <FontFamily>Tahoma</FontFamily>
                                   <FontWeight>Bold</FontWeight>

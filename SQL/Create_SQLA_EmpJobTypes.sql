@@ -15,7 +15,7 @@ GO
 IF NOT EXISTS (select * from dbo.sysobjects where id = object_id(N'[dbo].[SQLA_EmpJobTypes]') and OBJECTPROPERTY(id, N'IsTable') = 1)
 	CREATE TABLE [dbo].[SQLA_EmpJobTypes](
 		[JobType] [nvarchar](20) NOT NULL,
-	 CONSTRAINT [PK_SQLA_EmpJobTypes] PRIMARY KEY CLUSTERED 
+	 CONSTRAINT [PK_SQLA_EmpJobTypes] PRIMARY KEY CLUSTERED
 	(
 		[JobType] ASC
 	)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
@@ -27,4 +27,3 @@ GO
 
 SET ANSI_PADDING OFF
 GO
-

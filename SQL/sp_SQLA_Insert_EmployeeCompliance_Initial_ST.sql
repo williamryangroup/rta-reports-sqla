@@ -53,7 +53,7 @@ BEGIN
 		   [Rea] = case when tReassign is not null then 1 else 0 end,
 		   [ReaRej] = case when tReassignRej is not null then 1 else 0 end,
 		   [SourceTable] = 'EVENT1_ST',
-		   [RtaCardTmSec] = case when tRespondCard > tRespondMobile then datediff(ss,tRespondMobile,tRespondCard) else 0 end
+		   [RtaCardTmSec] = case when tRespondCard > isnull(tRespondMobile,tAccept) then datediff(ss,isnull(tRespondMobile,tAccept),tRespondCard) else 0 end
 	  from (
 	select EmpNum, PktNum, EventDisplay, tOut = min(tOut), CustTier,
 		   tAssign = min(tAssign),

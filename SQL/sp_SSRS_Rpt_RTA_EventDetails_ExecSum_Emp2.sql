@@ -328,8 +328,8 @@ BEGIN
 		   u.PktNum, 
 		   EventDisplay = case when u.EventDisplay like 'JKPT%' and isnumeric(d.AmtEvent)=1 and cast(d.AmtEvent as float) < 1200 then 'JKPT<1200'
 	                           when u.EventDisplay like 'JKPT%' and isnumeric(d.AmtEvent)=1 and cast(d.AmtEvent as float) >= 1200 then 'JKPT>=1200'
-							   when u.EventDisplay like 'JP%' and isnumeric(d.AmtEvent)=1 and cast(d.AmtEvent as float) < 1200 then 'JKPT<1200'
-	                           when u.EventDisplay like 'JP%' and isnumeric(d.AmtEvent)=1 and cast(d.AmtEvent as float) >= 1200 then 'JKPT>=1200'
+							   when u.EventDisplay like 'JP%' and u.EventDisplay <> 'JP VER' and isnumeric(d.AmtEvent)=1 and cast(d.AmtEvent as float) < 1200 then 'JKPT<1200'
+	                           when u.EventDisplay like 'JP%' and u.EventDisplay <> 'JP VER' and isnumeric(d.AmtEvent)=1 and cast(d.AmtEvent as float) >= 1200 then 'JKPT>=1200'
 							   when u.EventDisplay like 'PROG%' or u.EventDisplay like 'PJ%' then 'PROG'
 							   when u.EventDisplay like 'PJ%' then 'PJ'
 							   when u.EventDisplay like 'EMPCARD%' then 'EMPCARD'

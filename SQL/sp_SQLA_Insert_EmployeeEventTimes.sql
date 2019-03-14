@@ -30,8 +30,8 @@ BEGIN
 	
 	delete from SQLA_EmployeeEventTimes where ActivityEnd is null
 	
-	DECLARE @MinPktNum int = (select isnull(MAX(PktNum),0) from SQLA_EmployeeEventTimes)
-	DECLARE @MinBreakOOSLoginDttm datetime = (select isnull(MAX(ActivityStart),'1/1/2010') from SQLA_EmployeeEventTimes where PktNum in (1,2,3))
+	--DECLARE @MinPktNum int = (select isnull(MAX(PktNum),0) from SQLA_EmployeeEventTimes)
+	DECLARE @MinBreakOOSLoginDttm datetime = dateadd(hour,-72,getdate())
 	
 	
 	CREATE TABLE #Employee_EventTimeStart_Tmp (
@@ -64,31 +64,42 @@ BEGIN
 	-- Start Times - Employee assigned to event
 	insert into #Employee_EventTimeStart_Tmp (PktNum, EmpNum, EventDisplay, StartTime)
     select distinct PktNum, EmpNum, Activity, tOut
-	  from SQLA_FloorActivity
-	 where PktNum > @MinPktNum and tOut is not null	and EmpNum is not null and EmpNum <> ''
+	  from SQLA_FloorActivity as f1
+	 where tOut >= @MinBreakOOSLoginDttm and EmpNum is not null and EmpNum <> ''
 	   and ActivityTypeID = 5 and State in ('Assign','Assign Supervisor','Re-assign','Reassign Attendant','Reassign Supervisor','tReassignPrior')
+	   and not exists
+	     ( select null from SQLA_EmployeeEventTimes as t
+		    where t.PktNum = f1.PktNum
+			  and t.EmpNum = f1.EmpNum
+			  and t.ActivityStart = f1.tOut )
 	   
 	-- Start Times - Employee authorized events without being assigned (Take)
 	insert into #Employee_EventTimeStart_Tmp (PktNum, EmpNum, EventDisplay, StartTime)
 	select distinct PktNum, EmpNum, Activity, tOut
 	  from SQLA_FloorActivity as f1
-	 where PktNum > @MinPktNum and tOut is not null and EmpNum is not null and EmpNum <> ''
+	 where tOut >= @MinBreakOOSLoginDttm and EmpNum is not null and EmpNum <> ''
 	   and ActivityTypeID = 5 and State in ('Authorize Card In','Authorize Initial','Authorize Mobile','Initial Response','Respond Mobile')
 	   and not exists
 		 ( select null from SQLA_FloorActivity as f2
-			where f2.PktNum = f1.PktNum
+			where f2.tOut >= @MinBreakOOSLoginDttm
+			  and f2.PktNum = f1.PktNum
 			  and f2.EmpNum = f1.EmpNum
 			  and f2.ActivityTypeID = 5
 			  and f2.tOut <= f1.tOut
 			  and f2.State in ('Assign','Assign Supervisor','Re-assign','Reassign Attendant','Reassign Supervisor','tReassignPrior') )
 	   and not exists
 		 ( select null from SQLA_FloorActivity as f2
-			where f2.PktNum = f1.PktNum
+			where f2.tOut >= @MinBreakOOSLoginDttm
+			  and f2.PktNum = f1.PktNum
 			  and f2.EmpNum = f1.EmpNum
 			  and f2.ActivityTypeID = 5
 			  and f2.tOut < f1.tOut
 			  and f2.State in ('Authorize Card In','Authorize Initial','Authorize Mobile','Initial Response','Respond Mobile') )
-	
+	   and not exists
+	     ( select null from SQLA_EmployeeEventTimes as t
+		    where t.PktNum = f1.PktNum
+			  and t.EmpNum = f1.EmpNum
+			  and t.ActivityStart = f1.tOut )
 	
 	-- End Times - Event is completed
 	insert into #Employee_EventTimeEnd_Tmp (PktNum, EmpNum, EventDisplay, EndTime)
@@ -98,7 +109,7 @@ BEGIN
 	    on f.tOut >= s.StartTime
 	   and f.PktNum = s.PktNum
 	   and f.State like 'Complete%'
-	 where f.PktNum > @MinPktNum and f.ActivityTypeID = 5
+	 where f.ActivityTypeID = 5
 	 group by s.PktNum, s.EmpNum, s.EventDisplay, s.StartTime
 	
 	-- End Times - Employee rejects event or assigned another event
@@ -110,7 +121,7 @@ BEGIN
 	   and f.PktNum = s.PktNum
 	   and f.EmpNum = s.EmpNum
 	   and (f.State like 'Reject%' or f.State like 'Reassign%Reject%' or f.State = 'Event Assigned Remove')
-	 where f.PktNum > @MinPktNum and f.ActivityTypeID = 5 and f.EmpNum is not null and f.EmpNum <> ''
+	 where f.ActivityTypeID = 5 and f.EmpNum is not null and f.EmpNum <> ''
 	 group by s.PktNum, s.EmpNum, s.EventDisplay, s.StartTime
 	
 	-- End times - Next event state is with another employee
@@ -121,7 +132,7 @@ BEGIN
 	    on f.tOut >= s.StartTime
 	   and f.PktNum = s.PktNum
 	   and f.EmpNum <> s.EmpNum
-	 where f.PktNum > @MinPktNum and f.ActivityTypeID = 5 and f.EmpNum is not null and f.EmpNum <> ''
+	 where f.ActivityTypeID = 5 and f.EmpNum is not null and f.EmpNum <> ''
 	   and State in ('Assign','Assign Supervisor','Re-assign','Reassign Attendant','Reassign Supervisor','tReassignPrior',
 	                 'Authorize Card In','Authorize Initial','Authorize Mobile','Initial Response','Respond Mobile')
 	 group by s.PktNum, s.EmpNum, s.EventDisplay, s.StartTime
@@ -135,7 +146,7 @@ BEGIN
 	   and f.PktNum = s.PktNum
 	   and f.EmpNum = s.EmpNum
 	   and f.State in ('Assign','Assign Supervisor','Re-assign','Reassign Attendant','Reassign Supervisor','tReassignPrior')
-	 where f.PktNum > @MinPktNum and f.ActivityTypeID = 5 and f.EmpNum is not null and f.EmpNum <> ''
+	 where f.ActivityTypeID = 5 and f.EmpNum is not null and f.EmpNum <> ''
 	 group by s.PktNum, s.EmpNum, s.EventDisplay, s.StartTime
 	
 	-- End times - Employee is assigned or authorized another event before event is completed
@@ -150,7 +161,7 @@ BEGIN
 	   and f.PktNum <> s.PktNum
 	   and f.EmpNum = s.EmpNum
 	   and f.State in ('Re-assign')
-	 where f.PktNum > @MinPktNum and f.ActivityTypeID = 5 and f.EmpNum is not null and f.EmpNum <> ''
+	 where f.ActivityTypeID = 5 and f.EmpNum is not null and f.EmpNum <> ''
 	 group by s.PktNum, s.EmpNum, s.EventDisplay, s.StartTime
 	
 	
@@ -226,6 +237,11 @@ BEGIN
 	 where s.tOut > @MinBreakOOSLoginDttm
        and s.State = 'Start' and s.ActivityTypeID = 1
 	   and e.ActivityTypeID in (1,3,7) and ((e.State = 'End' or e.State like '%Logout%') or (e.State = 'Start' and e.tOut > s.tOut))
+	   and not exists
+	     ( select null from SQLA_EmployeeEventTimes as t
+		    where t.EmpNum = s.EmpNum
+			  and t.PktNum = s.ActivityTypeID
+			  and t.ActivityStart = s.tOut )
 	 group by s.EmpNum, emp.NameFirst, emp.NameLast, emp.JobType, s.ActivityTypeID, s.tOut ) as a
 	 group by EmpNum, EmpNameFirst, EmpNameLast, EmpJobType, PktNum, EventDisplay, ActivityEnd
 	
@@ -255,6 +271,11 @@ BEGIN
 	   and (    (e.ActivityTypeID = 2 and (e.State = 'End' or (e.State = 'Start' and e.tOut > s.tOut)))
 	         or (e.ActivityTypeID = 3 and (e.State like '%Logout%'))
 			 or (e.ActivityTypeID = 7 and (e.State = 'SupervAdmEvt' and e.Activity = 'AdminEventActionComplete')))
+	   and not exists
+	     ( select null from SQLA_EmployeeEventTimes as t
+		    where t.EmpNum = s.EmpNum
+			  and t.PktNum = s.ActivityTypeID
+			  and t.ActivityStart = s.tOut )
 	 group by s.EmpNum, emp.NameFirst, emp.NameLast, emp.JobType, s.ActivityTypeID, s.tOut ) as a
 	 group by EmpNum, EmpNameFirst, EmpNameLast, EmpJobType, PktNum, EventDisplay, ActivityEnd
 	
@@ -306,6 +327,11 @@ BEGIN
 	 where s.tOut > @MinBreakOOSLoginDttm
 	   and s.State = 'Login' and (e.State = 'Login' or e.State like '%Logout%')
 	   and s.ActivityTypeID = 3
+	   and not exists
+	     ( select null from SQLA_EmployeeEventTimes as t
+		    where t.EmpNum = s.EmpNum
+			  and t.PktNum = s.ActivityTypeID
+			  and t.ActivityStart = s.tOut )
 	 group by s.EmpNum, emp.NameFirst, emp.NameLast, emp.JobType, s.ActivityTypeID, s.tOut ) as a
 	 group by EmpNum, EmpNameFirst, EmpNameLast, EmpJobType, PktNum, EventDisplay, ActivityEnd
 	
@@ -333,11 +359,12 @@ BEGIN
 	    on e2.EmpNum = e1.EmpNum
 	   and e2.ActivityStart < e1.ActivityEnd
 	   and e2.ActivityStart > e1.ActivityStart
-	   and e2.PktNum <> 3
+	   and e2.PktNum <> 3 and e2.ActivityStart >= @MinBreakOOSLoginDttm
 	 where e1.PktNum <> 3 and e1.ActivityStart >= @MinBreakOOSLoginDttm
 	   and not exists
 	     ( select null from SQLA_EmployeeEventTimes as e3
-		    where e3.EmpNum = e1.EmpNum
+		    where e3.ActivityStart >= @MinBreakOOSLoginDttm
+			  and e3.EmpNum = e1.EmpNum
 			  and e3.ActivityStart < e1.ActivityEnd
 			  and e3.ActivityStart > e1.ActivityStart
 			  and e3.PktNum <> 3

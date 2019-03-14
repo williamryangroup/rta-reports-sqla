@@ -530,6 +530,9 @@
             <Left>2.5in</Left>
             <Height>5.2967in</Height>
             <Width>6.5in</Width>
+            <Visibility>
+              <Hidden>=iif(Parameters!StartDt.Value &gt; Parameters!EndDt.Value,True,False)</Hidden>
+            </Visibility>
             <Style>
               <Border>
                 <Style>None</Style>
@@ -851,6 +854,9 @@
             <Height>5.2967in</Height>
             <Width>2.5in</Width>
             <ZIndex>1</ZIndex>
+            <Visibility>
+              <Hidden>=iif(Parameters!StartDt.Value &gt; Parameters!EndDt.Value,True,False)</Hidden>
+            </Visibility>
             <Bookmark>bkmkEmpPerf</Bookmark>
             <Style>
               <Border>
@@ -1621,8 +1627,45 @@
               <PaddingBottom>2pt</PaddingBottom>
             </Style>
           </Textbox>
+          <Textbox Name="Textbox1">
+            <CanGrow>true</CanGrow>
+            <KeepTogether>true</KeepTogether>
+            <Paragraphs>
+              <Paragraph>
+                <TextRuns>
+                  <TextRun>
+                    <Value>ERROR:  Invalid date parameters entered!</Value>
+                    <Style>
+                      <FontWeight>Bold</FontWeight>
+                      <Color>White</Color>
+                    </Style>
+                  </TextRun>
+                </TextRuns>
+                <Style />
+              </Paragraph>
+            </Paragraphs>
+            <rd:DefaultName>Textbox1</rd:DefaultName>
+            <Top>6.95209in</Top>
+            <Left>0.01389in</Left>
+            <Height>0.25in</Height>
+            <Width>3.11458in</Width>
+            <ZIndex>18</ZIndex>
+            <Visibility>
+              <Hidden>=iif(Parameters!StartDt.Value &gt; Parameters!EndDt.Value,FALSE,TRUE)</Hidden>
+            </Visibility>
+            <Style>
+              <Border>
+                <Style>None</Style>
+              </Border>
+              <BackgroundColor>Red</BackgroundColor>
+              <PaddingLeft>2pt</PaddingLeft>
+              <PaddingRight>2pt</PaddingRight>
+              <PaddingTop>2pt</PaddingTop>
+              <PaddingBottom>2pt</PaddingBottom>
+            </Style>
+          </Textbox>
         </ReportItems>
-        <Height>6.9382in</Height>
+        <Height>7.20209in</Height>
         <Style>
           <Border>
             <Style>None</Style>
