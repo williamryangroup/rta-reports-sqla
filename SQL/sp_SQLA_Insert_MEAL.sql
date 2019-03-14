@@ -47,10 +47,10 @@ BEGIN
 		   ml.PktNumWitness3, ml.PktNumSourceWitness3, ml.EmpNumWitness3, ml.EmpNameWitness3, ml.EmpLicNumWitness3, ml.tWitness3,
 		   ml.PktNumWitness4, ml.PktNumSourceWitness4, ml.EmpNumWitness4, ml.EmpNameWitness4, ml.EmpLicNumWitness4, ml.tWitness4,
 		   ml.PktNumWitness5, ml.PktNumSourceWitness5, ml.EmpNumWitness5, ml.EmpNameWitness5, ml.EmpLicNumWitness5, ml.tWitness5,
-		   EventComment = isnull(es.EventComment,et.EventComment),
+		   EventComment = right(isnull(es.EventComment,et.EventComment),LEN(isnull(es.EventComment,et.EventComment))-CHARINDEX(';',isnull(es.EventComment,et.EventComment))),
 		   ml.Asset,
 		   CardInEvtDisp = isnull(isnull(isnull(isnull(isnull(crs.EventDisplay,crt.EventDisplay),rds.CmpReasonNum),rdt.CmpReasonNum),es.ResolutionDesc),et.ResolutionDesc),
-		   CardInEvtDesc = isnull(isnull(isnull(isnull(isnull(crs.EventDescription,crt.EventDescription),rds.CompleteReason),rdt.CompleteReason),es.ResolutionDesc),et.ResolutionDesc),
+		   CardInEvtDesc = case when isnull(es.ResolutionDesc,et.ResolutionDesc) = 'Phantom' then ltrim(rtrim(isnull(isnull(isnull(isnull(crs2.EventDescription,crt2.EventDescription),rds2.CompleteReason),rdt2.CompleteReason),''))) + '; Phantom' else ltrim(rtrim(isnull(isnull(isnull(isnull(isnull(crs.EventDescription,crt.EventDescription),rds.CompleteReason),rdt.CompleteReason),es.ResolutionDesc),et.ResolutionDesc))) end,
 		   Source = case when ml.PktCbMsg = 'RTA Offline' then 'RTA Offline'
 						 when et.PktNum is not null then 'TECH'
 						 else 'SLOT' end,
@@ -63,13 +63,21 @@ BEGIN
 	    on (et.PktNum = ml.ParentEventID or (ml.ParentEventID = 0 and et.PktNum = ml.PktNumEvent))
 	   and et.Location = ml.Location
 	  left join RTSS.dbo.CARDIN_REASON as crs with (nolock)
-	    on es.ResolutionDesc = crs.EventDisplay
+	    on crs.EventDisplay = es.ResolutionDesc
 	  left join RTSS.dbo.CARDIN_REASON_ST as crt with (nolock)
-	    on et.ResolutionDesc = crt.EventDisplay
+	    on crt.EventDisplay = et.ResolutionDesc
 	  left join (select CmpReasonNum = cast(row_number() over(order by ConfigSection, ConfigParam)-1 as nvarchar), CompleteReason = Setting from RTSS.dbo.SYSTEMSETTINGS with (nolock) where ConfigSection = 'CompleteReason') as rds
 	    on rds.CmpReasonNum = es.ResolutionDesc
 	  left join (select CmpReasonNum = cast(row_number() over(order by ConfigSection, ConfigParam)-1 as nvarchar), CompleteReason = Setting from RTSS.dbo.SYSTEMSETTINGS with (nolock) where ConfigSection = 'CompleteReason_ST') as rdt
 	    on rdt.CmpReasonNum = et.ResolutionDesc
+	  left join RTSS.dbo.CARDIN_REASON as crs2 with (nolock)
+	    on crs2.EventDisplay = left(es.EventComment,(case when CHARINDEX(';',es.EventComment) > 0 then CHARINDEX(';',es.EventComment)-1 else 0 end))
+	  left join RTSS.dbo.CARDIN_REASON_ST as crt2 with (nolock)
+	    on crt2.EventDisplay = left(et.EventComment,(case when CHARINDEX(';',et.EventComment) > 0 then CHARINDEX(';',et.EventComment)-1 else 0 end))
+	  left join (select CmpReasonNum = cast(row_number() over(order by ConfigSection, ConfigParam)-1 as nvarchar), CompleteReason = Setting from RTSS.dbo.SYSTEMSETTINGS with (nolock) where ConfigSection = 'CompleteReason') as rds2
+	    on rds2.CmpReasonNum = left(es.EventComment,(case when CHARINDEX(';',es.EventComment) > 0 then CHARINDEX(';',es.EventComment)-1 else 0 end))
+	  left join (select CmpReasonNum = cast(row_number() over(order by ConfigSection, ConfigParam)-1 as nvarchar), CompleteReason = Setting from RTSS.dbo.SYSTEMSETTINGS with (nolock) where ConfigSection = 'CompleteReason_ST') as rdt2
+	    on rdt2.CmpReasonNum = left(et.EventComment,(case when CHARINDEX(';',et.EventComment) > 0 then CHARINDEX(';',et.EventComment)-1 else 0 end))
 	 where not exists (select null from SQLA_MEAL as sm WITH (NOLOCK) where sm.PktNum = ml.PktNum)
 	   and (ml.tOut is not NULL and isdate(ml.tOut) = 1 and ml.tOut > '1/2/1980')
 	   and (    (ml.ParentEventID is null) or (ml.PktCbMsg = 'RTA Offline')
