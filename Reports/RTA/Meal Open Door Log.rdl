@@ -1537,7 +1537,7 @@
                           </Group>
                           <SortExpressions>
                             <SortExpression>
-                              <Value>=Fields!ParentEventID.Value</Value>
+                              <Value>=Fields!tOut.Value</Value>
                             </SortExpression>
                           </SortExpressions>
                           <TablixMembers>
