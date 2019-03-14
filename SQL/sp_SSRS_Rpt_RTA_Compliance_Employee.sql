@@ -125,7 +125,8 @@ BEGIN
            OverallTmSec = OverallTmSec,
            AsnOther = isnull((select distinct 1 from SQLA_EmployeeCompliance as c2 where c2.PktNum = c.PktNum and c2.EmpNum <> c.EmpNum and c2.tAsnMin < c.tRspMin),0),
 		   s.ShiftName, ShiftOrder = s.ShiftColumn, CustTier, d.tOutHour, EvtDay = cast(c.tOut as date),
-	       MEALbkEntries = 0, MEALbkSignatures = 0, BreakCount = 0, BreakSecs = 0, RtaCardTmSec = isnull(c.RtaCardTmSec,0)
+	       MEALbkEntries = 0, MEALbkSignatures = 0, BreakCount = 0, BreakSecs = 0, RtaCardTmSec = isnull(c.RtaCardTmSec,0), d.Zone, d.AmtEvent,
+		   AcpTmSec = c.AcpTmSec
       FROM SQLA_EmployeeCompliance as c
 	 INNER JOIN SQLA_EventDetails as d
 	    ON d.PktNum = c.PktNum
@@ -147,7 +148,8 @@ BEGIN
            Asn = 0, Acp = 0, Rsp = 1, Cmp = 1, CmpMobile = 0, RejMan = 0, RejAuto = 0, RspRTA = 0, RspCard = 0, RspRTAandCard = 0, 
            RspTmSec = 0, OverallTmSec = DATEDIFF(second,j.tOut,j.tComplete), AsnOther = 0,
 		   s.ShiftName, ShiftOrder = s.ShiftColumn, CustTier = '', d.tOutHour, EvtDay = cast(d.tOut as date),
-	       MEALbkEntries = 0, MEALbkSignatures = 0, BreakCount = 0, BreakSecs = 0, RtaCardTmSec = 0
+	       MEALbkEntries = 0, MEALbkSignatures = 0, BreakCount = 0, BreakSecs = 0, RtaCardTmSec = 0, d.Zone, d.AmtEvent,
+		   AcpTmSec = null
 	  FROM SQLA_EventDetails_JPVER as j
 	 INNER JOIN SQLA_EventDetails as d
 	    ON d.PktNum = j.PktNum
@@ -169,7 +171,8 @@ BEGIN
 	       PktNum = ml.ParentEventID, evt.EventDisplay, Location = case when @UseAssetField = 1 then ml.Asset else ml.Location end,
            Asn = 0, Acp = 0, Rsp = 0, Cmp = 0, CmpMobile = 0, RejMan = 0, RejAuto = 0, RspRTA = 0, RspCard = 0, RspRTAandCard = 0, RspTmSec = 0, OverallTmSec = 0, AsnOther = 0,
 		   s.ShiftName, ShiftOrder = s.ShiftColumn, CustTier = evt.CustTierLevel, tOutHour = datepart(hour,ml.tOut), EvtDay = cast(ml.tOut as date),
-	       MEALbkEntries = 1, MEALbkSignatures = 0, BreakCount = 0, BreakSecs = 0, RtaCardTmSec = 0
+	       MEALbkEntries = 1, MEALbkSignatures = 0, BreakCount = 0, BreakSecs = 0, RtaCardTmSec = 0, ml.Zone, evt.AmtEvent,
+		   AcpTmSec = null
 	  FROM SQLA_MEAL as ml
 	 inner join SQLA_Employees as emp
 	    on emp.CardNum = ml.EmpNum
@@ -190,7 +193,8 @@ BEGIN
 	       PktNum = ml.ParentEventID, evt.EventDisplay, Location = case when @UseAssetField = 1 then ml.Asset else ml.Location end,
            Asn = 0, Acp = 0, Rsp = 0, Cmp = 0, CmpMobile = 0, RejMan = 0, RejAuto = 0, RspRTA = 0, RspCard = 0, RspRTAandCard = 0, RspTmSec = 0, OverallTmSec = 0, AsnOther = 0,
 		   s.ShiftName, ShiftOrder = s.ShiftColumn, CustTier = evt.CustTierLevel, tOutHour = datepart(hour,ml.tOut), EvtDay = cast(ml.tOut as date),
-	       MEALbkEntries = 0, MEALbkSignatures = 1, BreakCount = 0, BreakSecs = 0, RtaCardTmSec = 0
+	       MEALbkEntries = 0, MEALbkSignatures = 1, BreakCount = 0, BreakSecs = 0, RtaCardTmSec = 0, ml.Zone, evt.AmtEvent,
+		   AcpTmSec = null
 	  FROM SQLA_MEAL as ml
 	 inner join SQLA_Employees as emp
 	    on emp.CardNum = ml.EmpNumWitness1
@@ -211,7 +215,8 @@ BEGIN
 	       PktNum = ml.ParentEventID, evt.EventDisplay, Location = case when @UseAssetField = 1 then ml.Asset else ml.Location end,
            Asn = 0, Acp = 0, Rsp = 0, Cmp = 0, CmpMobile = 0, RejMan = 0, RejAuto = 0, RspRTA = 0, RspCard = 0, RspRTAandCard = 0, RspTmSec = 0, OverallTmSec = 0, AsnOther = 0,
 		   s.ShiftName, ShiftOrder = s.ShiftColumn, CustTier = evt.CustTierLevel, tOutHour = datepart(hour,ml.tOut), EvtDay = cast(ml.tOut as date),
-	       MEALbkEntries = 0, MEALbkSignatures = 1, BreakCount = 0, BreakSecs = 0, RtaCardTmSec = 0
+	       MEALbkEntries = 0, MEALbkSignatures = 1, BreakCount = 0, BreakSecs = 0, RtaCardTmSec = 0, ml.Zone, evt.AmtEvent,
+		   AcpTmSec = null
 	  FROM SQLA_MEAL as ml
 	 inner join SQLA_Employees as emp
 	    on emp.CardNum = ml.EmpNumWitness2
@@ -232,7 +237,8 @@ BEGIN
 	       PktNum = ml.ParentEventID, evt.EventDisplay, Location = case when @UseAssetField = 1 then ml.Asset else ml.Location end,
            Asn = 0, Acp = 0, Rsp = 0, Cmp = 0, CmpMobile = 0, RejMan = 0, RejAuto = 0, RspRTA = 0, RspCard = 0, RspRTAandCard = 0, RspTmSec = 0, OverallTmSec = 0, AsnOther = 0,
 		   s.ShiftName, ShiftOrder = s.ShiftColumn, CustTier = evt.CustTierLevel, tOutHour = datepart(hour,ml.tOut), EvtDay = cast(ml.tOut as date),
-	       MEALbkEntries = 0, MEALbkSignatures = 1, BreakCount = 0, BreakSecs = 0, RtaCardTmSec = 0
+	       MEALbkEntries = 0, MEALbkSignatures = 1, BreakCount = 0, BreakSecs = 0, RtaCardTmSec = 0, ml.Zone, evt.AmtEvent,
+		   AcpTmSec = null
 	  FROM SQLA_MEAL as ml
 	 inner join SQLA_Employees as emp
 	    on emp.CardNum = ml.EmpNumWitness3
@@ -253,7 +259,8 @@ BEGIN
 	       PktNum = ml.ParentEventID, evt.EventDisplay, Location = case when @UseAssetField = 1 then ml.Asset else ml.Location end,
            Asn = 0, Acp = 0, Rsp = 0, Cmp = 0, CmpMobile = 0, RejMan = 0, RejAuto = 0, RspRTA = 0, RspCard = 0, RspRTAandCard = 0, RspTmSec = 0, OverallTmSec = 0, AsnOther = 0,
 		   s.ShiftName, ShiftOrder = s.ShiftColumn, CustTier = evt.CustTierLevel, tOutHour = datepart(hour,ml.tOut), EvtDay = cast(ml.tOut as date),
-	       MEALbkEntries = 0, MEALbkSignatures = 1, BreakCount = 0, BreakSecs = 0, RtaCardTmSec = 0
+	       MEALbkEntries = 0, MEALbkSignatures = 1, BreakCount = 0, BreakSecs = 0, RtaCardTmSec = 0, ml.Zone, evt.AmtEvent,
+		   AcpTmSec = null
 	  FROM SQLA_MEAL as ml
 	 inner join SQLA_Employees as emp
 	    on emp.CardNum = ml.EmpNumWitness4
@@ -274,7 +281,8 @@ BEGIN
 	       PktNum = emp.PktNum, emp.EventDisplay, Location = '',
            Asn = 0, Acp = 0, Rsp = 0, Cmp = 0, CmpMobile = 0, RejMan = 0, RejAuto = 0, RspRTA = 0, RspCard = 0, RspRTAandCard = 0, RspTmSec = 0, OverallTmSec = 0, AsnOther = 0,
 		   s.ShiftName, ShiftOrder = s.ShiftColumn, CustTier = '', tOutHour = datepart(hour,emp.ActivityStart), EvtDay = cast(emp.ActivityStart as date),
-	       MEALbkEntries = 0, MEALbkSignatures = 0, BreakCount = 1, BreakSecs = ActivitySecs, RtaCardTmSec = 0
+	       MEALbkEntries = 0, MEALbkSignatures = 0, BreakCount = 1, BreakSecs = ActivitySecs, RtaCardTmSec = 0, Zone = '', AmtEvent = '',
+		   AcpTmSec = null
 	  FROM SQLA_EmployeeEventTimes as emp
 	  left join SQLA_ShiftHours as s
 	    ON s.StartHour = datepart(hour,emp.ActivityStart)

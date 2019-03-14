@@ -83,7 +83,10 @@ BEGIN
 		MEALbkSignatures int,
 		BreakCount int,
 		BreakSecs int,
-		RtaCardTmSec int
+		RtaCardTmSec int,
+		Zone nvarchar(255),
+		AmtEvent nvarchar(255),
+		AcpTmSec int
     )
 	
 	INSERT INTO dbo.#RTA_Compliance_Employee_Tmp EXEC dbo.sp_SSRS_Rpt_RTA_Compliance_Employee @StartDt=@StartDt1, @EndDt=@EndDt1, @EmpJobType=@EmpJobType1, @EventType=@EventType1, @AsnRspOnly=@AsnRspOnly1, @IncludeOOS=@IncludeOOS1, @IncludeEMPCARD=@IncludeEMPCARD1
