@@ -257,6 +257,7 @@ BEGIN
 					when l.EventState = 'EventMainButton' then 'Main Menu Button'
 					when l.EventState = 'EventAssignedRemove' then 'Event Assigned Remove'
 					when l.EventState = 'tReassignPrior' then 'Reassigned to Prior Event'
+					when l.EventState = 'tRespondBy' then 'Respond Dashboard'
 					else l.EventState end,
 			   EventDisplay = EventDisplay + case when EventDisplay = 'EMPCARD' and DeviceIDComplete is not null then ' ' + ltrim(rtrim(isnull(ResolutionDesc,'')))
 												  when EventDisplay in ('JKPT','PJ','JP','PROG') then ' ' + isnull(AmtEvent,'')
