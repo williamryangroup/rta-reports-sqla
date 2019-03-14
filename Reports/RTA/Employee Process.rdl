@@ -241,6 +241,18 @@
           <DataField>RtaCardTmSec</DataField>
           <rd:UserDefined>true</rd:UserDefined>
         </Field>
+        <Field Name="Zone">
+          <DataField>Zone</DataField>
+          <rd:UserDefined>true</rd:UserDefined>
+        </Field>
+        <Field Name="AmtEvent">
+          <DataField>AmtEvent</DataField>
+          <rd:UserDefined>true</rd:UserDefined>
+        </Field>
+        <Field Name="AcpTmSec">
+          <DataField>AcpTmSec</DataField>
+          <rd:UserDefined>true</rd:UserDefined>
+        </Field>
       </Fields>
     </DataSet>
     <DataSet Name="RTA_EmpJobTypes">
@@ -476,6 +488,9 @@ order by Setting desc</CommandText>
                 </TablixColumn>
                 <TablixColumn>
                   <Width>0.1in</Width>
+                </TablixColumn>
+                <TablixColumn>
+                  <Width>1in</Width>
                 </TablixColumn>
                 <TablixColumn>
                   <Width>1in</Width>
@@ -1925,6 +1940,49 @@ order by Setting desc</CommandText>
                     </TablixCell>
                     <TablixCell>
                       <CellContents>
+                        <Textbox Name="Textbox142">
+                          <CanGrow>true</CanGrow>
+                          <UserSort>
+                            <SortExpression>=iif(Sum(iif(Fields!RspTmSec.Value &gt; 0, 1, 0)) = 0, "00:00", right("00" &amp; int((Sum(Fields!RspTmSec.Value) / Sum(iif(Fields!RspTmSec.Value &gt; 0, 1, 0))) * 1 / 60), 2) &amp; ":" &amp; right("00" &amp; int((Sum(Fields!RspTmSec.Value) / Sum(iif(Fields!RspTmSec.Value &gt; 0, 1, 0))) * 1 Mod 60), 2))</SortExpression>
+                            <SortExpressionScope>Employee</SortExpressionScope>
+                          </UserSort>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value>Avg Acp</Value>
+                                  <Style>
+                                    <FontFamily>Tahoma</FontFamily>
+                                    <FontSize>11pt</FontSize>
+                                    <FontWeight>Bold</FontWeight>
+                                    <Color>White</Color>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style>
+                                <TextAlign>Center</TextAlign>
+                              </Style>
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>Textbox18</rd:DefaultName>
+                          <ToolTip>average time between assign and response</ToolTip>
+                          <Style>
+                            <Border>
+                              <Color>#7292cc</Color>
+                              <Style>Solid</Style>
+                            </Border>
+                            <BackgroundColor>#4c68a2</BackgroundColor>
+                            <PaddingLeft>2pt</PaddingLeft>
+                            <PaddingRight>2pt</PaddingRight>
+                            <PaddingTop>2pt</PaddingTop>
+                            <PaddingBottom>2pt</PaddingBottom>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                    <TablixCell>
+                      <CellContents>
                         <Textbox Name="Textbox18">
                           <CanGrow>true</CanGrow>
                           <UserSort>
@@ -1964,7 +2022,6 @@ order by Setting desc</CommandText>
                             <PaddingBottom>2pt</PaddingBottom>
                           </Style>
                         </Textbox>
-                        <rd:Selected>true</rd:Selected>
                       </CellContents>
                     </TablixCell>
                     <TablixCell>
@@ -3258,6 +3315,41 @@ order by Setting desc</CommandText>
                             </Paragraph>
                           </Paragraphs>
                           <rd:DefaultName>Textbox29</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Color>#e5e5e5</Color>
+                              <Style>Solid</Style>
+                            </Border>
+                            <PaddingLeft>2pt</PaddingLeft>
+                            <PaddingRight>2pt</PaddingRight>
+                            <PaddingTop>2pt</PaddingTop>
+                            <PaddingBottom>2pt</PaddingBottom>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                    <TablixCell>
+                      <CellContents>
+                        <Textbox Name="Textbox171">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value>=iif(Sum(iif(Fields!AcpTmSec.Value &gt; 0, 1, 0)) = 0, "00:00", right("00" &amp; int((Sum(Fields!AcpTmSec.Value) / Sum(iif(Fields!AcpTmSec.Value &gt; 0, 1, 0))) * 1 / 60), 2) &amp; ":" &amp; right("00" &amp; int((Sum(Fields!AcpTmSec.Value) / Sum(iif(Fields!AcpTmSec.Value &gt; 0, 1, 0))) * 1 Mod 60), 2))</Value>
+                                  <Style>
+                                    <FontFamily>Tahoma</FontFamily>
+                                    <Color>#4d4d4d</Color>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style>
+                                <TextAlign>Center</TextAlign>
+                              </Style>
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>Textbox19</rd:DefaultName>
                           <Style>
                             <Border>
                               <Color>#e5e5e5</Color>
@@ -4628,6 +4720,42 @@ order by Setting desc</CommandText>
                     </TablixCell>
                     <TablixCell>
                       <CellContents>
+                        <Textbox Name="Textbox208">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value>=iif(Sum(iif(Fields!AcpTmSec.Value &gt; 0, 1, 0)) = 0, "00:00", right("00" &amp; int((Sum(Fields!AcpTmSec.Value) / Sum(iif(Fields!AcpTmSec.Value &gt; 0, 1, 0))) * 1 / 60), 2) &amp; ":" &amp; right("00" &amp; int((Sum(Fields!AcpTmSec.Value) / Sum(iif(Fields!AcpTmSec.Value &gt; 0, 1, 0))) * 1 Mod 60), 2))</Value>
+                                  <Style>
+                                    <FontFamily>Tahoma</FontFamily>
+                                    <Color>#4d4d4d</Color>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style>
+                                <TextAlign>Center</TextAlign>
+                              </Style>
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>Textbox67</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Color>#c6daf8</Color>
+                              <Style>Solid</Style>
+                            </Border>
+                            <BackgroundColor>#9eb6e4</BackgroundColor>
+                            <PaddingLeft>2pt</PaddingLeft>
+                            <PaddingRight>2pt</PaddingRight>
+                            <PaddingTop>2pt</PaddingTop>
+                            <PaddingBottom>2pt</PaddingBottom>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                    <TablixCell>
+                      <CellContents>
                         <Textbox Name="Textbox92">
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
@@ -4671,7 +4799,7 @@ order by Setting desc</CommandText>
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=iif(Sum(iif(Fields!RspTmSec.Value&gt;0,1,0))=0,"00:00",right("00" &amp; int((Sum(Fields!RspTmSec.Value)/Sum(iif(Fields!RspTmSec.Value&gt;0,1,0))) * 1 / 60), 2) &amp; ":" &amp; right("00" &amp; int((Sum(Fields!RspTmSec.Value)/Sum(iif(Fields!RspTmSec.Value&gt;0,1,0))) * 1 Mod 60), 2))</Value>
+                                  <Value>=iif(Sum(iif(Fields!CmpTmSec.Value&gt;0,1,0))=0,"00:00",right("00" &amp; int((Sum(Fields!CmpTmSec.Value)/Sum(iif(Fields!CmpTmSec.Value&gt;0,1,0))) * 1 / 60), 2) &amp; ":" &amp; right("00" &amp; int((Sum(Fields!CmpTmSec.Value)/Sum(iif(Fields!CmpTmSec.Value&gt;0,1,0))) * 1 Mod 60), 2))</Value>
                                   <Style>
                                     <FontFamily>Tahoma</FontFamily>
                                     <Color>#4d4d4d</Color>
@@ -4811,6 +4939,11 @@ order by Setting desc</CommandText>
                 <TablixMember>
                   <Visibility>
                     <Hidden>=iif(Parameters!DistAvg.Value=1,TRUE,FALSE)</Hidden>
+                  </Visibility>
+                </TablixMember>
+                <TablixMember>
+                  <Visibility>
+                    <Hidden>=iif(Parameters!DistAvg.Value=0,TRUE,FALSE)</Hidden>
                   </Visibility>
                 </TablixMember>
                 <TablixMember>
@@ -5034,7 +5167,10 @@ order by Setting desc</CommandText>
             <DataSetName>RTA_Compliance_Employee</DataSetName>
             <Top>1.35833in</Top>
             <Height>0.75in</Height>
-            <Width>30.7in</Width>
+            <Width>31.7in</Width>
+            <Visibility>
+              <Hidden>=iif(Parameters!StartDt.Value &gt; Parameters!EndDt.Value, True, False)</Hidden>
+            </Visibility>
             <Style>
               <Border>
                 <Style>None</Style>
@@ -5386,15 +5522,51 @@ order by Setting desc</CommandText>
               <PaddingBottom>2pt</PaddingBottom>
             </Style>
           </Textbox>
+          <Textbox Name="Textbox95">
+            <CanGrow>true</CanGrow>
+            <KeepTogether>true</KeepTogether>
+            <Paragraphs>
+              <Paragraph>
+                <TextRuns>
+                  <TextRun>
+                    <Value>ERROR:  Invalid date parameters entered!</Value>
+                    <Style>
+                      <FontWeight>Bold</FontWeight>
+                      <Color>White</Color>
+                    </Style>
+                  </TextRun>
+                </TextRuns>
+                <Style />
+              </Paragraph>
+            </Paragraphs>
+            <rd:DefaultName>Textbox1</rd:DefaultName>
+            <Top>2.15in</Top>
+            <Height>0.25in</Height>
+            <Width>3.11458in</Width>
+            <ZIndex>10</ZIndex>
+            <Visibility>
+              <Hidden>=iif(Parameters!StartDt.Value &gt; Parameters!EndDt.Value, False, True)</Hidden>
+            </Visibility>
+            <Style>
+              <Border>
+                <Style>None</Style>
+              </Border>
+              <BackgroundColor>Red</BackgroundColor>
+              <PaddingLeft>2pt</PaddingLeft>
+              <PaddingRight>2pt</PaddingRight>
+              <PaddingTop>2pt</PaddingTop>
+              <PaddingBottom>2pt</PaddingBottom>
+            </Style>
+          </Textbox>
         </ReportItems>
-        <Height>2.10833in</Height>
+        <Height>2.4in</Height>
         <Style>
           <Border>
             <Style>None</Style>
           </Border>
         </Style>
       </Body>
-      <Width>30.7in</Width>
+      <Width>31.7in</Width>
       <Page>
         <PageFooter>
           <Height>0.45in</Height>
