@@ -58,7 +58,9 @@ CREATE PROCEDURE [dbo].[sp_SSRS_Rpt_RTA_EventDetails]
 	@IncludeEMPCARD int = 1,
 	@MinTrvSecs int = -1,
 	@MaxTrvSecs int = 0,
-	@NoBeepVib int = 0
+	@NoBeepVib int = 0,
+	@JpAmtMin float = 0,
+	@JpAmtMax float = 0
 
 AS
 BEGIN
@@ -85,6 +87,7 @@ BEGIN
 
 	DECLARE @UseCustName char(255) = isnull((select Setting from RTSS.dbo.SYSTEMSETTINGS where ConfigSection = 'REPORTS' and ConfigParam = 'UseCustNamesInReports'),'1')
 	DECLARE @UseEmpName char(255) = isnull((select Setting from RTSS.dbo.SYSTEMSETTINGS where ConfigSection = 'REPORTS' and ConfigParam = 'UseEmpNamesInReports'),'1')
+	DECLARE @UseAssetField char(255) = isnull((select case when Setting = 'Asset' then '1' else '0' end from RTSS.dbo.SYSTEMSETTINGS WITH (NOLOCK) where ConfigSection = 'RTSSHH' and ConfigParam = 'EventLocationOrAssetFieldName'),'0')
 
 	-- CREATE TABLE OF EventTypes
 	IF (EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES 
@@ -176,7 +179,7 @@ BEGIN
 			   tOut, 
 			   Customer = case when @UseCustName = '1' then CustName else CustNum end,
 			   CustTierLevel,
-			   Location,
+			   e.Location,
 			   EventDisplay = case when EventDisplay in ('JKPT','PJ','JP','PROG') then EventDisplay + ' ' + isnull(AmtEvent,'') else EventDisplay end,
 			   tAuthorize,
 			   tComplete,
@@ -198,7 +201,7 @@ BEGIN
 		                          when @UseEmpName = '1' and EmpNameCmp <> '' and empcmp.CardNum is null then EmpNameCmp
 								  else EmpNumCmp end,
 			   ResolutionDesc,
-			   Zone,
+			   e.Zone,
 			   CustNum,
 			   SupervisorAssign = case when EmpJobTypeAsn = 'Supervisor' and Reassign = 0 and ReassignSupervisor = 0 then 1 else 0 end,
 			   Reassign,
@@ -213,7 +216,10 @@ BEGIN
 			   tAsnInit = (select min(tAsn) from SQLA_EmployeeEventTimes as t where t.PktNum = e.PktNum),
 			   tReaInit = (select min(tRea) from SQLA_EmployeeEventTimes as t where t.PktNum = e.PktNum),
 			   tAcpInit = (select min(tAcp) from SQLA_EmployeeEventTimes as t where t.PktNum = e.PktNum),
-			   tRejInit = (select min(tRej) from SQLA_EmployeeEventTimes as t where t.PktNum = e.PktNum)
+			   tRejInit = (select min(tRej) from SQLA_EmployeeEventTimes as t where t.PktNum = e.PktNum),
+			   Asset = case when @UseAssetField = 1 then ltrim(rtrim(loc.Location)) else ltrim(rtrim(loc.Asset)) end,
+			   CustPriorityLevel = isnull(e.CustPriorityLevel,0),
+			   e.CompVarianceReason
 		  from SQLA_EventDetails as e
 		  left join SQLA_ShiftHours as s
 			on s.StartHour = tOutHour
@@ -226,13 +232,14 @@ BEGIN
 		    on emprsp.CardNum = e.EmpNumRsp
 		  left join SQLA_Employees as empcmp
 		    on empcmp.CardNum = e.EmpNumCmp
-			
-		   
+		  left join SQLA_Locations as loc
+		    on (    (@UseAssetField = 0 and loc.Location = e.Location)
+			     or (@UseAssetField = 1 and loc.Asset = e.Location) )
 		 where (    (     @FromReport not in ('Executive Scorecard Employee Activity','Supervisor Review','Employee Process')
 		              and tOut >= @StartDt1 and tOut < @EndDt1
 		              and (TotSecs*1.0/60.0) <= @MaxCmpMins1
 		              and (EventDisplay in (select EventType from #RTA_Compliance_EventTypes) or @EventType1 is null or @EventType1 = '')
-		              and (Zone in (select ZoneArea from #RTA_Compliance_ZoneAreas) or @ZoneArea1 is null or @ZoneArea1 = '')
+		              and (e.Zone in (select ZoneArea from #RTA_Compliance_ZoneAreas) or @ZoneArea1 is null or @ZoneArea1 = '')
 		              and (    (CustTierLevel in (select CustTier from #RTA_Compliance_CustTiers))
 				            or (CustTierLevel = '' and 'NUL' in (select CustTier from #RTA_Compliance_CustTiers))
 				            or (@CustTier1 is null or @CustTier1 = ''))
@@ -245,9 +252,9 @@ BEGIN
 		              and ((@MaxCmpSecs = 0) or (CmpSecs < @MaxCmpSecs))
 		              and ((@MinOverallMins1 = 0) or (TotSecs >= @MinOverallMins1 * 60))
 		              and ((@ResDesc1 = 0) or (@ResDesc1 = ResolutionDescID))
-		              and ((@Location = '') or (@Location = Location) or (@Location = 'All') or (@Location = ' All'))
+		              and ((@Location = '') or (@Location = e.Location) or (@Location = 'All') or (@Location = ' All'))
 		              and ((@Hour is null) or (@Hour = tOutHour))
-		              and ((@Shift is null) or (@Shift = ShiftColumn))
+		              and ((@Shift is null) or (@Shift = -1) or (@Shift = ShiftColumn))
 		              and ((@EmpCmpAsnTaken = 0) or (@EmpCmpAsnTaken = AsnTakeID))
 		              and ((@EmpCmpJobType = '') or (@EmpCmpJobType = 'All') or (@EmpCmpJobType = EmpJobTypeCmp))
 		              and ((@FromZoneArea = '') or (@FromZoneArea = 'All') or (@FromZoneArea = FromZone) or ((FromZone is null or FromZone = '') and @FromZoneArea = e.Zone))
@@ -256,6 +263,7 @@ BEGIN
 		              and ((@EmpComplete1 = '') or (@EmpComplete1 = EmpNameCmp) or (@EmpComplete1 = EmpNumCmp))
 		              and ((@IncludeOOS = 0 and EventDisplay not in ('OOS','10 6')) or (@IncludeOOS = 1))
 		              and ((@IncludeEMPCARD = 0 and EventDisplay not in ('EMPCARD')) or (@IncludeEMPCARD = 1))
+					  and ((@JpAmtMin = 0) or (AmtEvent >= @JpAmtMin)) and ((@JpAmtMax = 0) or (AmtEvent < @JpAmtMax))
 					  and (      @NoBeepVib = 0
 							or (     @NoBeepVib = 1
 								 and exists (select null from SQLA_FloorActivity as f where f.PktNum = e.PktNum and f.ActivityTypeID = 5 and f.State in ('Assign','Assign Supervisor','Re-assign','Reassign Attendant','Reassign Supervisor'))
@@ -289,9 +297,10 @@ BEGIN
 										           and EventDisplay = @EmpActEvtDisplay
 										           and Stat = @EmpActStat))
 		                    or (     (@EmpActStat <> 'OOS' or @EmpActStat = '')
-							     and e.PktNum in (select PktNum from #RTA_EventDetails_ExecSum_Emp2_Tmp
+							     and (e.EventDisplay in (select EventType from #RTA_Compliance_EventTypes) or @EventType1 is null or @EventType1 = '')
+								 and e.PktNum in (select PktNum from #RTA_EventDetails_ExecSum_Emp2_Tmp
 					                               where (EmpNum = @EmpActEmpNum or @EmpActEmpNum='')
-										             and (EventDisplay = @EmpActEvtDisplay)
+										             --and (EventDisplay = @EmpActEvtDisplay)
 										             and (Stat = @EmpActStat or @EmpActStat='')) ) ) ) ) ) as d
 		 where ((@MinTrvSecs = -1) or (d.tAuthorize is not null and d.tAcpInit <= d.tAuthorize and DATEDIFF(second,d.tAcpInit,d.tAuthorize) >= @MinTrvSecs))
 		   and ((@MaxTrvSecs = 0) or (d.tAuthorize is not null and d.tAcpInit <= d.tAuthorize and DATEDIFF(second,d.tAcpInit,d.tAuthorize) < @MaxTrvSecs))
@@ -309,7 +318,7 @@ BEGIN
 			   tOut, 
 			   Customer = case when @UseCustName = '1' then CustName else CustNum end,
 			   CustTierLevel,
-			   Location,
+			   e.Location,
 			   EventDisplay = case when EventDisplay in ('JKPT','PJ','JP','PROG') then EventDisplay + ' ' + isnull(AmtEvent,'') else EventDisplay end,
 			   tAuthorize,
 			   tComplete,
@@ -325,7 +334,7 @@ BEGIN
 			   EmpRespond = case when @UseEmpName = '1' then EmpNameRsp else EmpNumRsp end,
 			   EmpComplete = case when @UseEmpName = '1' then EmpNameCmp else EmpNumCmp end,
 			   ResolutionDesc,
-			   Zone,
+			   e.Zone,
 			   CustNum,
 			   SupervisorAssign = case when EmpJobTypeAsn = 'Supervisor' and Reassign = 0 and ReassignSupervisor = 0 then 1 else 0 end,
 			   Reassign,
@@ -340,10 +349,16 @@ BEGIN
 			   tAsnInit = (select min(tAsn) from SQLA_EmployeeEventTimes as t where t.PktNum = e.PktNum),
 			   tReaInit = (select min(tRea) from SQLA_EmployeeEventTimes as t where t.PktNum = e.PktNum),
 			   tAcpInit = (select min(tAcp) from SQLA_EmployeeEventTimes as t where t.PktNum = e.PktNum),
-			   tRejInit = (select min(tRej) from SQLA_EmployeeEventTimes as t where t.PktNum = e.PktNum)
+			   tRejInit = (select min(tRej) from SQLA_EmployeeEventTimes as t where t.PktNum = e.PktNum),
+			   Asset = case when @UseAssetField = 1 then ltrim(rtrim(loc.Location)) else ltrim(rtrim(loc.Asset)) end,
+			   CustPriorityLevel = isnull(e.CustPriorityLevel,0),
+			   e.CompVarianceReason
 		  from SQLA_EventDetails as e
 		  left join SQLA_ShiftHours as s
-			on s.StartHour = tOutHour ) as d
+			on s.StartHour = tOutHour
+		  left join SQLA_Locations as loc
+		    on (    (@UseAssetField = 0 and loc.Location = e.Location)
+			     or (@UseAssetField = 1 and loc.Asset = e.Location) ) ) as d
 		 order by tOut desc
 	END
 END

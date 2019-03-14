@@ -35,7 +35,7 @@ BEGIN
 	DECLARE @ProcessTilt int = isnull((select cast(Setting as int) from RTSS.dbo.SYSTEMSETTINGS WITH (NOLOCK) where ConfigSection = 'MGAM' and ConfigParam = 'ProcessTilt'),1)
 	DECLARE @FeedType char(255) = isnull((select Setting from RTSS.dbo.SYSTEMSETTINGS WITH (NOLOCK) where ConfigSection = 'SYSTEM' and ConfigParam = 'FeedType'),'')
 	
-	insert into SQLA_EventDetails (PktNum, tOut, tOutHour, CustNum, CustName, CustTierLevel, CustPriorityLevel, Location, Zone, EventDisplay, tAssign, tAccept, tAuthorize, tComplete, CompCode, HasReject, EmpNumAsn, EmpNameAsn, EmpNumRsp, EmpNameRsp, EmpNumCmp, EmpNameCmp, RspRTA, RspCard, CmpMobile, CmpGame, CmpWS, ResolutionDescID, ResolutionDesc, Reassign, ReassignSupervisor, FromZone, EmpJobTypeAsn, EmpJobTypeRsp, EmpJobTypeCmp, RspSecs, CmpSecs, TotSecs, AsnTakeID, AsnTake, SourceTable, AmtEvent)
+	insert into SQLA_EventDetails (PktNum, tOut, tOutHour, CustNum, CustName, CustTierLevel, CustPriorityLevel, Location, Zone, EventDisplay, tAssign, tAccept, tAuthorize, tComplete, CompCode, HasReject, EmpNumAsn, EmpNameAsn, EmpNumRsp, EmpNameRsp, EmpNumCmp, EmpNameCmp, RspRTA, RspCard, CmpMobile, CmpGame, CmpWS, ResolutionDescID, ResolutionDesc, Reassign, ReassignSupervisor, FromZone, EmpJobTypeAsn, EmpJobTypeRsp, EmpJobTypeCmp, RspSecs, CmpSecs, TotSecs, AsnTakeID, AsnTake, SourceTable, AmtEvent, CompVarianceReason)
 	select PktNum,
 	       tOut,
 	       tOutHour,
@@ -78,7 +78,7 @@ BEGIN
 	                      when (d.EmpNumAsn is not null and d.EmpNumAsn <> '') and ((d.EmpNumAsn = d.EmpNumRsp) or (d.EmpNumRsp is null or d.EmpNumRsp = '')) and (DATEDIFF(millisecond,d.tAssign,d.tAuthorize) >= 1000) then 1 else 2 end,
 	       AsnTake = case when (d.EmpNumAsn is null or d.EmpNumAsn = '') and (d.EmpNumRsp is null or d.EmpNumRsp = '') then 'Cmp'
 	                      when (d.EmpNumAsn is not null and d.EmpNumAsn <> '') and ((d.EmpNumAsn = d.EmpNumRsp) or (d.EmpNumRsp is null or d.EmpNumRsp = '')) and (DATEDIFF(millisecond,d.tAssign,d.tAuthorize) >= 1000) then 'Asn' else 'Take' end,
-	       SourceTable = 'EVENT1', AmtEvent
+	       SourceTable = 'EVENT1', AmtEvent, CompVarianceReason
 	  from (
 	select distinct e.PktNum, e.tOut, tOutHour = DATEPART(HOUR,e.tOut),
 		   CustNum,
@@ -126,7 +126,8 @@ BEGIN
 		   Reassign = case when tReassign is null or tReassign = '' then 0 else 1 end,
 		   ReassignSupervisor = case when tReassignSupervisor is null or tReassignSupervisor = '' then 0 else 1 end,
 		   FromZone = e.AssocArea,
-		   e.AmtEvent
+		   e.AmtEvent,
+		   e.CompVarianceReason
 	  from RTSS.dbo.EVENT4 as e WITH (NOLOCK)
 	  left join SQLA_FloorActivity as l WITH (NOLOCK)
 	    on l.PktNum = e.PktNum

@@ -78,7 +78,18 @@ BEGIN
 		EmpCmpJobType varchar(255),
 		FromZone varchar(255),
 		HasReject int,
-		RspType varchar(255)
+		RspType varchar(255),
+		tAsnInit datetime,
+		tReaInit datetime,
+		tAcpInit datetime,
+		tRejInit datetime,
+		Asset varchar(255),
+		CustPriorityLevel varchar(255),
+		CompVarianceReason varchar(50),
+		AsnSecs int,
+		ReaSecs int,
+		AcpSecs int,
+		RejSecs int
 	)
 		
 	INSERT INTO dbo.#RTA_EventDetails_Tmp EXEC dbo.sp_SSRS_Rpt_RTA_EventDetails @StartDt1, @EndDt1, @MaxCmpMins1, @EventType1, @ZoneArea1, @CustTier1, @CustNum1, @MinRspMins1, @MinCmpMins1, @MinOverallMins1, @ResDesc1
