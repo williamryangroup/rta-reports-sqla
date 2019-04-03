@@ -396,60 +396,71 @@ BEGIN
 	BEGIN
 		-- EVENT_STATE_LOG1
 		insert into SQLA_FloorActivity
-		select distinct l.tEventState, 5,
-			   case when l.EventState = 'tAuthorize' and l.PktNumEventState is not null then 'Authorize Card In'
-					when l.EventState = 'tAuthorize' and l.PktNumEventState is null and EmpName <> 'RTSSGUI' then 'Authorize Mobile'
-					when l.EventState = 'tAuthorize' and EmpName = 'RTSSGUI' then 'Authorize Workstation'
-					when l.EventState = 'tInitialResponse' then 'Initial Response'
-					when l.EventState = 'tRespondMobile' then 'Respond Mobile'
-					when l.EventState = 'tReassign' then 'Re-assign'
-					when l.EventState = 'tRejectAuto' then 'Reject Auto'
-					when l.EventState = 'tComplete' then 'Complete'
-					when l.EventState = 'tReject' and l.EmpName = @ServerIP then 'Reject Auto Server'
-					when l.EventState = 'tReject' and l.EmpName <> @ServerIP and l.DeviceID = l.EventStateSource then 'Reject Manual'
-					when l.EventState = 'tReject' and l.EmpName <> @ServerIP and l.DeviceID <> l.EventStateSource then 'Reject'
-					when l.EventState = 'tOut' then 'RTSS Open'
-					when l.EventState = 'tDisplayMobile' then 'Event Display Mobile'
-					when l.EventState = 'tAcceptMobile' then 'Accept Mobile'
-					when l.EventState = 'tRemove' then 'Remove'
-					when l.EventState = 'tAssign' then 'Assign'
-					when l.EventState = 'tDisplay' then 'Display Workstation'
-					when l.EventState = 'tAssignSupervisor' then 'Assign Supervisor'
-					when l.EventState = 'tReassignAttendant' then 'Reassign Attendant'
-					when l.EventState = 'tReassignSupervisor' then 'Reassign Supervisor'
-					when l.EventState = 'tReassignRemove' then 'Reassign Remove'
-					when l.EventState = 'tRejectRA' and l.DeviceID = l.EventStateSource then 'Reassign Reject Manual'
-					when l.EventState = 'tRejectRA' and l.DeviceID <> l.EventStateSource then 'Reassign Reject Auto'
-					when l.EventState = 'tRejectRASupervisor' then 'Reassign Supervisor Reject'
-					when l.EventState = 'tRejectAutoServer' then 'Reject Auto Server'
-					when l.EventState = 'tRejectAutoDevice' then 'Reject Auto Device'
-					when l.EventState = 'tReassignDisplayed' then 'Display Reassign Popup'
-					when l.EventState = 'EventMainButton' then 'Main Menu Button'
-					when l.EventState = 'EventAssignedRemove' then 'Event Assigned Remove'
-					when l.EventState = 'tReassignPrior' then 'Reassigned to Prior Event'
-					when l.EventState = 'tJackpotVerify' then 'Jackpot Verify'
-					when l.EventState = 'tRespondBy' then 'Respond Dashboard'
-					else l.EventState end,
-			   EventDisplay = EventDisplay + case when EventDisplay = 'EMPCARD' and DeviceIDComplete is not null then ' ' + ltrim(rtrim(isnull(ResolutionDesc,'')))
-												  when EventDisplay in ('JKPT','PJ','JP','PROG') then ' ' + isnull(AmtEvent,'')
-												  else '' end,
-		       case when @UseAssetAsLocation = 1 then e.Asset else e.Location end, Zone,
-			   l.PktNum, e.CustTierLevel, l.EmpNum, l.EmpName,
-			   case when l.PktNumEventState is not null and l.PktNumEventState <> 0 then cast(l.PktNumEventState as varchar)
-			        when (l.PktNumEventState is null or l.PktNumEventState = 0) and l.EventStateSource is not null then l.EventStateSource
-			        else l.DeviceID end,
-			   Description =  case when l.EventState = 'tReject' and l.EmpName <> @ServerIP and l.DeviceID = l.EventStateSource then 'MANUAL REJECT' else '' end,
-			   RejAfterDisp = case when l.EventState = 'tReject' and l.EmpName <> @ServerIP and l.DeviceID = l.EventStateSource then
-							  isnull((select distinct 'Y' from RTSS.dbo.EVENT_STATE_LOG1 as l2 WITH (NOLOCK)
-									   where l2.PktNum = l.PktNum and l2.EventTable = 'EVENT'
-										 and l2.EmpNum = l.EmpNum
-										 and l2.tEventState < l.tEventState
-										 and l2.EventState = 'tDisplayMobile'),'N')
-							  else '' end,
-			   'EVENT_STATE_LOG1', l.SEQ, '', '', ''
+    select distinct l.tEventState,
+           5,
+           case when l.EventState = 'tAuthorize' and l.PktNumEventState is not null then 'Authorize Card In'
+                when l.EventState = 'tAuthorize' and l.PktNumEventState is null and EmpName <> 'RTSSGUI' then 'Authorize Mobile'
+                when l.EventState = 'tAuthorize' and EmpName = 'RTSSGUI' then 'Authorize Workstation'
+                when l.EventState = 'tInitialResponse' then 'Initial Response'
+                when l.EventState = 'tRespondMobile' then 'Respond Mobile'
+                when l.EventState = 'tReassign' then 'Re-assign'
+                when l.EventState = 'tRejectAuto' then 'Reject Auto'
+                when l.EventState = 'tComplete' then 'Complete'
+                when l.EventState = 'tReject' and l.EmpName = @ServerIP then 'Reject Auto Server'
+                when l.EventState = 'tReject' and l.EmpName <> @ServerIP and l.DeviceID = l.EventStateSource then 'Reject Manual'
+                when l.EventState = 'tReject' and l.EmpName <> @ServerIP and l.DeviceID <> l.EventStateSource then 'Reject'
+                when l.EventState = 'tOut' then 'RTSS Open'
+                when l.EventState = 'tDisplayMobile' then 'Event Display Mobile'
+                when l.EventState = 'tAcceptMobile' then 'Accept Mobile'
+                when l.EventState = 'tRemove' then 'Remove'
+                when l.EventState = 'tAssign' then 'Assign'
+                when l.EventState = 'tDisplay' then 'Display Workstation'
+                when l.EventState = 'tAssignSupervisor' then 'Assign Supervisor'
+                when l.EventState = 'tReassignAttendant' then 'Reassign Attendant'
+                when l.EventState = 'tReassignSupervisor' then 'Reassign Supervisor'
+                when l.EventState = 'tReassignRemove' then 'Reassign Remove'
+                when l.EventState = 'tRejectRA' and l.DeviceID = l.EventStateSource then 'Reassign Reject Manual'
+                when l.EventState = 'tRejectRA' and l.DeviceID <> l.EventStateSource then 'Reassign Reject Auto'
+                when l.EventState = 'tRejectRASupervisor' then 'Reassign Supervisor Reject'
+                when l.EventState = 'tRejectAutoServer' then 'Reject Auto Server'
+                when l.EventState = 'tRejectAutoDevice' then 'Reject Auto Device'
+                when l.EventState = 'tReassignDisplayed' then 'Display Reassign Popup'
+                when l.EventState = 'EventMainButton' then 'Main Menu Button'
+                when l.EventState = 'EventAssignedRemove' then 'Event Assigned Remove'
+                when l.EventState = 'tReassignPrior' then 'Reassigned to Prior Event'
+                when l.EventState = 'tJackpotVerify' then 'Jackpot Verify'
+                when l.EventState = 'tRespondBy' then 'Respond Dashboard'
+                else l.EventState end,
+           EventDisplay = EventDisplay + 
+                          case when EventDisplay = 'EMPCARD' and DeviceIDComplete is not null then ' ' + ltrim(rtrim(isnull(ResolutionDesc,'')))
+												       when EventDisplay in ('JKPT','PJ','JP','PROG') then ' ' + isnull(AmtEvent,'')
+												       else '' end,
+           case when @UseAssetAsLocation = 1 then e.Asset else e.Location end,
+           Zone,
+           l.PktNum,
+           e.CustTierLevel,
+           l.EmpNum,
+           l.EmpName,
+           case when l.PktNumEventState is not null and l.PktNumEventState <> 0 then cast(l.PktNumEventState as varchar)
+			          when (l.PktNumEventState is null or l.PktNumEventState = 0) and l.EventStateSource is not null then l.EventStateSource
+			          else l.DeviceID end,
+           Description =  case when l.EventState = 'tReject' and l.EmpName <> @ServerIP and l.DeviceID = l.EventStateSource then 'MANUAL REJECT'
+                               else '' end,
+           RejAfterDisp = case when l.EventState = 'tReject' and l.EmpName <> @ServerIP and l.DeviceID = l.EventStateSource
+                               then isnull((select distinct 'Y' from RTSS.dbo.EVENT_STATE_LOG1 as l2 WITH (NOLOCK)
+									                           where l2.PktNum = l.PktNum and l2.EventTable = 'EVENT'
+										                           and l2.EmpNum = l.EmpNum
+										                           and l2.tEventState < l.tEventState
+										                           and l2.EventState = 'tDisplayMobile'),'N')
+                               else '' end,
+           'EVENT_STATE_LOG1',
+           l.SEQ,
+           '',
+           '',
+           ''
 		  from RTSS.dbo.EVENT_STATE_LOG1 as l WITH (NOLOCK)
 		 inner join RTSS.dbo.EVENT4 as e WITH (NOLOCK)
-			on e.PktNum = l.PktNum and l.EventTable = 'EVENT'
+			  on e.PktNum = l.PktNum and l.EventTable = 'EVENT'
 		 where l.tEventState is not null and e.EventDisplay not in ('OOS','10 6')
 		   and EventState not in ('tRecd','tOut','tDisplay','tInitialResponse','tRemove','tComplete','tRejectAuto')
 		   and l.SEQ in (select SEQ from SQLA_New_SEQ)
@@ -713,8 +724,8 @@ BEGIN
 	       EmpName = er.EmpNameReject,
 	       Source = er.DeviceIDReject,
 	       Description = er.RejectReason,
-		   AfterDisplay = case when l.PktNum is null then 'N' else 'Y' end,
-		   'EVENTREJECT1', er.PktNum, '', '', ''
+         AfterDisplay = case when l.PktNum is null then 'N' else 'Y' end,
+         'EVENTREJECT1', er.PktNum, '', '', ''
 	  from RTSS.dbo.EVENTREJECT1 as er WITH (NOLOCK)
 	 inner join RTSS.dbo.EVENT4 as ev WITH (NOLOCK)
 		on ev.PktNum = er.PktNum
@@ -745,8 +756,8 @@ BEGIN
 	       EmpName = er.EmpNameReject,
 	       Source = er.DeviceIDReject,
 	       Description = er.RejectReason,
-		   AfterDisplay = case when l.PktNum is null then 'N' else 'Y' end,
-		   'EVENTREJECT', er.PktNum, '', '', ''
+         AfterDisplay = case when l.PktNum is null then 'N' else 'Y' end,
+         'EVENTREJECT', er.PktNum, '', '', ''
 	  from RTSS.dbo.EVENTREJECT as er WITH (NOLOCK)
 	 inner join RTSS.dbo.EVENT4 as ev WITH (NOLOCK)
 		on ev.PktNum = er.PktNum
@@ -777,8 +788,8 @@ BEGIN
 	       EmpName = er.EmpNameAuthorize,
 	       Source = ev.RejPktNum,
 	       Description = 'EMPCARD REMOVE',
-		   AfterDisplay = case when l.PktNum is null then 'N' else 'Y' end,
-		   'EVENT1', er.PktNum, '', '', ''
+         AfterDisplay = case when l.PktNum is null then 'N' else 'Y' end,
+         'EVENT1', er.PktNum, '', '', ''
 	  from RTSS.dbo.EVENT4 as er WITH (NOLOCK)
 	 inner join (select RejPktNum = cast(left(right(rtrim([DESC]), LEN([DESC])-18), len(RIGHT(rtrim([DESC]),LEN([DESC])-18))-1) as int),
 	                    PktNum, Asset, Location, EventDisplay, CustTierLevel, Zone

@@ -92,7 +92,7 @@ BEGIN
 		                   when @UseEmpName = '1' and emp.CardNum is null then EmpName
 		                   else er.EmpNum end,
 		   Reason = case when [Description] is null or [Description] = '' then State else [Description] end,
-		   AfterDisplay = er.RejAfterDisp								 
+		   AfterDisplay = case when er.RejAfterDisp	is null or er.RejAfterDisp = '' then 'N' else er.RejAfterDisp end
 	  from SQLA_FloorActivity as er
 	  left join SQLA_Employees as emp
 	    on emp.CardNum = er.EmpNum
