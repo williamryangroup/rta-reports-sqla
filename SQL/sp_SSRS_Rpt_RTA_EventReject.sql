@@ -100,7 +100,13 @@ BEGIN
 	   and er.ActivityTypeID = 5
 	   and er.State like '%Reject%'
 	   and Source <> 'RTSSPPE'
-	   and (er.Activity in (select EventType from #RTA_Compliance_EventTypes) or @EventType is null or @EventType = '')
+	   and (    @EventType is null or @EventType = ''
+           or er.Activity in (select EventType from #RTA_Compliance_EventTypes)
+           or er.Activity like 'JKPT %' and 'JKPT' in (select EventType from #RTA_Compliance_EventTypes)
+           or er.Activity like 'PROG %' and 'PROG' in (select EventType from #RTA_Compliance_EventTypes)
+           or er.Activity like 'PJ %' and 'PJ' in (select EventType from #RTA_Compliance_EventTypes)
+           or er.Activity like 'JP %' and er.Activity <> 'JP VER' and 'JP' in (select EventType from #RTA_Compliance_EventTypes)
+         )
 	   and (er.Zone in (select ZoneArea from #RTA_Compliance_ZoneAreas) or @ZoneArea is null or @ZoneArea = '')
 	   and (    (er.Tier in (select CustTier from #RTA_Compliance_CustTiers))
 	         or (er.Tier = '' and 'NUL' in (select CustTier from #RTA_Compliance_CustTiers))
