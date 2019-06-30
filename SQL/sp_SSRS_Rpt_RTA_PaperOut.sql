@@ -35,18 +35,18 @@ BEGIN
 	
 	-- CREATE TABLE OF ZoneAreas
 	IF (EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES 
-                 WHERE TABLE_SCHEMA = 'dbo' 
-                   AND TABLE_NAME = '#RTA_Compliance_ZoneAreas'))
-    BEGIN
-		drop table dbo.#RTA_Compliance_ZoneAreas;
-    END    
+               WHERE TABLE_SCHEMA = 'dbo' 
+                 AND TABLE_NAME = '#RTA_Compliance_ZoneAreas'))
+  BEGIN
+	 drop table dbo.#RTA_Compliance_ZoneAreas;
+  END    
     
-    create table #RTA_Compliance_ZoneAreas (
-		ZoneArea nvarchar(4) NOT NULL PRIMARY KEY
-    )
+  create table #RTA_Compliance_ZoneAreas (
+    ZoneArea nvarchar(4) NOT NULL PRIMARY KEY
+  )
     
-    insert into #RTA_Compliance_ZoneAreas (ZoneArea)
-    select distinct left(ltrim(rtrim(val)),4) from dbo.fn_String_To_Table(@ZoneArea, ',', 1)
+  insert into #RTA_Compliance_ZoneAreas (ZoneArea)
+  select distinct left(ltrim(rtrim(val)),4) from dbo.fn_String_To_Table(@ZoneArea, ',', 1)
 
 	
 	SELECT d.EventDisplay, d.tOut, d.Zone, d.Location, d.tAssign, d.EmpNumAsn, d.EmpNameAsn, d.tComplete

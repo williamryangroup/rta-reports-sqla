@@ -39,17 +39,15 @@ BEGIN
 	WHILE LEN(@String) > 0
 	BEGIN
 		SET @Val = LEFT(@String, ISNULL(NULLIF(CHARINDEX(@Delimeter, @String) - 1, -1), LEN(@String)))
-        SET @String = SUBSTRING(@String, ISNULL(NULLIF(CHARINDEX(@Delimeter, @String), 0), LEN(@String)) + 1, LEN(@String))
+    SET @String = SUBSTRING(@String, ISNULL(NULLIF(CHARINDEX(@Delimeter, @String), 0), LEN(@String)) + 1, LEN(@String))
 		
 		IF @TrimSpace = 1 Set @Val = LTRIM(RTRIM(@Val))
 		
 		INSERT INTO @Table ( [Val] ) VALUES ( @Val )
-    END
-
+    
+  END
 	RETURN 
+
 END
 
-
 GO
-
-
